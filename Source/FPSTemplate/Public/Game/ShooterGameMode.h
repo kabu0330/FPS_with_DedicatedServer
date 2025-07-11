@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameLiftServerSDK.h"
 #include "ShooterGameModeBase.h"
 //#include "GameLiftServerSDK.h"
 #include "ShooterGameMode.generated.h"
@@ -24,6 +25,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	void BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule);
+	void ParesCommandLinePort();
 
 private:
 	void InitGameLift();

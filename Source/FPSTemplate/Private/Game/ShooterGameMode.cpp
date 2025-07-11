@@ -45,22 +45,13 @@ void AShooterGameMode::InitGameLift()
 
     // Getting the module first.
     FGameLiftServerSDKModule* GameLiftSdkModule = &FModuleManager::LoadModuleChecked<FGameLiftServerSDKModule>(FName("GameLiftServerSDK"));
-
+    if (GameLiftSdkModule)
+    {
+        UE_LOG(LogShooterGameMode, Log, TEXT("GameLiftServerSDK Load succeeded"));
+    }
     //Define the server parameters for a GameLift Anywhere fleet. These are not needed for a GameLift managed EC2 fleet.
     FServerParameters ServerParametersForAnywhere;
-
-    bool bIsAnywhereActive = false;
-    if (FParse::Param(FCommandLine::Get(), TEXT("glAnywhere")))
-    {
-        bIsAnywhereActive = true;
-    }
-
-    if (bIsAnywhereActive)
-    {
-        UE_LOG(LogShooterGameMode, Log, TEXT("Configuring server parameters for Anywhere..."));
-
-        SetServerParameters(ServerParametersForAnywhere);
-    }
+    SetServerParameters(ServerParametersForAnywhere);
 
     UE_LOG(LogShooterGameMode, Log, TEXT("Initializing the GameLift Server..."));
 
@@ -82,59 +73,9 @@ void AShooterGameMode::InitGameLift()
         return;
     }
 
-    ProcessParameters = MakeShared<FProcessParameters>();
+    BindCallback(GameLiftSdkModule);
 
-    //When a game session is created, Amazon GameLift Servers sends an activation request to the game server and passes along the game session object containing game properties and other settings.
-    //Here is where a game server should take action based on the game session object.
-    //Once the game server is ready to receive incoming player connections, it should invoke GameLiftServerAPI.ActivateGameSession()
-    ProcessParameters->OnStartGameSession.BindLambda([=](Aws::GameLift::Server::Model::GameSession InGameSession)
-        {
-            FString GameSessionId = FString(InGameSession.GetGameSessionId());
-            UE_LOG(LogShooterGameMode, Log, TEXT("GameSession Initializing: %s"), *GameSessionId);
-            GameLiftSdkModule->ActivateGameSession();
-        });
-
-    //OnProcessTerminate callback. Amazon GameLift Servers will invoke this callback before shutting down an instance hosting this game server.
-    //It gives this game server a chance to save its state, communicate with services, etc., before being shut down.
-    //In this case, we simply tell Amazon GameLift Servers we are indeed going to shutdown.
-    ProcessParameters->OnTerminate.BindLambda([=]()
-        {
-            UE_LOG(LogShooterGameMode, Log, TEXT("Game Server Process is terminating"));
-            GameLiftSdkModule->ProcessEnding();
-        });
-
-    //This is the HealthCheck callback.
-    //Amazon GameLift Servers will invoke this callback every 60 seconds or so.
-    //Here, a game server might want to check the health of dependencies and such.
-    //Simply return true if healthy, false otherwise.
-    //The game server has 60 seconds to respond with its health status. Amazon GameLift Servers will default to 'false' if the game server doesn't respond in time.
-    //In this case, we're always healthy!
-    ProcessParameters->OnHealthCheck.BindLambda([]()
-        {
-            UE_LOG(LogShooterGameMode, Log, TEXT("Performing Health Check"));
-            return true;
-        });
-
-    //GameServer.exe -port=7777 LOG=server.mylog
-    ProcessParameters->port = FURL::UrlConfig.DefaultPort;
-    TArray<FString> CommandLineTokens;
-    TArray<FString> CommandLineSwitches;
-
-    FCommandLine::Parse(FCommandLine::Get(), CommandLineTokens, CommandLineSwitches);
-
-    for (FString SwitchStr : CommandLineSwitches)
-    {
-        FString Key;
-        FString Value;
-
-        if (SwitchStr.Split("=", &Key, &Value))
-        {
-            if (Key.Equals("port"))
-            {
-                ProcessParameters->port = FCString::Atoi(*Value);
-            }
-        }
-    }
+    ParesCommandLinePort();
 
     //Here, the game server tells Amazon GameLift Servers where to find game session log files.
     //At the end of a game session, Amazon GameLift Servers uploads everything in the specified 
@@ -168,23 +109,41 @@ void AShooterGameMode::InitGameLift()
 
 void AShooterGameMode::SetServerParameters(FServerParameters& OutServerParameters)
 {
-     // If GameLift Anywhere is enabled, parse command line arguments and pass them in the ServerParameters object.
+    // bool bIsAnywhereActive = false;
+    // if (FParse::Param(FCommandLine::Get(), TEXT("glAnywhere")))
+    // {
+    //     bIsAnywhereActive = true;
+    //     UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhere found"));
+    // }
+    // else
+    // {
+    //     UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhere is not found"));
+    // }
+    
+    // if (bIsAnywhereActive)
+    // {
+        UE_LOG(LogShooterGameMode, Log, TEXT("Configuring server parameters for Anywhere..."));
+        
+        // If GameLift Anywhere is enabled, parse command line arguments and pass them in the ServerParameters object.
         FString glAnywhereWebSocketUrl = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereWebSocketUrl="), glAnywhereWebSocketUrl))
         {
             OutServerParameters.m_webSocketUrl = TCHAR_TO_UTF8(*glAnywhereWebSocketUrl);
+            UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhereWebSocketUrl succeeded!"));
         }
 
         FString glAnywhereFleetId = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereFleetId="), glAnywhereFleetId))
         {
             OutServerParameters.m_fleetId = TCHAR_TO_UTF8(*glAnywhereFleetId);
+            UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhereFleetId succeeded!"));
         }
 
         FString glAnywhereProcessId = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereProcessId="), glAnywhereProcessId))
         {
             OutServerParameters.m_processId = TCHAR_TO_UTF8(*glAnywhereProcessId);
+            UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhereProcessId succeeded!"));
         }
         else
         {
@@ -192,44 +151,53 @@ void AShooterGameMode::SetServerParameters(FServerParameters& OutServerParameter
             FString TimeString = FString::FromInt(std::time(nullptr));
             FString ProcessId = "ProcessId_" + TimeString;
             OutServerParameters.m_processId = TCHAR_TO_UTF8(*ProcessId);
+            UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhereProcessId succeeded!"));
         }
 
         FString glAnywhereHostId = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereHostId="), glAnywhereHostId))
         {
             OutServerParameters.m_hostId = TCHAR_TO_UTF8(*glAnywhereHostId);
+            UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhereHostId succeeded!"));
         }
 
         FString glAnywhereAuthToken = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereAuthToken="), glAnywhereAuthToken))
         {
             OutServerParameters.m_authToken = TCHAR_TO_UTF8(*glAnywhereAuthToken);
+            UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhereAuthToken succeeded!"));
         }
 
         FString glAnywhereAwsRegion = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereAwsRegion="), glAnywhereAwsRegion))
         {
             OutServerParameters.m_awsRegion = TCHAR_TO_UTF8(*glAnywhereAwsRegion);
+            UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhereAwsRegion succeeded!"));
         }
 
         FString glAnywhereAccessKey = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereAccessKey="), glAnywhereAccessKey))
         {
             OutServerParameters.m_accessKey = TCHAR_TO_UTF8(*glAnywhereAccessKey);
+            UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhereAccessKey succeeded!"));
         }
 
         FString glAnywhereSecretKey = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereSecretKey="), glAnywhereSecretKey))
         {
             OutServerParameters.m_secretKey = TCHAR_TO_UTF8(*glAnywhereSecretKey);
+            UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhereSecretKey succeeded!"));
         }
 
         FString glAnywhereSessionToken = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereSessionToken="), glAnywhereSessionToken))
         {
             OutServerParameters.m_sessionToken = TCHAR_TO_UTF8(*glAnywhereSessionToken);
+            UE_LOG(LogShooterGameMode, Log, TEXT("glAnywhereSessionToken succeeded!"));
         }
-
+       
+    //}
+    
         UE_LOG(LogShooterGameMode, SetColor, TEXT("%s"), COLOR_YELLOW);
         UE_LOG(LogShooterGameMode, Log, TEXT(">>>> WebSocket URL: %s"), *OutServerParameters.m_webSocketUrl);
         UE_LOG(LogShooterGameMode, Log, TEXT(">>>> Fleet ID: %s"), *OutServerParameters.m_fleetId);
@@ -241,4 +209,65 @@ void AShooterGameMode::SetServerParameters(FServerParameters& OutServerParameter
         UE_LOG(LogShooterGameMode, Log, TEXT(">>>> Secret Key: %s"), *OutServerParameters.m_secretKey);
         UE_LOG(LogShooterGameMode, Log, TEXT(">>>> Session Token: %s"), *OutServerParameters.m_sessionToken);
         UE_LOG(LogShooterGameMode, SetColor, TEXT("%s"), COLOR_NONE);
+}
+
+void AShooterGameMode::BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule)
+{
+    ProcessParameters = MakeShared<FProcessParameters>();
+
+    //When a game session is created, Amazon GameLift Servers sends an activation request to the game server and passes along the game session object containing game properties and other settings.
+    //Here is where a game server should take action based on the game session object.
+    //Once the game server is ready to receive incoming player connections, it should invoke GameLiftServerAPI.ActivateGameSession()
+    ProcessParameters->OnStartGameSession.BindLambda([=](Aws::GameLift::Server::Model::GameSession InGameSession)
+    {
+        FString GameSessionId = FString(InGameSession.GetGameSessionId());
+        UE_LOG(LogShooterGameMode, Log, TEXT("GameSession Initializing: %s"), *GameSessionId);
+        GameLiftSdkModule->ActivateGameSession();
+    });
+
+    //OnProcessTerminate callback. Amazon GameLift Servers will invoke this callback before shutting down an instance hosting this game server.
+    //It gives this game server a chance to save its state, communicate with services, etc., before being shut down.
+    //In this case, we simply tell Amazon GameLift Servers we are indeed going to shutdown.
+    ProcessParameters->OnTerminate.BindLambda([=]()
+    {
+        UE_LOG(LogShooterGameMode, Log, TEXT("Game Server Process is terminating"));
+        GameLiftSdkModule->ProcessEnding();
+    });
+
+    //This is the HealthCheck callback.
+    //Amazon GameLift Servers will invoke this callback every 60 seconds or so.
+    //Here, a game server might want to check the health of dependencies and such.
+    //Simply return true if healthy, false otherwise.
+    //The game server has 60 seconds to respond with its health status. Amazon GameLift Servers will default to 'false' if the game server doesn't respond in time.
+    //In this case, we're always healthy!
+    ProcessParameters->OnHealthCheck.BindLambda([]()
+    {
+        UE_LOG(LogShooterGameMode, Log, TEXT("Performing Health Check"));
+        return true;
+    });
+}
+
+void AShooterGameMode::ParesCommandLinePort()
+{
+    //GameServer.exe -port=7777 LOG=server.mylog
+    ProcessParameters->port = FURL::UrlConfig.DefaultPort;
+    TArray<FString> CommandLineTokens;
+    TArray<FString> CommandLineSwitches;
+
+    FCommandLine::Parse(FCommandLine::Get(), CommandLineTokens, CommandLineSwitches); // -port=7777
+
+    for (const FString& SwitchStr : CommandLineSwitches)
+    {
+        FString Key;
+        FString Value;
+
+        if (SwitchStr.Split("=", &Key, &Value)) // port "=" 7777
+        {
+            if (Key.Equals("port", ESearchCase::IgnoreCase))
+            {
+                ProcessParameters->port = FCString::Atoi(*Value);
+                return;
+            }
+        }
+    }
 }
