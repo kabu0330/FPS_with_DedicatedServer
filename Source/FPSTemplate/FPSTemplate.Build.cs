@@ -13,7 +13,7 @@ public class FPSTemplate : ModuleRules
 			{ 
 				"Core", "CoreUObject", "Engine", 
 				"InputCore", "EnhancedInput", "PhysicsCore", 
-				 "DedicatedServers"
+				 "DedicatedServers", "GameLiftServerSDK"
 				 
 			});
 

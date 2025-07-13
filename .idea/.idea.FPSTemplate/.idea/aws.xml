@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="accountSettings">
-    <option name="activeRegion" value="us-east-1" />
+    <option name="activeProfile" value="profile:kabu" />
+    <option name="activeRegion" value="us-east-2" />
     <option name="recentlyUsedProfiles">
       <list>
         <option value="profile:kabu" />
@@ -9,6 +10,7 @@
     </option>
     <option name="recentlyUsedRegions">
       <list>
+        <option value="us-east-2" />
         <option value="us-east-1" />
       </list>
     </option>
