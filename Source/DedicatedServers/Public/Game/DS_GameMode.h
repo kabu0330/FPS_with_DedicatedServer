@@ -3,35 +3,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/GameMode.h"
 #include "GameLiftServerSDK.h"
-#include "ShooterGameModeBase.h"
-//#include "GameLiftServerSDK.h"
-#include "ShooterGameMode.generated.h"
+#include "DS_GameMode.generated.h"
 
 struct FProcessParameters;
 
-DECLARE_LOG_CATEGORY_EXTERN(LogShooterGameMode, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogDS_GameMode, Log, All);
 
 /**
  * 
  */
-UCLASS(/*minimalapi*/)
-class FPSTEMPLATE_API AShooterGameMode : public AShooterGameModeBase
+UCLASS()
+class DEDICATEDSERVERS_API ADS_GameMode : public AGameMode
 {
 	GENERATED_BODY()
 
-public:
-	AShooterGameMode();
-
 protected:
 	virtual void BeginPlay() override;
-	void BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule);
-	void ParesCommandLinePort();
-
+	
 private:
 	void InitGameLift();
 	void SetServerParameters(FServerParameters& OutServerParameters);
+	void BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule);
+	void ParesCommandLinePort();
 	
 	TSharedPtr<FProcessParameters> ProcessParameters;
 };
-

@@ -11,5 +11,6 @@ public class FPSTemplateServerTarget : TargetRules
         DefaultBuildSettings = BuildSettingsVersion.Latest;
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
         ExtraModuleNames.Add("FPSTemplate");
+        ExtraModuleNames.Add("DedicatedServers");
     }
 }
