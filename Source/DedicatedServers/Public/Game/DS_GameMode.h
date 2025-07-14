@@ -9,7 +9,6 @@
 
 struct FProcessParameters;
 
-DECLARE_LOG_CATEGORY_EXTERN(LogDS_GameMode, Log, All);
 
 /**
  * 

@@ -16,5 +16,29 @@ void UAPITestOverlay::NativeConstruct()
 
 	check(ListFleetsBox);
 	check(ListFleetsBox->Button_ListFleets);
-	ListFleetsBox->Button_ListFleets->OnClicked.AddDynamic(APITestManager, &UAPITestManager::ListFleetsButtonClicked);
+	ListFleetsBox->Button_ListFleets->OnClicked.AddDynamic(this, &UAPITestOverlay::ListFleetsButtonClicked);
+}
+
+void UAPITestOverlay::ListFleetsButtonClicked()
+{
+	check(APITestManager);
+	APITestManager->OnListFleetsResponseReceived.AddDynamic(this, &UAPITestOverlay::OnListFleetsResponseReceived);
+	APITestManager->ListFleets();
+
+	// 결과를 수신하기 전까지 사용자의 클릭 요청을 무시
+	ListFleetsBox->Button_ListFleets->SetIsEnabled(false);
+}
+
+void UAPITestOverlay::OnListFleetsResponseReceived(const FDSListFleetsResponse& ListFleetsResponse, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		
+	}
+	else
+	{
+		
+	}
+	
+	ListFleetsBox->Button_ListFleets->SetIsEnabled(true);
 }

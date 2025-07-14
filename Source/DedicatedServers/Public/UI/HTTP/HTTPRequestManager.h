@@ -6,6 +6,8 @@
 #include "UObject/Object.h"
 #include "HTTPRequestManager.generated.h"
 
+class UAPIData;
+class FJsonObject;
 /**
  * 
  */
@@ -13,4 +15,11 @@ UCLASS(Blueprintable)
 class DEDICATEDSERVERS_API UHTTPRequestManager : public UObject
 {
 	GENERATED_BODY()
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UAPIData> APIData;
+
+	bool ContainsErrors(TSharedPtr<FJsonObject> JsonObject, bool bPrintLog);
+	void DumpMetaData(TSharedPtr<FJsonObject> JsonObject);
 };
