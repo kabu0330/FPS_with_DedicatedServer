@@ -8,6 +8,7 @@
 
 class UListFleetsBox;
 class UAPITestManager;
+class UFleetId;
 struct FDSListFleetsResponse;
 /**
  * 
@@ -17,9 +18,12 @@ class DEDICATEDSERVERS_API UAPITestOverlay : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UAPITestManager> APITestManagerClass;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UFleetId> FleetIdWidgetClass;
+	
 protected:
 	virtual void NativeConstruct() override;
 

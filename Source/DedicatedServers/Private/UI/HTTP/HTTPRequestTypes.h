@@ -1,4 +1,4 @@
-﻿#pragma endregion
+﻿#pragma once
 
 #include "HTTPRequestTypes.generated.h"
 
