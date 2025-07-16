@@ -16,35 +16,35 @@ void ADS_GameMode::BeginPlay()
 void ADS_GameMode::InitGameLift()
 {
 		#if WITH_GAMELIFT
-    UE_LOG(Log_DedicatedServer, Log, TEXT("Calling InitGameLift..."));
+    UE_LOG(LogDedicatedServers, Log, TEXT("Calling InitGameLift..."));
 
     // Getting the module first.
     FGameLiftServerSDKModule* GameLiftSdkModule = &FModuleManager::LoadModuleChecked<FGameLiftServerSDKModule>(FName("GameLiftServerSDK"));
     if (GameLiftSdkModule)
     {
-        UE_LOG(Log_DedicatedServer, Log, TEXT("GameLiftServerSDK Load succeeded"));
+        UE_LOG(LogDedicatedServers, Log, TEXT("GameLiftServerSDK Load succeeded"));
     }
     //Define the server parameters for a GameLift Anywhere fleet. These are not needed for a GameLift managed EC2 fleet.
     FServerParameters ServerParametersForAnywhere;
     SetServerParameters(ServerParametersForAnywhere);
 
-    UE_LOG(Log_DedicatedServer, Log, TEXT("Initializing the GameLift Server..."));
+    UE_LOG(LogDedicatedServers, Log, TEXT("Initializing the GameLift Server..."));
 
     //InitSDK will establish a local connection with GameLift's agent to enable further communication.
     FGameLiftGenericOutcome InitSdkOutcome = GameLiftSdkModule->InitSDK(ServerParametersForAnywhere);
     if (InitSdkOutcome.IsSuccess())
     {
-        UE_LOG(Log_DedicatedServer, SetColor, TEXT("%s"), COLOR_GREEN);
-        UE_LOG(Log_DedicatedServer, Log, TEXT("GameLift InitSDK succeeded!"));
-        UE_LOG(Log_DedicatedServer, SetColor, TEXT("%s"), COLOR_NONE);
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_GREEN);
+        UE_LOG(LogDedicatedServers, Log, TEXT("GameLift InitSDK succeeded!"));
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
     }
     else
     {
-        UE_LOG(Log_DedicatedServer, SetColor, TEXT("%s"), COLOR_RED);
-        UE_LOG(Log_DedicatedServer, Log, TEXT("ERROR: InitSDK failed : ("));
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_RED);
+        UE_LOG(LogDedicatedServers, Log, TEXT("ERROR: InitSDK failed : ("));
         FGameLiftError GameLiftError = InitSdkOutcome.GetError();
-        UE_LOG(Log_DedicatedServer, Log, TEXT("ERROR: %s"), *GameLiftError.m_errorMessage);
-        UE_LOG(Log_DedicatedServer, SetColor, TEXT("%s"), COLOR_NONE);
+        UE_LOG(LogDedicatedServers, Log, TEXT("ERROR: %s"), *GameLiftError.m_errorMessage);
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
         return;
     }
 
@@ -56,29 +56,29 @@ void ADS_GameMode::InitGameLift()
     //At the end of a game session, Amazon GameLift Servers uploads everything in the specified 
     //location and stores it in the cloud for access later.
     TArray<FString> Logfiles;
-    Logfiles.Add(TEXT("Log_DedicatedServer/Saved/Logs/Log_DedicatedServer.log"));
+    Logfiles.Add(TEXT("LogDedicatedServer/Saved/Logs/LogDedicatedServer.log"));
     ProcessParameters->logParameters = Logfiles;
 
     //The game server calls ProcessReady() to tell Amazon GameLift Servers it's ready to host game sessions.
-    UE_LOG(Log_DedicatedServer, Log, TEXT("Calling Process Ready..."));
+    UE_LOG(LogDedicatedServers, Log, TEXT("Calling Process Ready..."));
     FGameLiftGenericOutcome ProcessReadyOutcome = GameLiftSdkModule->ProcessReady(*ProcessParameters);
 
     if (ProcessReadyOutcome.IsSuccess())
     {
-        UE_LOG(Log_DedicatedServer, SetColor, TEXT("%s"), COLOR_GREEN);
-        UE_LOG(Log_DedicatedServer, Log, TEXT("Process Ready!"));
-        UE_LOG(Log_DedicatedServer, SetColor, TEXT("%s"), COLOR_NONE);
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_GREEN);
+        UE_LOG(LogDedicatedServers, Log, TEXT("Process Ready!"));
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
     }
     else
     {
-        UE_LOG(Log_DedicatedServer, SetColor, TEXT("%s"), COLOR_RED);
-        UE_LOG(Log_DedicatedServer, Log, TEXT("ERROR: Process Ready Failed!"));
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_RED);
+        UE_LOG(LogDedicatedServers, Log, TEXT("ERROR: Process Ready Failed!"));
         FGameLiftError ProcessReadyError = ProcessReadyOutcome.GetError();
-        UE_LOG(Log_DedicatedServer, Log, TEXT("ERROR: %s"), *ProcessReadyError.m_errorMessage);
-        UE_LOG(Log_DedicatedServer, SetColor, TEXT("%s"), COLOR_NONE);
+        UE_LOG(LogDedicatedServers, Log, TEXT("ERROR: %s"), *ProcessReadyError.m_errorMessage);
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
     }
 
-    UE_LOG(Log_DedicatedServer, Log, TEXT("InitGameLift completed!"));
+    UE_LOG(LogDedicatedServers, Log, TEXT("InitGameLift completed!"));
 #endif
 }
 
@@ -88,11 +88,11 @@ void ADS_GameMode::SetServerParameters(FServerParameters& OutServerParameters)
     // if (FParse::Param(FCommandLine::Get(), TEXT("glAnywhere")))
     // {
     //     bIsAnywhereActive = true;
-    //     UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhere found"));
+    //     UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhere found"));
     // }
     // else
     // {
-    //     UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhere is not found"));
+    //     UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhere is not found"));
     // }
     
     // if (bIsAnywhereActive)

@@ -6,8 +6,12 @@
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 #include "JsonObjectConverter.h"
+#include "aws/gamelift/server/model/GameSession.h"
+#include "aws/gamelift/server/model/GameSessionStatus.h"
 #include "Data/API/APIData.h"
+#include "GameFramework/PlayerState.h"
 #include "GameplayTags/DedicatedServersTags.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/HTTP/HTTPRequestTypes.h"
 
 void UPortalManager::JoinGameSession()
@@ -28,8 +32,6 @@ void UPortalManager::JoinGameSession()
 void UPortalManager::FindOrCreateGameSession_Response(FHttpRequestPtr Request, FHttpResponsePtr Response,
 	bool bWasSuccessful)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Find Or Create Game Session Response Received");
-
 	if (!bWasSuccessful)
 	{
 		BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);
@@ -63,13 +65,98 @@ void UPortalManager::FindOrCreateGameSession_Response(FHttpRequestPtr Request, F
 		{
 			FDSGameSession GameSession;
 			FJsonObjectConverter::JsonObjectToUStruct(GameSessionJsonObject.ToSharedRef(), &GameSession);
-			GameSession.Dump();
-			BroadcastJoinGameSessionMessage.Broadcast(TEXT("Found Game Session"), false);
+
+			const FString GameSessionId = GameSession.GameSessionId;
+			const FString GameSessionStatus = GameSession.Status;
+			HandleGameSessionStatus(GameSessionStatus, GameSessionId);
 		}
 		else
 		{
 			BroadcastJoinGameSessionMessage.Broadcast(TEXT("Game Session Data is lost"), true);
 		}
 		
+	}
+}
+
+FString UPortalManager::GetUniquePlayerId() const
+{
+	APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
+	if (IsValid(LocalPlayerController))
+	{
+		APlayerState* LocalPlayerState = LocalPlayerController->GetPlayerState<APlayerState>();
+		if (IsValid(LocalPlayerState) && LocalPlayerState->GetUniqueId().IsValid())
+		{
+			return TEXT("Player_") + FString::FromInt(LocalPlayerState->GetUniqueID());
+		}
+	}
+	return FString();
+}
+
+void UPortalManager::HandleGameSessionStatus(const FString& Status, const FString& SessionId)
+{
+	if (Status.Equals(TEXT("ACTIVE")))
+	{
+		BroadcastJoinGameSessionMessage.Broadcast(TEXT("Found activate Game Session. Creating a Player Session..."), false);
+		TryCreatePlayerSession(GetUniquePlayerId(), SessionId);
+	}
+	else if (Status.Equals(TEXT("ACTIVATING")))
+	{
+		FTimerDelegate CreateSessionDelegate;
+		CreateSessionDelegate.BindUObject(this, &ThisClass::JoinGameSession);
+		
+		APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
+		if (IsValid(LocalPlayerController))
+		{
+			LocalPlayerController->GetWorldTimerManager().SetTimer(CreateSessionTimer, CreateSessionDelegate, 0.5f, false);
+		}
+	}
+	else
+	{
+		BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);
+	}
+}
+
+void UPortalManager::TryCreatePlayerSession(const FString& PlayerId, const FString& GameSessionId)
+{
+	check(APIData);
+	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, & UPortalManager::CreatePlayerSession_Response);
+
+	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::GameSessionsAPI::CreatePlayerSession);
+	Request->SetURL(APIUrl);
+	Request->SetVerb(TEXT("POST"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	// Lambda로 event 인자에 들어갈 gameSessionId, playerId를 Json에 담아 함께 보내야 한다.
+	TMap<FString, FString> Params = {
+		{TEXT("playerId"), PlayerId},
+		{TEXT("gameSessionId"), GameSessionId}
+	};
+	const FString Content = SerializeJsonContent(Params);
+	Request->SetContentAsString(Content);
+	Request->ProcessRequest(); // Queue에 작업 추가 => 워커 스레드가 작업
+}
+
+void UPortalManager::CreatePlayerSession_Response(FHttpRequestPtr Request, FHttpResponsePtr Response,
+	bool bWasSuccessful)
+{
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+	if (FJsonSerializer::Deserialize(JsonReader, JsonObject))
+	{
+		if (ContainsErrors(JsonObject, true))
+		{
+			BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);
+			return;
+		}
+
+		FDSPlayerSession PlayerSession;
+		FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &PlayerSession);
+
+		PlayerSession.Dump();
+
+		const FString IpAndPort = PlayerSession.IpAddress + TEXT(":") + FString::FromInt(PlayerSession.Port);
+		const FName Address(*IpAndPort);
+		UGameplayStatics::OpenLevel(this, Address);
 	}
 }
