@@ -1,0 +1,22 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "UI/Portal/PortalHUD.h"
+
+#include "Blueprint/UserWidget.h"
+#include "UI/Portal/SignIn/SignInOverlay.h"
+
+void APortalHUD::BeginPlay()
+{
+	Super::BeginPlay();
+
+	APlayerController* OwingPlayerController = GetOwningPlayerController();
+	SignInOverlay = CreateWidget<USignInOverlay>(OwingPlayerController, SignInOverlayClass);
+	if (IsValid(SignInOverlay))
+	{
+		SignInOverlay->AddToViewport();
+	}
+	FInputModeGameAndUI InputModeData;
+	OwingPlayerController->SetInputMode(InputModeData);
+	OwingPlayerController->SetShowMouseCursor(true);
+}

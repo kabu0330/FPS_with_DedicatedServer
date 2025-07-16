@@ -16,8 +16,8 @@ bool UHTTPRequestManager::ContainsErrors(TSharedPtr<FJsonObject> JsonObject, boo
 
 		if (bPrintLog)
 		{
-			UE_LOG(Log_DedicatedServer, Error, TEXT("Error Type: %s"), *ErrorType);
-			UE_LOG(Log_DedicatedServer, Error, TEXT("Error Message: %s"), *ErrorMessage);
+			UE_LOG(LogDedicatedServers, Error, TEXT("Error Type: %s"), *ErrorType);
+			UE_LOG(LogDedicatedServers, Error, TEXT("Error Message: %s"), *ErrorMessage);
 		}
 		
 		return true;
@@ -28,7 +28,7 @@ bool UHTTPRequestManager::ContainsErrors(TSharedPtr<FJsonObject> JsonObject, boo
 		
 		if (bPrintLog)
 		{
-			UE_LOG(Log_DedicatedServer, Error, TEXT("Error Type: %s"), *ErrorType);
+			UE_LOG(LogDedicatedServers, Error, TEXT("Error Type: %s"), *ErrorType);
 		}
 		
 		return true;

@@ -3,4 +3,4 @@
 
 IMPLEMENT_MODULE( FDefaultModuleImpl, DedicatedServers );
 
-DEFINE_LOG_CATEGORY(Log_DedicatedServer);
+DEFINE_LOG_CATEGORY(LogDedicatedServers);

@@ -27,7 +27,7 @@ void UAPITestOverlay::ListFleetsButtonClicked()
 {
 	check(APITestManager);
 	APITestManager->OnListFleetsResponseReceived.AddDynamic(this, &UAPITestOverlay::OnListFleetsResponseReceived);
-	APITestManager->ListFleets();
+	APITestManager->ListFleets(); // API gateway로 가 Fleets 리스트 요청
 
 	// 결과를 수신하기 전까지 사용자의 클릭 요청을 무시
 	ListFleetsBox->Button_ListFleets->SetIsEnabled(false);

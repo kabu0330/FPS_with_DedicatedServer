@@ -7,11 +7,9 @@
 #include "UI/HTTP/HTTPRequestManager.h"
 #include "APITestManager.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnListFleetsResponseReceived, const FDSListFleetsResponse&, ListFleetsResponse, bool, bWasSuccessful);
- 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FOnListFleetsResponseReceived, const FDSListFleetsResponse&, ListFleetsResponse, bool, bWasSuccessful);
+
 UCLASS()
 class DEDICATEDSERVERS_API UAPITestManager : public UHTTPRequestManager
 {

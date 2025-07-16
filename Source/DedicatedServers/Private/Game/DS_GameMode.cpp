@@ -97,28 +97,28 @@ void ADS_GameMode::SetServerParameters(FServerParameters& OutServerParameters)
     
     // if (bIsAnywhereActive)
     // {
-        UE_LOG(Log_DedicatedServer, Log, TEXT("Configuring server parameters for Anywhere..."));
+        UE_LOG(LogDedicatedServers, Log, TEXT("Configuring server parameters for Anywhere..."));
         
         // If GameLift Anywhere is enabled, parse command line arguments and pass them in the ServerParameters object.
         FString glAnywhereWebSocketUrl = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereWebSocketUrl="), glAnywhereWebSocketUrl))
         {
             OutServerParameters.m_webSocketUrl = TCHAR_TO_UTF8(*glAnywhereWebSocketUrl);
-            UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhereWebSocketUrl succeeded!"));
+            UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhereWebSocketUrl succeeded!"));
         }
 
         FString glAnywhereFleetId = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereFleetId="), glAnywhereFleetId))
         {
             OutServerParameters.m_fleetId = TCHAR_TO_UTF8(*glAnywhereFleetId);
-            UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhereFleetId succeeded!"));
+            UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhereFleetId succeeded!"));
         }
 
         FString glAnywhereProcessId = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereProcessId="), glAnywhereProcessId))
         {
             OutServerParameters.m_processId = TCHAR_TO_UTF8(*glAnywhereProcessId);
-            UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhereProcessId succeeded!"));
+            UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhereProcessId succeeded!"));
         }
         else
         {
@@ -126,64 +126,64 @@ void ADS_GameMode::SetServerParameters(FServerParameters& OutServerParameters)
             FString TimeString = FString::FromInt(std::time(nullptr));
             FString ProcessId = "ProcessId_" + TimeString;
             OutServerParameters.m_processId = TCHAR_TO_UTF8(*ProcessId);
-            UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhereProcessId succeeded!"));
+            UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhereProcessId succeeded!"));
         }
 
         FString glAnywhereHostId = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereHostId="), glAnywhereHostId))
         {
             OutServerParameters.m_hostId = TCHAR_TO_UTF8(*glAnywhereHostId);
-            UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhereHostId succeeded!"));
+            UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhereHostId succeeded!"));
         }
 
         FString glAnywhereAuthToken = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereAuthToken="), glAnywhereAuthToken))
         {
             OutServerParameters.m_authToken = TCHAR_TO_UTF8(*glAnywhereAuthToken);
-            UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhereAuthToken succeeded!"));
+            UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhereAuthToken succeeded!"));
         }
 
         FString glAnywhereAwsRegion = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereAwsRegion="), glAnywhereAwsRegion))
         {
             OutServerParameters.m_awsRegion = TCHAR_TO_UTF8(*glAnywhereAwsRegion);
-            UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhereAwsRegion succeeded!"));
+            UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhereAwsRegion succeeded!"));
         }
 
         FString glAnywhereAccessKey = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereAccessKey="), glAnywhereAccessKey))
         {
             OutServerParameters.m_accessKey = TCHAR_TO_UTF8(*glAnywhereAccessKey);
-            UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhereAccessKey succeeded!"));
+            UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhereAccessKey succeeded!"));
         }
 
         FString glAnywhereSecretKey = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereSecretKey="), glAnywhereSecretKey))
         {
             OutServerParameters.m_secretKey = TCHAR_TO_UTF8(*glAnywhereSecretKey);
-            UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhereSecretKey succeeded!"));
+            UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhereSecretKey succeeded!"));
         }
 
         FString glAnywhereSessionToken = "";
         if (FParse::Value(FCommandLine::Get(), TEXT("glAnywhereSessionToken="), glAnywhereSessionToken))
         {
             OutServerParameters.m_sessionToken = TCHAR_TO_UTF8(*glAnywhereSessionToken);
-            UE_LOG(Log_DedicatedServer, Log, TEXT("glAnywhereSessionToken succeeded!"));
+            UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhereSessionToken succeeded!"));
         }
        
     //}
     
-        UE_LOG(Log_DedicatedServer, SetColor, TEXT("%s"), COLOR_YELLOW);
-        UE_LOG(Log_DedicatedServer, Log, TEXT(">>>> WebSocket URL: %s"), *OutServerParameters.m_webSocketUrl);
-        UE_LOG(Log_DedicatedServer, Log, TEXT(">>>> Fleet ID: %s"), *OutServerParameters.m_fleetId);
-        UE_LOG(Log_DedicatedServer, Log, TEXT(">>>> Process ID: %s"), *OutServerParameters.m_processId);
-        UE_LOG(Log_DedicatedServer, Log, TEXT(">>>> Host ID (Compute Name): %s"), *OutServerParameters.m_hostId);
-        UE_LOG(Log_DedicatedServer, Log, TEXT(">>>> Auth Token: %s"), *OutServerParameters.m_authToken);
-        UE_LOG(Log_DedicatedServer, Log, TEXT(">>>> Aws Region: %s"), *OutServerParameters.m_awsRegion);
-        UE_LOG(Log_DedicatedServer, Log, TEXT(">>>> Access Key: %s"), *OutServerParameters.m_accessKey);
-        UE_LOG(Log_DedicatedServer, Log, TEXT(">>>> Secret Key: %s"), *OutServerParameters.m_secretKey);
-        UE_LOG(Log_DedicatedServer, Log, TEXT(">>>> Session Token: %s"), *OutServerParameters.m_sessionToken);
-        UE_LOG(Log_DedicatedServer, SetColor, TEXT("%s"), COLOR_NONE);
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_YELLOW);
+        UE_LOG(LogDedicatedServers, Log, TEXT(">>>> WebSocket URL: %s"), *OutServerParameters.m_webSocketUrl);
+        UE_LOG(LogDedicatedServers, Log, TEXT(">>>> Fleet ID: %s"), *OutServerParameters.m_fleetId);
+        UE_LOG(LogDedicatedServers, Log, TEXT(">>>> Process ID: %s"), *OutServerParameters.m_processId);
+        UE_LOG(LogDedicatedServers, Log, TEXT(">>>> Host ID (Compute Name): %s"), *OutServerParameters.m_hostId);
+        UE_LOG(LogDedicatedServers, Log, TEXT(">>>> Auth Token: %s"), *OutServerParameters.m_authToken);
+        UE_LOG(LogDedicatedServers, Log, TEXT(">>>> Aws Region: %s"), *OutServerParameters.m_awsRegion);
+        UE_LOG(LogDedicatedServers, Log, TEXT(">>>> Access Key: %s"), *OutServerParameters.m_accessKey);
+        UE_LOG(LogDedicatedServers, Log, TEXT(">>>> Secret Key: %s"), *OutServerParameters.m_secretKey);
+        UE_LOG(LogDedicatedServers, Log, TEXT(">>>> Session Token: %s"), *OutServerParameters.m_sessionToken);
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
 }
 
 void ADS_GameMode::BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule)
@@ -196,7 +196,7 @@ void ADS_GameMode::BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule)
     ProcessParameters->OnStartGameSession.BindLambda([=](Aws::GameLift::Server::Model::GameSession InGameSession)
     {
         FString GameSessionId = FString(InGameSession.GetGameSessionId());
-        UE_LOG(Log_DedicatedServer, Log, TEXT("GameSession Initializing: %s"), *GameSessionId);
+        UE_LOG(LogDedicatedServers, Log, TEXT("GameSession Initializing: %s"), *GameSessionId);
         GameLiftSdkModule->ActivateGameSession();
     });
 
@@ -205,7 +205,7 @@ void ADS_GameMode::BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule)
     //In this case, we simply tell Amazon GameLift Servers we are indeed going to shutdown.
     ProcessParameters->OnTerminate.BindLambda([=]()
     {
-        UE_LOG(Log_DedicatedServer, Log, TEXT("Game Server Process is terminating"));
+        UE_LOG(LogDedicatedServers, Log, TEXT("Game Server Process is terminating"));
         GameLiftSdkModule->ProcessEnding();
     });
 
@@ -217,7 +217,7 @@ void ADS_GameMode::BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule)
     //In this case, we're always healthy!
     ProcessParameters->OnHealthCheck.BindLambda([]()
     {
-        UE_LOG(Log_DedicatedServer, Log, TEXT("Performing Health Check"));
+        UE_LOG(LogDedicatedServers, Log, TEXT("Performing Health Check"));
         return true;
     });
 }

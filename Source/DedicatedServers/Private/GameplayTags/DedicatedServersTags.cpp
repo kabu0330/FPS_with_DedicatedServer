@@ -5,7 +5,9 @@ namespace DedicatedServersTags
 	namespace GameSessionsAPI
 	{
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(ListFleets, "DedicatedServersTags.GameSessionAPI.ListFleets", "List Fleets resources on the GameSession API")
-		
-		
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(FindOrCreateGameSession, "DedicatedServersTags.GameSessionAPI.FindOrCreateGameSession",
+			"Retrieves an ACTIVE Game Session, creating one if one doesn't exist on the GameSessions API" )
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(CreatePlayerSession, "DedicatedServersTags.GameSessionAPI.CreatePlayerSession",
+			"Creates a New Player Session on the GameSessions API")
 	}
 }

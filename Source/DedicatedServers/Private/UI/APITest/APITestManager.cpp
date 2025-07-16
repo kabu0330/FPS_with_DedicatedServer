@@ -14,9 +14,7 @@
 void UAPITestManager::ListFleets()
 {
 	check(APIData);
-
 	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
-
 	Request->OnProcessRequestComplete().BindUObject(this, &UAPITestManager::ListFleets_Response);
 
 	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::GameSessionsAPI::ListFleets);
@@ -48,5 +46,4 @@ void UAPITestManager::ListFleets_Response(FHttpRequestPtr Request, FHttpResponse
 
 		OnListFleetsResponseReceived.Broadcast(ListFleetsResponse, true);
 	}
-
 }
