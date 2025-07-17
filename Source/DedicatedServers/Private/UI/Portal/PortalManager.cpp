@@ -101,6 +101,7 @@ void UPortalManager::HandleGameSessionStatus(const FString& Status, const FStrin
 	{
 		UE_LOG(LogDedicatedServers, Log, TEXT("4. Found activate Game Session Creating a Player Session..."));
 		BroadcastJoinGameSessionMessage.Broadcast(TEXT("Found activate Game Session. Creating a Player Session..."), false);
+		
 		TryCreatePlayerSession(GetUniquePlayerId(), SessionId);
 	}
 	else if (Status.Equals(TEXT("ACTIVATING")))
