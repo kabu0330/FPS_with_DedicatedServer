@@ -37,4 +37,21 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> TextBlock_StatusMessage;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> TextBlock_PasswordStatusMessage;
+
+protected:
+	virtual void NativeConstruct() override;
+
+private:
+	UFUNCTION()
+	void UpdateSignUpButtonState(const FText& Text);
+
+	UFUNCTION()
+	void UpdatePasswordStatus(const FText& Text);
+	bool IsValidPassword();
+
+	bool IsValidEmail(const FString& Email);
+	bool IsStrongPassword(const FString& Password, FString& StatusMessage);
 };

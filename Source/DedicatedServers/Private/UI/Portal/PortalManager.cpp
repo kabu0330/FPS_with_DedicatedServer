@@ -35,7 +35,7 @@ void UPortalManager::JoinGameSession()
 }
 
 void UPortalManager::FindOrCreateGameSession_Response(FHttpRequestPtr Request, FHttpResponsePtr Response,
-	bool bWasSuccessful)
+                                                      bool bWasSuccessful)
 {
 	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_DARK_BLUE);
 	UE_LOG(LogDedicatedServers, Log, TEXT("2. PortalManager received an HTTP Response from FindOrCreateGameSession AWS Lambda function"));
@@ -204,4 +204,27 @@ void UPortalManager::CreatePlayerSession_Response(FHttpRequestPtr Request, FHttp
 		
 		UE_LOG(LogDedicatedServers, Log, TEXT("9. Open Level, %s"), *IpAndPort);
 	}
+}
+
+void UPortalManager::SignIn(const FString& UserName, const FString& Password)
+{
+	
+}
+
+void UPortalManager::SignUp(const FString& UserName, const FString& Password, const FString& Email)
+{
+}
+
+void UPortalManager::Confirm(const FString& ConfirmationCode)
+{
+}
+
+void UPortalManager::QuitGame()
+{
+	APlayerController* PlayerLocalController = GEngine->GetFirstLocalPlayerController(GetWorld());
+	if (IsValid(PlayerLocalController))
+	{
+		UKismetSystemLibrary::QuitGame(this, PlayerLocalController, EQuitPreference::Quit, false);
+	}
+
 }
