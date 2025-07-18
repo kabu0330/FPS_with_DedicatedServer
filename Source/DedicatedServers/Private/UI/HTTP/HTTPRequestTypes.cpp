@@ -32,6 +32,7 @@ void FDSListFleetsResponse::Dump() const
 void FDSGameSession::Dump() const
 {
 	UE_LOG(LogDedicatedServers, Log, TEXT("--- GameSession DUMP---"));
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_YELLOW);
 	UE_LOG(LogDedicatedServers, Log, TEXT("  CreationTime: %s"), *CreationTime);
 	UE_LOG(LogDedicatedServers, Log, TEXT("  CreatorId: %s"), *CreatorId);
 	UE_LOG(LogDedicatedServers, Log, TEXT("  CurrentPlayerSessionCount: %d"), CurrentPlayerSessionCount);
@@ -54,22 +55,85 @@ void FDSGameSession::Dump() const
 	UE_LOG(LogDedicatedServers, Log, TEXT("  Status: %s"), *Status);
 	UE_LOG(LogDedicatedServers, Log, TEXT("  StatusReason: %s"), *StatusReason);
 	UE_LOG(LogDedicatedServers, Log, TEXT("  TerminationTime: %s"), *TerminationTime);
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
 	UE_LOG(LogDedicatedServers, Log, TEXT("--- END GameSession DUMP---"));
 }
 void FDSPlayerSession::Dump() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("--- FDSPlayerSession DUMP ---"));
-	UE_LOG(LogTemp, Warning, TEXT("CreationTime: %s"), *CreationTime);
-	UE_LOG(LogTemp, Warning, TEXT("DnsName: %s"), *DnsName);
-	UE_LOG(LogTemp, Warning, TEXT("FleetArn: %s"), *FleetArn);
-	UE_LOG(LogTemp, Warning, TEXT("FleetId: %s"), *FleetId);
-	UE_LOG(LogTemp, Warning, TEXT("GameSessionId: %s"), *GameSessionId);
-	UE_LOG(LogTemp, Warning, TEXT("IpAddress: %s"), *IpAddress);
-	UE_LOG(LogTemp, Warning, TEXT("PlayerData: %s"), *PlayerData);
-	UE_LOG(LogTemp, Warning, TEXT("PlayerId: %s"), *PlayerId);
-	UE_LOG(LogTemp, Warning, TEXT("PlayerSessionId: %s"), *PlayerSessionId);
-	UE_LOG(LogTemp, Warning, TEXT("Port: %d"), Port);
-	UE_LOG(LogTemp, Warning, TEXT("Status: %s"), *Status);
-	UE_LOG(LogTemp, Warning, TEXT("TerminationTime: %s"), *TerminationTime);
-	UE_LOG(LogTemp, Warning, TEXT("--- END FDSPlayerSession DUMP ---"));
+	UE_LOG(LogDedicatedServers, Log, TEXT("--- FDSPlayerSession DUMP ---"));
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_YELLOW);
+	UE_LOG(LogDedicatedServers, Log, TEXT("CreationTime: %s"), *CreationTime);
+	UE_LOG(LogDedicatedServers, Log, TEXT("DnsName: %s"), *DnsName);
+	UE_LOG(LogDedicatedServers, Log, TEXT("FleetArn: %s"), *FleetArn);
+	UE_LOG(LogDedicatedServers, Log, TEXT("FleetId: %s"), *FleetId);
+	UE_LOG(LogDedicatedServers, Log, TEXT("GameSessionId: %s"), *GameSessionId);
+	UE_LOG(LogDedicatedServers, Log, TEXT("IpAddress: %s"), *IpAddress);
+	UE_LOG(LogDedicatedServers, Log, TEXT("PlayerData: %s"), *PlayerData);
+	UE_LOG(LogDedicatedServers, Log, TEXT("PlayerId: %s"), *PlayerId);
+	UE_LOG(LogDedicatedServers, Log, TEXT("PlayerSessionId: %s"), *PlayerSessionId);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Port: %d"), Port);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Status: %s"), *Status);
+	UE_LOG(LogDedicatedServers, Log, TEXT("TerminationTime: %s"), *TerminationTime);
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
+	UE_LOG(LogDedicatedServers, Log, TEXT("--- END FDSPlayerSession DUMP ---"));
+}
+
+void FDSCodeDeliveryDetails::Dump() const
+{
+	UE_LOG(LogDedicatedServers, Log, TEXT("AttributeName: %s"), *AttributeName);
+	UE_LOG(LogDedicatedServers, Log, TEXT("DeliveryMedium: %s"), *DeliveryMedium);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Destination: %s"), *Destination);
+}
+
+void FDSSignUpResponse::Dump() const
+{
+	UE_LOG(LogTemp, Warning, TEXT("--- FDSSignUpResponse DUMP ---"));
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_YELLOW);
+	CodeDeliveryDetails.Dump();
+	UE_LOG(LogDedicatedServers, Log, TEXT("Session: %s"), *Session);
+	UE_LOG(LogDedicatedServers, Log, TEXT("UserConfirmed: %s"), UserConfirmed ? TEXT("true") : TEXT("false"));
+	UE_LOG(LogDedicatedServers, Log, TEXT("UserSub: %s"), *UserSub);
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
+	UE_LOG(LogTemp, Warning, TEXT("--- END FDSSignUpResponse DUMP ---"));
+}
+
+void FDSNewDeviceMetadata::Dump() const
+{
+	UE_LOG(LogDedicatedServers, Log, TEXT("  --- NewDeviceMetadata ---"));
+	UE_LOG(LogDedicatedServers, Log, TEXT("    DeviceGroupKey: %s"), *DeviceGroupKey);
+	UE_LOG(LogDedicatedServers, Log, TEXT("    DeviceKey: %s"), *DeviceKey);
+}
+
+void FDSAuthenticationResult::Dump() const
+{
+	UE_LOG(LogDedicatedServers, Log, TEXT("  --- AuthenticationResult ---"));
+	UE_LOG(LogDedicatedServers, Log, TEXT("    AccessToken: %s"), *AccessToken);
+	UE_LOG(LogDedicatedServers, Log, TEXT("    ExpiresIn: %s"), *ExpiresIn);
+	UE_LOG(LogDedicatedServers, Log, TEXT("    IdToken: %s"), *IdToken);
+	NewDeviceMetadata.Dump();
+	UE_LOG(LogDedicatedServers, Log, TEXT("    RefreshToken: %s"), *RefreshToken);
+	UE_LOG(LogDedicatedServers, Log, TEXT("    TokenType: %s"), *TokenType);
+}
+
+void FDSInitiateAuthResponse::Dump() const
+{
+	UE_LOG(LogDedicatedServers, Log, TEXT("--- FDSSignInResponse DUMP ---"));
+	AuthenticationResult.Dump();
+
+	UE_LOG(LogDedicatedServers, Log, TEXT("  AvailableChallenges:"));
+	for (const FString& Challenge : AvailableChallenges)
+	{
+		UE_LOG(LogDedicatedServers, Log, TEXT("    - %s"), *Challenge);
+	}
+
+	UE_LOG(LogDedicatedServers, Log, TEXT("  ChallengeName: %s"), *ChallengeName);
+
+	UE_LOG(LogDedicatedServers, Log, TEXT("  ChallengeParameters:"));
+	for (const auto& Elem : ChallengeParameters)
+	{
+		UE_LOG(LogDedicatedServers, Log, TEXT("    %s: %s"), *Elem.Key, *Elem.Value);
+	}
+
+	UE_LOG(LogDedicatedServers, Log, TEXT("  Session: %s"), *Session);
+	UE_LOG(LogDedicatedServers, Log, TEXT("--- END FDSSignInResponse DUMP ---"));
 }

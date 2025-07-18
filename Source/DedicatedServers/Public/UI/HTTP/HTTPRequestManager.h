@@ -6,6 +6,8 @@
 #include "UObject/Object.h"
 #include "HTTPRequestManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAPIStatusMessgae, const FString&, StatusMessage, bool, bShouldResetWidgets);
+
 class UAPIData;
 class FJsonObject;
 /**

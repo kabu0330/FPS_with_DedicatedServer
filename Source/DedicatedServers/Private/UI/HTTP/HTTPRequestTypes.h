@@ -149,3 +149,114 @@ struct FDSPlayerSession
 
 	void Dump() const;
 };
+
+// FDSSignUpResponse
+USTRUCT()
+struct FDSCodeDeliveryDetails
+{
+	GENERATED_BODY();
+
+	UPROPERTY()
+	FString AttributeName{};
+
+	UPROPERTY()
+	FString DeliveryMedium{};
+
+	UPROPERTY()
+	FString Destination{};
+
+	void Dump() const;
+};
+
+USTRUCT()
+struct FDSSignUpResponse
+{
+	GENERATED_BODY();
+
+	UPROPERTY()
+	FDSCodeDeliveryDetails CodeDeliveryDetails{};
+
+	UPROPERTY()
+	FString Session{};
+
+	UPROPERTY()
+	bool UserConfirmed{};
+
+	UPROPERTY()
+	FString UserSub{};
+
+	void Dump() const;
+};
+
+USTRUCT()
+struct FDSConfirmSignUpResponse
+{
+	GENERATED_BODY();
+
+	UPROPERTY()
+	FString Session{};
+};
+
+// FDSSignInResponse
+USTRUCT()
+struct FDSNewDeviceMetadata
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString DeviceGroupKey;
+
+	UPROPERTY()
+	FString DeviceKey;
+
+	void Dump() const;
+};
+
+USTRUCT()
+struct FDSAuthenticationResult
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString AccessToken;
+
+	UPROPERTY()
+	FString ExpiresIn{};
+
+	UPROPERTY()
+	FString IdToken;
+
+	UPROPERTY()
+	FDSNewDeviceMetadata NewDeviceMetadata;
+
+	UPROPERTY()
+	FString RefreshToken;
+
+	UPROPERTY()
+	FString TokenType;
+
+	void Dump() const;
+};
+
+USTRUCT()
+struct FDSInitiateAuthResponse
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FDSAuthenticationResult AuthenticationResult;
+
+	UPROPERTY()
+	TArray<FString> AvailableChallenges;
+	
+	UPROPERTY()
+	FString ChallengeName;
+
+	UPROPERTY()
+	TMap<FString, FString> ChallengeParameters;
+
+	UPROPERTY()
+	FString Session;
+
+	void Dump() const;
+};

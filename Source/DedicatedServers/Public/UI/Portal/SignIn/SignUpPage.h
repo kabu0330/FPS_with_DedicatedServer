@@ -41,6 +41,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> TextBlock_PasswordStatusMessage;
 
+	UFUNCTION()
+	void UpdateStatusMessage(const FString& Message, bool bShouldResetWidget);
+
 protected:
 	virtual void NativeConstruct() override;
 
