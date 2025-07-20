@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "SignInOverlay.generated.h"
 
+class USignInQuitPage;
 class UButton;
 class USuccessConfirmedPage;
 class UConfirmSignUpPage;
@@ -37,6 +38,9 @@ private:
 	TObjectPtr<USignInPage> SignInPage;
 
 	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<USignInQuitPage> SignInQuitPage;
+
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<USignUpPage> SignUpPage;
 	
 	UPROPERTY(meta = (BindWidget))
@@ -45,9 +49,10 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<USuccessConfirmedPage> SuccessConfirmedPage;
 
+#if WITH_EDITORONLY_DATA
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> Button_SignIn_Test;
-
+	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> Button_SignUp_Test;
 	
@@ -56,12 +61,16 @@ private:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> Button_SuccessConfirmed_Test;
+#endif
 	
 	UPROPERTY()
 	TObjectPtr<UPortalManager> PortalManager;
 
 	UFUNCTION()
 	void ShowSignInPage();
+
+	UFUNCTION()
+	void ShowSignQuitPage();
 
 	UFUNCTION()
 	void ShowSignUpPage();
@@ -80,4 +89,11 @@ private:
 
 	UFUNCTION()
 	void ConfirmSignUpButtonClicked();
+
+	UFUNCTION()
+	void OnSignUpSucceeded();
+
+	UFUNCTION()
+	void OnConfirmSucceeded();
+	
 };

@@ -7,6 +7,24 @@
 #include "Components/EditableTextBox.h"
 #include "Components/TextBlock.h"
 
+void USignUpPage::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	TextBox_UserName->OnTextChanged.AddDynamic(this, &USignUpPage::UpdateSignUpButtonState);
+	TextBox_Email->OnTextChanged.AddDynamic(this, &USignUpPage::UpdateSignUpButtonState);
+	
+	TextBox_Password->OnTextChanged.AddDynamic(this, &USignUpPage::UpdatePasswordStatus);
+	TextBox_ConfirmPassword->OnTextChanged.AddDynamic(this, &USignUpPage::UpdatePasswordStatus);
+
+	Button_SignUp->SetIsEnabled(false);
+	
+	if (TextBox_UserName)
+	{
+		TextBox_UserName->SetKeyboardFocus();
+	}
+}
+
 void USignUpPage::UpdateStatusMessage(const FString& Message, bool bShouldResetWidget)
 {
 	TextBlock_StatusMessage->SetText(FText::FromString(Message));
@@ -14,17 +32,6 @@ void USignUpPage::UpdateStatusMessage(const FString& Message, bool bShouldResetW
 	{
 		Button_SignUp->SetIsEnabled(true);
 	}
-}
-
-void USignUpPage::NativeConstruct()
-{
-	Super::NativeConstruct();
-
-	TextBox_UserName->OnTextChanged.AddDynamic(this, &USignUpPage::UpdateSignUpButtonState);
-	TextBox_Password->OnTextChanged.AddDynamic(this, &USignUpPage::UpdatePasswordStatus);
-	TextBox_ConfirmPassword->OnTextChanged.AddDynamic(this, &USignUpPage::UpdatePasswordStatus);
-	TextBox_Email->OnTextChanged.AddDynamic(this, &USignUpPage::UpdateSignUpButtonState);
-	Button_SignUp->SetIsEnabled(false);
 }
 
 void USignUpPage::UpdateSignUpButtonState(const FText& Text)
@@ -37,9 +44,9 @@ void USignUpPage::UpdateSignUpButtonState(const FText& Text)
 	
 	if (false == bIsUsernameValid)
 	{
-		TextBlock_StatusMessage->SetText(FText::FromString(TEXT("User Name은 두 글자 이상이어야 합니다.")));
+		TextBlock_StatusMessage->SetText(FText::FromString(TEXT("User Name은 두글자 이상이어야 합니다.")));
 	}
-	else if (false == bIsValidEmail && false == bIsEmailEmpty)
+	else if (false == bIsValidEmail && false == bIsEmailEmpty && bIsUsernameValid)
 	{
 		TextBlock_StatusMessage->SetText(FText::FromString(TEXT("유효하지 않은 이메일 형식입니다.")));
 	}
@@ -140,4 +147,14 @@ bool USignUpPage::IsStrongPassword(const FString& Password, FString& StatusMessa
 		return false;
 	}
 	return true;
+}
+
+void USignUpPage::ClearTextBoxes()
+{
+	TextBox_UserName->SetText(FText::GetEmpty());
+	TextBox_Email->SetText(FText::GetEmpty());
+	TextBox_Password->SetText(FText::GetEmpty());
+	TextBox_ConfirmPassword->SetText(FText::GetEmpty());
+	TextBlock_StatusMessage->SetText(FText::GetEmpty());
+	TextBlock_PasswordStatusMessage->SetText(FText::GetEmpty());
 }
