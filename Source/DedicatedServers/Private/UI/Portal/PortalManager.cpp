@@ -9,7 +9,7 @@
 #include "Data/API/APIData.h"
 #include "GameplayTags/DedicatedServersTags.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Player/DSLocalPlayerSubsystem.h"
 
 
 void UPortalManager::SignIn(const FString& UserName, const FString& Password)
@@ -47,15 +47,22 @@ void UPortalManager::SignIn_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 	{
 		if (ContainsErrors(JsonObject, true))
 		{
-			SignInStatusMessageDelegate.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);
+			SignInStatusMessageDelegate.Broadcast(TEXT("UserName 또는 Password가 일치하지 않습니다."), true);
 			return;
 		}
 
 		FDSInitiateAuthResponse InitiateAuthResponse;
 		FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &InitiateAuthResponse);
 		OnSignInSucceededDelegate.Broadcast();
-		
 		InitiateAuthResponse.Dump();
+
+		// LocalPlayerSubsystem에 엑세스 토큰 등과 같은 중요한 데이터를 보관한다.
+		// 레벨 이동을 해도 데이터가 고유하게 유지되는 클래스
+		UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem();
+		if (IsValid(LocalPlayerSubsystem))
+		{
+			LocalPlayerSubsystem->InitializeTokens(InitiateAuthResponse.AuthenticationResult, this);
+		}
 	}
 }
 
@@ -166,7 +173,48 @@ void UPortalManager::QuitGame()
 	{
 		UKismetSystemLibrary::QuitGame(this, PlayerLocalController, EQuitPreference::Quit, false);
 	}
-
 }
 
+void UPortalManager::RefreshTokens(const FString& RefreshToken)
+{
+	check(APIData);
+	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, & UPortalManager::RefreshTokens_Response);
+
+	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::PortalAPI::SignIn);
+	Request->SetURL(APIUrl);
+	Request->SetVerb(TEXT("POST"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	
+	TMap<FString, FString> Params = {
+		{TEXT("refreshToken"), RefreshToken}
+	};
+	const FString Content = SerializeJsonContent(Params);
+	Request->SetContentAsString(Content);
+	Request->ProcessRequest(); 
+}
+
+void UPortalManager::RefreshTokens_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+{
+	if (!bWasSuccessful) return;
+	
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+	if (FJsonSerializer::Deserialize(JsonReader, JsonObject))
+	{
+		if (ContainsErrors(JsonObject, true)) return; 
+
+		FDSInitiateAuthResponse InitiateAuthResponse;
+		FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &InitiateAuthResponse);
+		
+		UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem();
+		if (IsValid(LocalPlayerSubsystem))
+		{
+			LocalPlayerSubsystem->UpdateTokens(
+				InitiateAuthResponse.AuthenticationResult.AccessToken,
+				InitiateAuthResponse.AuthenticationResult.IdToken
+				);
+		}
+	}
+}
 

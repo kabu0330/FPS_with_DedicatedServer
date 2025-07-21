@@ -37,7 +37,8 @@ void USignUpPage::UpdateStatusMessage(const FString& Message, bool bShouldResetW
 void USignUpPage::UpdateSignUpButtonState(const FText& Text)
 {
 	constexpr int UserNameLength = 2;
-	const bool bIsUsernameValid = !TextBox_UserName->GetText().ToString().IsEmpty() && TextBox_UserName->GetText().ToString().Len() >= UserNameLength;
+	const bool bIsUsernameValid = !TextBox_UserName->GetText().ToString().IsEmpty() &&
+		TextBox_UserName->GetText().ToString().Len() >= UserNameLength;
 
 	const bool bIsValidEmail = IsValidEmail(TextBox_Email->GetText().ToString());
 	const bool bIsEmailEmpty = !TextBox_Email->GetText().ToString().IsEmpty();

@@ -11,6 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAPIRequestSucceeded);
 
 class UAPIData;
 class FJsonObject;
+class UDSLocalPlayerSubsystem;
 /**
  * 
  */
@@ -19,6 +20,9 @@ class DEDICATEDSERVERS_API UHTTPRequestManager : public UObject
 {
 	GENERATED_BODY()
 
+public:
+	UDSLocalPlayerSubsystem* GetDSLocalPlayerSubsystem() const;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UAPIData> APIData;
