@@ -10,6 +10,7 @@
 #include "GameplayTags/DedicatedServersTags.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/DSLocalPlayerSubsystem.h"
+#include "UI/Portal/PortalHUD.h"
 
 
 void UPortalManager::SignIn(const FString& UserName, const FString& Password)
@@ -63,6 +64,17 @@ void UPortalManager::SignIn_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 		{
 			LocalPlayerSubsystem->InitializeTokens(InitiateAuthResponse.AuthenticationResult, this);
 		}
+
+		APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
+		if (IsValid(LocalPlayerController))
+		{
+			APortalHUD* PortalHUD = Cast<APortalHUD>(LocalPlayerController->GetHUD());
+			if (IsValid(PortalHUD))
+			{
+				PortalHUD->OnSignIn();
+			}
+		}
+		
 	}
 }
 
@@ -168,10 +180,10 @@ void UPortalManager::Confirm_Response(FHttpRequestPtr Request, FHttpResponsePtr 
 
 void UPortalManager::QuitGame()
 {
-	APlayerController* PlayerLocalController = GEngine->GetFirstLocalPlayerController(GetWorld());
-	if (IsValid(PlayerLocalController))
+	APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
+	if (IsValid(LocalPlayerController))
 	{
-		UKismetSystemLibrary::QuitGame(this, PlayerLocalController, EQuitPreference::Quit, false);
+		UKismetSystemLibrary::QuitGame(this, LocalPlayerController, EQuitPreference::Quit, false);
 	}
 }
 

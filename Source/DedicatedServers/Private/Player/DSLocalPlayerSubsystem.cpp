@@ -4,7 +4,7 @@
 #include "Player/DSLocalPlayerSubsystem.h"
 
 #include "UI/Portal/PortalManager.h"
-#include "UI/Portal/Interface/PortalManagement.h"
+#include "UI/Interface/PortalManagement.h"
 
 void UDSLocalPlayerSubsystem::InitializeTokens(const FDSAuthenticationResult& AuthResult, TScriptInterface<IPortalManagement> PortalManager)
 {

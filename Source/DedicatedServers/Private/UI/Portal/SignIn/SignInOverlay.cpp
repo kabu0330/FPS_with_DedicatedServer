@@ -21,15 +21,7 @@ void USignInOverlay::NativeConstruct()
 	SetIsFocusable(true); // 키보드 입력 포커스
 	
 	check(PortalManagerClass);
-	
 	PortalManager = NewObject<UPortalManager>(this, PortalManagerClass);
-	
-#if WITH_EDITORONLY_DATA
-	Button_SignIn_Test->OnClicked.AddDynamic(this, &USignInOverlay::ShowSignInPage);
-	Button_SignUp_Test->OnClicked.AddDynamic(this, &USignInOverlay::ShowSignUpPage);
-	Button_ConfirmSignUp_Test->OnClicked.AddDynamic(this, &USignInOverlay::ShowConfirmSignUpPage);
-	Button_SuccessConfirmed_Test->OnClicked.AddDynamic(this, &USignInOverlay::ShowSuccessConfirmedPage);
-#endif
 	
 	// Sign In
 	SignInPage->Button_SignIn->OnClicked.AddDynamic(this, &USignInOverlay::SignInButtonClicked);

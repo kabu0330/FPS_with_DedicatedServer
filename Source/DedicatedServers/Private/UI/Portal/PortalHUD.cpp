@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "UI/Portal/SignIn/SignInOverlay.h"
+#include "UI/Portal/Dashboard/DashboardOverlay.h" 
 
 void APortalHUD::BeginPlay()
 {
@@ -19,4 +20,18 @@ void APortalHUD::BeginPlay()
 	FInputModeGameAndUI InputModeData;
 	OwingPlayerController->SetInputMode(InputModeData);
 	OwingPlayerController->SetShowMouseCursor(true);
+}
+
+void APortalHUD::OnSignIn()
+{
+	if (IsValid(SignInOverlay))
+	{
+		SignInOverlay->RemoveFromParent();
+	}
+	APlayerController* OwingPlayerController = GetOwningPlayerController();
+	DashboardOverlay = CreateWidget<UDashboardOverlay>(OwingPlayerController, DashboardOverlayClass);
+	if (IsValid(DashboardOverlay))
+	{
+		DashboardOverlay->AddToViewport();
+	}
 }

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interface/PortalManagement.h"
+#include "UI/Interface/PortalManagement.h"
 #include "Interfaces/IHttpRequest.h"
 #include "UI/HTTP/HTTPRequestManager.h"
 #include "UI/HTTP/HTTPRequestTypes.h"

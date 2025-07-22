@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UI/Portal/Interface/PortalManagement.h"
+#include "UI/Interface/PortalManagement.h"
 
 
 // Add default functionality here for any IPortalManagement functions that are not pure virtual.

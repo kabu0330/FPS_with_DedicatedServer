@@ -48,20 +48,6 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<USuccessConfirmedPage> SuccessConfirmedPage;
-
-#if WITH_EDITORONLY_DATA
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> Button_SignIn_Test;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> Button_SignUp_Test;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> Button_ConfirmSignUp_Test;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> Button_SuccessConfirmed_Test;
-#endif
 	
 	UPROPERTY()
 	TObjectPtr<UPortalManager> PortalManager;
