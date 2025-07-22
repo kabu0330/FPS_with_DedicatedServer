@@ -21,6 +21,12 @@ public:
 	void InitializeTokens(const FDSAuthenticationResult& AuthResult, TScriptInterface<IPortalManagement> PortalManager);
 	void SetRefreshTokenTimer();
 	void UpdateTokens(const FString& AccessToken, const FString& IdToken);
+	FDSAuthenticationResult GetAuthenticationResult() const;
+	
+	FString GetUsername() const;
+	FString GetEmail() const;
+	void SetUsername(const FString& Name);
+	void SetEmail(const FString& EmailAddress);
 	
 private:
 	UPROPERTY()
@@ -31,4 +37,7 @@ private:
 
 	float TokenRefreshInterval = 1.0f;
 	FTimerHandle TokenRefreshTimer;
+
+	FString Username;
+	FString Email;
 };

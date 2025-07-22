@@ -135,5 +135,6 @@ void FDSInitiateAuthResponse::Dump() const
 	}
 
 	UE_LOG(LogDedicatedServers, Log, TEXT("  Session: %s"), *Session);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  email: %s"), *email);
 	UE_LOG(LogDedicatedServers, Log, TEXT("--- END FDSSignInResponse DUMP ---"));
 }

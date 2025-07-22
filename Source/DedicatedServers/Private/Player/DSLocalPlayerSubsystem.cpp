@@ -39,3 +39,28 @@ void UDSLocalPlayerSubsystem::UpdateTokens(const FString& AccessToken, const FSt
 	AuthenticationResult.Dump();
 	SetRefreshTokenTimer();
 }
+
+FDSAuthenticationResult UDSLocalPlayerSubsystem::GetAuthenticationResult() const
+{
+	return AuthenticationResult;
+}
+
+FString UDSLocalPlayerSubsystem::GetUsername() const
+{
+	return Username;
+}
+
+FString UDSLocalPlayerSubsystem::GetEmail() const
+{
+	return Email;
+}
+
+void UDSLocalPlayerSubsystem::SetUsername(const FString& Name)
+{
+	Username = Name;
+}
+
+void UDSLocalPlayerSubsystem::SetEmail(const FString& EmailAddress)
+{
+	Email = EmailAddress;
+}

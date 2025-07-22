@@ -35,3 +35,17 @@ void APortalHUD::OnSignIn()
 		DashboardOverlay->AddToViewport();
 	}
 }
+
+void APortalHUD::OnSignOut()
+{
+	if (IsValid(DashboardOverlay))
+	{
+		DashboardOverlay->RemoveFromParent();
+	}
+	APlayerController* OwingPlayerController = GetOwningPlayerController();
+	SignInOverlay = CreateWidget<USignInOverlay>(OwingPlayerController, SignInOverlayClass);
+	if (IsValid(SignInOverlay))
+	{
+		SignInOverlay->AddToViewport();
+	}
+}

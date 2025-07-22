@@ -15,6 +15,8 @@ void UDashboardOverlay::NativeConstruct()
 	Button_Game->OnClicked.AddDynamic(this, &UDashboardOverlay::ShowGamePage);
 	Button_Career->OnClicked.AddDynamic(this, &UDashboardOverlay::ShowCareerPage);
 	Button_Leaderboard->OnClicked.AddDynamic(this, &UDashboardOverlay::ShowLeaderboardPage);
+
+	ShowGamePage();
 }
 
 void UDashboardOverlay::ShowGamePage()

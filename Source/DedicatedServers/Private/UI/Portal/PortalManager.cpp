@@ -10,10 +10,11 @@
 #include "GameplayTags/DedicatedServersTags.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/DSLocalPlayerSubsystem.h"
-#include "UI/Portal/PortalHUD.h"
+#include "UI/Interface/HUDManagement.h"
+#include "Gameframework/HUD.h"
 
 
-void UPortalManager::SignIn(const FString& UserName, const FString& Password)
+void UPortalManager::SignIn(const FString& Username, const FString& Password)
 {
 	SignInStatusMessageDelegate.Broadcast(TEXT("사용자 확인 중..."), false);
 	
@@ -25,9 +26,10 @@ void UPortalManager::SignIn(const FString& UserName, const FString& Password)
 	Request->SetURL(APIUrl);
 	Request->SetVerb(TEXT("POST"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	
+
+	LastUserName = Username;
 	TMap<FString, FString> Params = {
-		{TEXT("username"), UserName},
+		{TEXT("username"), Username},
 		{TEXT("password"), Password}
 	};
 	const FString Content = SerializeJsonContent(Params);
@@ -63,22 +65,23 @@ void UPortalManager::SignIn_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 		if (IsValid(LocalPlayerSubsystem))
 		{
 			LocalPlayerSubsystem->InitializeTokens(InitiateAuthResponse.AuthenticationResult, this);
+			LocalPlayerSubsystem->SetUsername(LastUserName);
+			LocalPlayerSubsystem->SetEmail(InitiateAuthResponse.email);
 		}
 
 		APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
 		if (IsValid(LocalPlayerController))
 		{
-			APortalHUD* PortalHUD = Cast<APortalHUD>(LocalPlayerController->GetHUD());
-			if (IsValid(PortalHUD))
+			if (IHUDManagement* HUDManagementInterface = Cast<IHUDManagement>(LocalPlayerController->GetHUD()))
 			{
-				PortalHUD->OnSignIn();
+				HUDManagementInterface->OnSignIn();
 			}
 		}
 		
 	}
 }
 
-void UPortalManager::SignUp(const FString& UserName, const FString& Password, const FString& Email)
+void UPortalManager::SignUp(const FString& Username, const FString& Password, const FString& Email)
 {
 	SignUpStatusMessageDelegate.Broadcast(TEXT("새로운 계정을 생성하고 있습니다..."), false);
 	
@@ -91,9 +94,9 @@ void UPortalManager::SignUp(const FString& UserName, const FString& Password, co
 	Request->SetVerb(TEXT("POST"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
-	LastUserName = UserName;
+	LastUserName = Username;
 	TMap<FString, FString> Params = {
-		{TEXT("username"), UserName},
+		{TEXT("username"), Username},
 		{TEXT("password"), Password},
 		{TEXT("email"), Email}
 	};
@@ -115,6 +118,15 @@ void UPortalManager::SignUp_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 	{
 		if (ContainsErrors(JsonObject, true))
 		{
+			if (JsonObject->HasField(TEXT("name")))
+			{
+				FString Exception = JsonObject->GetStringField(TEXT("name"));
+				if (Exception.Equals(TEXT("UsernameExistsException")))
+				{
+					ConfirmStatusMessageDelegate.Broadcast(TEXT("이미 사용 중인 UserName입니다. 이름을 변경해주세요."), true);
+					return;
+				}
+			}
 			SignUpStatusMessageDelegate.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);
 			return;
 		}
@@ -230,3 +242,46 @@ void UPortalManager::RefreshTokens_Response(FHttpRequestPtr Request, FHttpRespon
 	}
 }
 
+void UPortalManager::SignOut(const FString& AccessToken)
+{
+	check(APIData);
+	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, & UPortalManager::SignOut_Response);
+
+	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::PortalAPI::SignOut);
+	Request->SetURL(APIUrl);
+	Request->SetVerb(TEXT("POST"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	
+	TMap<FString, FString> Params = {
+		{TEXT("accessToken"), AccessToken}
+	};
+	const FString Content = SerializeJsonContent(Params);
+	Request->SetContentAsString(Content);
+	Request->ProcessRequest(); 
+}
+
+void UPortalManager::SignOut_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+{
+	if (!bWasSuccessful)
+	{
+		return;
+	}
+	
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+	if (FJsonSerializer::Deserialize(JsonReader, JsonObject))
+	{
+		if (ContainsErrors(JsonObject, true))
+		{
+			return;
+		}
+		APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
+		// 부모 포인터가 자식 인스턴스를 가리키고 있다.(업캐스팅)
+		// true라면 인터페이스가 제시한 순수 가상함수를 반드시 구현한 상태이니까 부모 포인터로 자식 인스턴스의 함수를 호출할 수 있다.
+		if (IHUDManagement* HUDManagementInterface = Cast<IHUDManagement>(LocalPlayerController->GetHUD()))
+		{
+			HUDManagementInterface->OnSignOut();
+		}
+	}
+}
