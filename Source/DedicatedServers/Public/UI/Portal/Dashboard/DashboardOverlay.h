@@ -11,8 +11,9 @@ class UWidgetSwitcher;
 class ULeaderboardPage;
 class UCareerPage;
 class UGamePage;
-/**
- * 
+
+/** DB관련 데이터 제공
+ *  
  */
 UCLASS()
 class DEDICATEDSERVERS_API UDashboardOverlay : public UUserWidget

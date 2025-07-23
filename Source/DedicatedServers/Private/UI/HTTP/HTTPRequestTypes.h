@@ -36,7 +36,7 @@ struct FDSListFleetsResponse
 	TArray<FString> FleetIds{};
 
 	UPROPERTY()
-	FString NextToken;
+	FString NextToken{};
 
 	void Dump() const;
 };
@@ -204,10 +204,10 @@ struct FDSNewDeviceMetadata
 	GENERATED_BODY()
 
 	UPROPERTY()
-	FString DeviceGroupKey;
+	FString DeviceGroupKey{};
 
 	UPROPERTY()
-	FString DeviceKey;
+	FString DeviceKey{};
 
 	void Dump() const;
 };
@@ -218,22 +218,22 @@ struct FDSAuthenticationResult
 	GENERATED_BODY()
 
 	UPROPERTY()
-	FString AccessToken;
+	FString AccessToken{};
 
 	UPROPERTY()
 	FString ExpiresIn{};
 
 	UPROPERTY()
-	FString IdToken;
+	FString IdToken{};
 
 	UPROPERTY()
-	FDSNewDeviceMetadata NewDeviceMetadata;
+	FDSNewDeviceMetadata NewDeviceMetadata{};
 
 	UPROPERTY()
-	FString RefreshToken;
+	FString RefreshToken{};
 
 	UPROPERTY()
-	FString TokenType;
+	FString TokenType{};
 
 	void Dump() const;
 };
@@ -244,22 +244,22 @@ struct FDSInitiateAuthResponse
 	GENERATED_BODY()
 
 	UPROPERTY()
-	FDSAuthenticationResult AuthenticationResult;
+	FDSAuthenticationResult AuthenticationResult{};
 
 	UPROPERTY()
 	TArray<FString> AvailableChallenges;
 	
 	UPROPERTY()
-	FString ChallengeName;
+	FString ChallengeName{};
 
 	UPROPERTY()
 	TMap<FString, FString> ChallengeParameters;
 
 	UPROPERTY()
-	FString Session;
+	FString Session{};
 
 	UPROPERTY()
-	FString email;
+	FString email{};
 
 	void Dump() const;
 };

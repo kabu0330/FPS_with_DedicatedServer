@@ -13,8 +13,8 @@ class UHUDManagement : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
+/** 로그인 화면 UI와 대시보드 UI 간 자유로운 전환을 구현하기 위해
+ *  두 UI가 서로를 굳이 알 필요가 없도록 HUD 인터페이스를 통해서 처리
  */
 class DEDICATEDSERVERS_API IHUDManagement
 {

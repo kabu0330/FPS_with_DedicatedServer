@@ -10,7 +10,7 @@ class UImage;
 class UTextBlock;
 class UButton;
 class UWidgetSwitcher;
-/**
+/** 계정 정보 제공 UI
  * 
  */
 UCLASS()

@@ -12,7 +12,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAPIRequestSucceeded);
 class UAPIData;
 class FJsonObject;
 class UDSLocalPlayerSubsystem;
-/**
+
+/** HTTP Response 파싱과 관련된 편의 기능 지원
  * 
  */
 UCLASS(Blueprintable)

@@ -11,7 +11,6 @@
 UDSLocalPlayerSubsystem* UHTTPRequestManager::GetDSLocalPlayerSubsystem() const
 {
 	APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
-
 	if (IsValid(LocalPlayerController))
 	{
 		ULocalPlayer* LocalPlayer = LocalPlayerController->GetLocalPlayer();

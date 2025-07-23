@@ -15,7 +15,8 @@ class USignInPage;
 class UPortalManager;
 class UJoinGame;
 class UWidgetSwitcher;
-/**
+
+/** 로그인, 회원가입, 인증과 관련된 UI 전환 관리
  * 
  */
 UCLASS()

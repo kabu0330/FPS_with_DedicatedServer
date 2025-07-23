@@ -3,18 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameMode.h"
+#include "DS_GameModeBase.h"
 #include "GameLiftServerSDK.h"
 #include "DS_GameMode.generated.h"
 
 struct FProcessParameters;
 
 
-/**
+/** GameLift SDK 초기 설정만 책임진다.
  * 
  */
 UCLASS()
-class DEDICATEDSERVERS_API ADS_GameMode : public AGameMode
+class DEDICATEDSERVERS_API ADS_GameMode : public ADS_GameModeBase
 {
 	GENERATED_BODY()
 

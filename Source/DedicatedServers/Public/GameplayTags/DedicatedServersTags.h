@@ -1,4 +1,6 @@
-﻿#include "CoreMinimal.h"
+﻿#pragma once
+
+#include "CoreMinimal.h"
 #include "NativeGameplayTags.h"
 
 namespace DedicatedServersTags
