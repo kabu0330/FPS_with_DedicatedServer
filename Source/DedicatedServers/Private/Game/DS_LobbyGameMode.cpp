@@ -5,13 +5,81 @@
 
 #include "DedicatedServers/DedicatedServers.h"
 #include "Game/DS_GameInstanceSubsystem.h"
+#include "Kismet/GameplayStatics.h"
+
+ADS_LobbyGameMode::ADS_LobbyGameMode()
+{
+    bUseSeamlessTravel = true;
+    
+    LobbyStatus = ELobbyStatus::WaitingForPlayers;
+    MinPlayers = 1;
+    LobbyCountdownTimer.Type = ECountdownTimerType::LobbyCountdown;
+}
+
+void ADS_LobbyGameMode::PostLogin(APlayerController* NewPlayer)
+{
+    Super::PostLogin(NewPlayer);
+    CheckAndStartLobbyCountdown();
+}
+
+void ADS_LobbyGameMode::InitSeamlessTravelPlayer(AController* NewController)
+{
+    Super::InitSeamlessTravelPlayer(NewController);
+    CheckAndStartLobbyCountdown();
+}
+
+
+void ADS_LobbyGameMode::Logout(AController* Exiting)
+{
+    Super::Logout(Exiting);
+    CheckAndStopLobbyCountdown();
+}
+
+void ADS_LobbyGameMode::CheckAndStartLobbyCountdown()
+{
+    if (GetNumPlayers() >= MinPlayers && LobbyStatus == ELobbyStatus::WaitingForPlayers)
+    {
+        LobbyStatus = ELobbyStatus::CountdownToSeamlessTravel;
+        StartCountdownTimer(LobbyCountdownTimer);
+    }
+}
+
+void ADS_LobbyGameMode::CheckAndStopLobbyCountdown()
+{
+    if (GetNumPlayers() - 1 < MinPlayers && LobbyStatus == ELobbyStatus::CountdownToSeamlessTravel)
+    {
+        LobbyStatus = ELobbyStatus::WaitingForPlayers;
+        StopCountdownTimer(LobbyCountdownTimer);
+    }
+}
+
+void ADS_LobbyGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
+{
+    Super::OnCountdownTimerFinished(Type);
+
+    if (Type == ECountdownTimerType::LobbyCountdown)
+    {
+        LobbyStatus = ELobbyStatus::SeamlessTravelling;
+        const FString MapName = DestinationMap.ToSoftObjectPath().GetAssetName();
+        /** 서버 트래블은 패키징에서만 정상 동작하므로 테스트 환경에서 확인할 수 있도록 코드를 분리
+         * GIsEditor 매크로를 통해서 에디터 모드인지 아닌지를 구분할 수 있다.
+         */
+        if (GIsEditor)
+        {
+            UGameplayStatics::OpenLevelBySoftObjectPtr(this, DestinationMap);
+        }
+        else
+        {
+            GetWorld()->ServerTravel(MapName);
+        }
+    }
+}
 
 void ADS_LobbyGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	InitGameLift();
-
 }
 
 void ADS_LobbyGameMode::InitGameLift()
