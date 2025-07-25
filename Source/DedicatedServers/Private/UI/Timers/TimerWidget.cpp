@@ -19,7 +19,7 @@ void UTimerWidget::NativeOnInitialized()
 	}
 	if (bHiddenWhenInactive)
 	{
-		TextBlock_Timer->SetRenderOpacity(0.f); // 안보이게 숨길 것
+		TextBlock_Time->SetRenderOpacity(0.f); // 안보이게 숨길 것
 	}
 }
 
@@ -29,15 +29,52 @@ void UTimerWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 	if (bActive)
 	{
-		UpdateCountdown(InDeltaTime);
+		UpdateCountdown(InternalCountdown - InDeltaTime);
 	}
 }
 
 void UTimerWidget::UpdateCountdown(float InDeltaTime)
 {
-	InternalCountdown -= InDeltaTime;
+	InternalCountdown = InDeltaTime;
 	const FText TimeText = FText::FromString(FormatTimeAsString(InternalCountdown));
-	TextBlock_Timer->SetText(TimeText);
+	TextBlock_Time->SetText(TimeText);
+}
+
+
+void UTimerWidget::TimerStarted(float InitialTime)
+{
+	bActive = true;
+	TextBlock_Time->SetRenderOpacity(1.f);
+	K2_OnTimerUpdated(InitialTime, TimerType);
+}
+
+void UTimerWidget::TimerStopped()
+{
+	bActive = false;
+	UpdateCountdown(0.f);
+	if (bHiddenWhenInactive)
+	{
+		TextBlock_Time->SetRenderOpacity(0.f); 
+	}
+}
+
+void UTimerWidget::OnTimerUpdated(float CountdownTimeLeft, ECountdownTimerType Type)
+{
+	if (Type != TimerType) return;
+	
+	if (!bActive)
+	{
+		TimerStarted(CountdownTimeLeft);
+	}
+	UpdateCountdown(CountdownTimeLeft);
+	K2_OnTimerUpdated(CountdownTimeLeft, TimerType);
+}
+
+void UTimerWidget::OnTimerStopped(float CountdownTimeLeft, ECountdownTimerType Type)
+{
+	if (Type != TimerType) return;
+	TimerStopped();
+	K2_OnTimerStopped(CountdownTimeLeft, TimerType);
 }
 
 FString UTimerWidget::FormatTimeAsString(float TimeSeconds) const
@@ -63,38 +100,4 @@ FString UTimerWidget::FormatTimeAsString(float TimeSeconds) const
 	return DisplayTimeString;
 }
 
-void UTimerWidget::OnTimerUpdated(float CountdownTimeLeft, ECountdownTimerType Type)
-{
-	if (Type != TimerType) return;
-	
-	if (!bActive)
-	{
-		TimerStarted(CountdownTimeLeft);
-	}
-	UpdateCountdown(CountdownTimeLeft);
-	K2_OnTimerStopped(CountdownTimeLeft, TimerType);
-}
 
-void UTimerWidget::OnTimerStopped(float CountdownTimeLeft, ECountdownTimerType Type)
-{
-	if (Type != TimerType) return;
-	TimerStopped();
-	K2_OnTimerStopped(CountdownTimeLeft, TimerType);
-}
-
-void UTimerWidget::TimerStarted(float InitialTime)
-{
-	bActive = true;
-	TextBlock_Timer->SetRenderOpacity(1.f);
-	K2_OnTimerUpdated(InitialTime, TimerType);
-}
-
-void UTimerWidget::TimerStopped()
-{
-	bActive = false;
-	UpdateCountdown(0);
-	if (bHiddenWhenInactive)
-	{
-		TextBlock_Timer->SetRenderOpacity(0.f); 
-	}
-}

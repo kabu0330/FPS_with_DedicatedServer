@@ -22,10 +22,10 @@ protected:
 	virtual void BeginPlay() override;
 	
 private:
+	TSharedPtr<FProcessParameters> ProcessParameters;
+	
 	void InitGameLift();
 	void SetServerParameters(FServerParameters& OutServerParameters);
 	void BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule);
 	void ParesCommandLinePort();
-	
-	TSharedPtr<FProcessParameters> ProcessParameters;
 };

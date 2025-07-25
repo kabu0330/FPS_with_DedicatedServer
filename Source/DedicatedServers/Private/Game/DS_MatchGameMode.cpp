@@ -7,14 +7,25 @@ ADS_MatchGameMode::ADS_MatchGameMode()
 {
 	bUseSeamlessTravel = true;
 	MatchStatus = EMatchStatus::WaitingForPlayers;
-
+	PreMatchTimerHandle.Type = ECountdownTimerType::PreMatch;
+	MatchTimerHandle.Type = ECountdownTimerType::Match;
+	PostMatchTimerHandle.Type = ECountdownTimerType::PostMatch;
 	
+}
+
+ADS_MatchGameMode::~ADS_MatchGameMode()
+{
+	int a = 0;
 }
 
 void ADS_MatchGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
+	/** 처음에는 PreMatchTimer를 전달하고 x초 후에 OnCountdownTimerFinished 함수로 넘어오면
+	 ** Match -> PostMatch 타이머가 순차적으로 돌아간다.
+	 */
+	
 	if (MatchStatus == EMatchStatus::WaitingForPlayers)
 	{
 		MatchStatus = EMatchStatus::PreMatch;
@@ -33,6 +44,12 @@ void ADS_MatchGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
 	}
 	if (Type == ECountdownTimerType::Match)
 	{
-		
+		MatchStatus = EMatchStatus::PostMatch;
+		StartCountdownTimer(PostMatchTimerHandle);
+	}
+	if (Type == ECountdownTimerType::PostMatch)
+	{
+		MatchStatus = EMatchStatus::SeamlessTravelling;
+		// SeamlessTravelling
 	}
 }

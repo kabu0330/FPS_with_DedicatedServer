@@ -34,13 +34,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bActive = false;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	bool bCanBeNegative = false;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	bool bShowCentiSeconds = true;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	bool bHiddenWhenInactive = true;
 
 	UFUNCTION()
@@ -59,7 +59,7 @@ protected:
 
 private:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> TextBlock_Timer;
+	TObjectPtr<UTextBlock> TextBlock_Time;
 
 	float InternalCountdown;
 

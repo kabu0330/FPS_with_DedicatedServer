@@ -17,8 +17,8 @@ void ADS_GameModeBase::StartCountdownTimer(FCountdownTimerHandle& CountdownTimer
 	// 종료 타이머가 호출될 때 실행할 함수
 	CountdownTimerHandle.TimerFinishedDelegate.BindWeakLambda(this, [&]()
 	{
-		StopCountdownTimer(CountdownTimerHandle);
 		OnCountdownTimerFinished(CountdownTimerHandle.Type);
+		StopCountdownTimer(CountdownTimerHandle);
 	});
 
 	// 종료 타이머 설정
@@ -33,27 +33,19 @@ void ADS_GameModeBase::StartCountdownTimer(FCountdownTimerHandle& CountdownTimer
 	// 모든 클라이언트에게 남은 시간을 전파.
 	CountdownTimerHandle.TimerUpdateDelegate.BindWeakLambda(this, [&]()
 	{
-		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-		{
-			ADSPlayerController* DSPlayerController = Cast<ADSPlayerController>(Iterator->Get());
-			if (IsValid(DSPlayerController))
-			{
-				const float CountdownTimeLeft =
-					CountdownTimerHandle.CountdownTime - GetWorldTimerManager().GetTimerRemaining(CountdownTimerHandle.TimerFinishedHandle);
-				// 서버 : 얘들아, 지금 4초 남았어!
-				DSPlayerController->Client_TimerUpdated(CountdownTimeLeft, CountdownTimerHandle.Type);
-				// 클라 : 서버가 0.2초 전에 얘기했으니까 지금은 3.8초 남았네. 델리게이트야 3.8초로 전파해.
-			}
-		}
+		UpdateCountdownTimer(CountdownTimerHandle);
 	});
 
-	// Interval 시간마다 다시 타이머 업데이트
+	// Interval 간격마다 다시 타이머 업데이트
 	GetWorldTimerManager().SetTimer(
 		CountdownTimerHandle.TimerUpdateHandle,
 		CountdownTimerHandle.TimerUpdateDelegate,
 		CountdownTimerHandle.CountdownUpdateInterval,
 		true
 		);
+
+	// 다음 카운트다운 타이머가 보이기까지 딜레이가 발생하고 있는 문제를 해결하기 위해서 먼저 호출
+	UpdateCountdownTimer(CountdownTimerHandle);
 }
 
 void ADS_GameModeBase::StopCountdownTimer(FCountdownTimerHandle& CountdownTimerHandle)
@@ -82,7 +74,23 @@ void ADS_GameModeBase::StopCountdownTimer(FCountdownTimerHandle& CountdownTimerH
 	}
 }
 
+void ADS_GameModeBase::UpdateCountdownTimer(const FCountdownTimerHandle& CountdownTimerHandle)
+{
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		ADSPlayerController* DSPlayerController = Cast<ADSPlayerController>(Iterator->Get());
+		if (IsValid(DSPlayerController))
+		{
+			const float CountdownTimeLeft =
+				CountdownTimerHandle.CountdownTime - GetWorldTimerManager().GetTimerElapsed(CountdownTimerHandle.TimerFinishedHandle);
+			// 서버 : 얘들아, 지금 4초 남았어!
+			DSPlayerController->Client_TimerUpdated(CountdownTimeLeft, CountdownTimerHandle.Type);
+			// 클라 : 서버가 0.2초 전에 얘기했으니까 지금은 3.8초 남았네. 델리게이트야 3.8초로 전파해.
+		}
+	}
+}
+
 void ADS_GameModeBase::OnCountdownTimerFinished(ECountdownTimerType Type)
 {
-	
+	// MatchGameMode override
 }

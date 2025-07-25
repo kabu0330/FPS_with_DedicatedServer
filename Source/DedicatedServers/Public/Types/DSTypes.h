@@ -1,24 +1,25 @@
-﻿#pragma once
+#pragma once
 
+#include "CoreMinimal.h"
 #include "DSTypes.generated.h"
 
 UENUM(BlueprintType)
 enum class ECountdownTimerState : uint8
 {
-	NotStarted	 UMETA(DisplayName = TEXT("준비")),
-	Started		 UMETA(DisplayName = TEXT("시작")),
-	Paused		 UMETA(DisplayName = TEXT("일시정지")),
-	Stopped		 UMETA(DisplayName = TEXT("중단"))
+	NotStarted	 UMETA(DisplayName = "준비"),
+	Started		 UMETA(DisplayName = "시작"),
+	Paused		 UMETA(DisplayName = "일시정지"),
+	Stopped		 UMETA(DisplayName = "중단")
 };
 
 UENUM(BlueprintType)
 enum class ECountdownTimerType : uint8
 {
-	LobbyCountdown		UMETA(DisplayName = TEXT("로비 카운트다운")),
-	PreMatch			UMETA(DisplayName = TEXT("매칭 전")),
-	Match				UMETA(DisplayName = TEXT("매칭")),
-	PostMatch			UMETA(DisplayName = TEXT("매칭 후")),
-	None				UMETA(DisplayName = TEXT("NONE")),
+	LobbyCountdown		UMETA(DisplayName = "로비 카운트다운"),
+	PreMatch			UMETA(DisplayName = "경기 전"),
+	Match				UMETA(DisplayName = "경기 중"),
+	PostMatch			UMETA(DisplayName = "경기 후"),
+	None				UMETA(DisplayName = "NONE"),
 };
 
 UENUM()

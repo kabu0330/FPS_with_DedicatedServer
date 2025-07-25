@@ -42,5 +42,5 @@ void ADSPlayerController::Client_TimerUpdated_Implementation(float CountdownTime
 void ADSPlayerController::Client_TimerStopped_Implementation(float CountdownTimeLeft, ECountdownTimerType Type) const
 {
 	// Type == Stopped, 즉시 카운트다운 종료 전파
-	OnTimerUpdated.Broadcast(CountdownTimeLeft - SingleTripTime, Type);
+	OnTimerStopped.Broadcast(CountdownTimeLeft - SingleTripTime, Type);
 }
