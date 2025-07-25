@@ -11,8 +11,9 @@ struct FProcessParameters;
 
 
 /** GameLift SDK 초기 설정만 책임진다.
- * 
- */
+ *  더 이상 사용하지 않음
+ *  LobbyGameMode와 GameInstanceSubsystem으로 기능 이관
+ */ 
 UCLASS()
 class DEDICATEDSERVERS_API ADS_GameMode : public ADS_GameModeBase
 {
