@@ -28,7 +28,6 @@ void ADS_LobbyGameMode::InitSeamlessTravelPlayer(AController* NewController)
     CheckAndStartLobbyCountdown();
 }
 
-
 void ADS_LobbyGameMode::Logout(AController* Exiting)
 {
     Super::Logout(Exiting);
@@ -66,6 +65,7 @@ void ADS_LobbyGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
          */
         if (GIsEditor)
         {
+            // 리슨 서버 환경의 PIE에서 ServerTravel처럼 동작
             UGameplayStatics::OpenLevelBySoftObjectPtr(this, DestinationMap);
         }
         else

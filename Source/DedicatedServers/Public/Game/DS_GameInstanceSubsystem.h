@@ -22,10 +22,9 @@ public:
 	void InitGameLift(const FServerParameters& ServerParameters);
 
 private:
-	UPROPERTY()
 	TSharedPtr<FProcessParameters> ProcessParameters;
 
-	UPROPERTY(BlueprintReadOnly, Category = "GameLift")
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess))
 	bool bGameLiftInitialized;
 
 	void BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule);

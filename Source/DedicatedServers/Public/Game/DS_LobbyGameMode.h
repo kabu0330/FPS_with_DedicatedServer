@@ -21,11 +21,23 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
+	/* Post Login
+	 * 새로운 플레이어가 서버에 접속했을 때 서버에서 자동 호출
+	 */
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-	virtual void OnCountdownTimerFinished(ECountdownTimerType Type) override;
-	virtual void InitSeamlessTravelPlayer(AController* NewController) override;
-	void CheckAndStopLobbyCountdown();
+
+	/* Logout
+	 * 플레이어가 게임 모드에서 나갔을 때
+	 */
 	virtual void Logout(AController* Exiting) override;
+	
+	/* InitSeamlessTravelPlayer
+	 * 심리스 트래블로 넘어온 도착지 GameMode에 PlayerController들에게 호출
+	 */
+	virtual void InitSeamlessTravelPlayer(AController* NewController) override;
+	virtual void OnCountdownTimerFinished(ECountdownTimerType Type) override;
+	void CheckAndStopLobbyCountdown();
 	
 	UPROPERTY()
 	ELobbyStatus LobbyStatus;

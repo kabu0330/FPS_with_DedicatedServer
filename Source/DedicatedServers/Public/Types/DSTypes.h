@@ -48,7 +48,7 @@ struct FCountdownTimerHandle
 	UPROPERTY(BlueprintReadWrite)
 	ECountdownTimerState State = ECountdownTimerState::NotStarted;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	ECountdownTimerType Type = ECountdownTimerType::None;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
