@@ -3,6 +3,7 @@
 
 #include "Game/DS_GameModeBase.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "Player/DSPlayerController.h"
 
 void ADS_GameModeBase::StartCountdownTimer(FCountdownTimerHandle& CountdownTimerHandle)
@@ -93,4 +94,21 @@ void ADS_GameModeBase::UpdateCountdownTimer(const FCountdownTimerHandle& Countdo
 void ADS_GameModeBase::OnCountdownTimerFinished(ECountdownTimerType Type)
 {
 	// MatchGameMode override
+}
+
+void ADS_GameModeBase::TrySeamlessTravel(TSoftObjectPtr<UWorld> DestinationMap)
+{
+	const FString MapName = DestinationMap.ToSoftObjectPath().GetAssetName();
+	/** 서버 트래블은 패키징에서만 정상 동작하므로 테스트 환경에서 확인할 수 있도록 코드를 분리
+	 * GIsEditor 매크로를 통해서 에디터 모드인지 아닌지를 구분할 수 있다.
+	 */
+	if (GIsEditor)
+	{
+		// 리슨 서버 환경의 PIE에서 ServerTravel처럼 동작
+		UGameplayStatics::OpenLevelBySoftObjectPtr(this, DestinationMap);
+	}
+	else
+	{
+		GetWorld()->ServerTravel(MapName);
+	}
 }

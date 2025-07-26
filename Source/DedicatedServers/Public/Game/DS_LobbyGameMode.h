@@ -8,8 +8,10 @@
 #include "DS_LobbyGameMode.generated.h"
 
 class UDS_GameInstanceSubsystem;
-/**
- * 
+
+/** 1. GameInstanceSubsystem->InitGameLift() 호출
+ *  2. 로그인 시 가장 먼저 도착하는 레벨
+ *  3. 
  */
 UCLASS()
 class DEDICATEDSERVERS_API ADS_LobbyGameMode : public ADS_GameModeBase
@@ -20,20 +22,21 @@ public:
 	void CheckAndStartLobbyCountdown();
 
 protected:
+	// InitGameLift() 호출
 	virtual void BeginPlay() override;
 	
-	/* Post Login
-	 * 새로운 플레이어가 서버에 접속했을 때 서버에서 자동 호출
+	/**  Post Login
+	 *  새로운 플레이어가 서버에 접속했을 때 서버에서 자동 호출
 	 */
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
-	/* Logout
-	 * 플레이어가 게임 모드에서 나갔을 때
+	/** Logout
+	 *  플레이어가 게임 모드에서 나갔을 때
 	 */
 	virtual void Logout(AController* Exiting) override;
 	
-	/* InitSeamlessTravelPlayer
-	 * 심리스 트래블로 넘어온 도착지 GameMode에 PlayerController들에게 호출
+	/** InitSeamlessTravelPlayer
+	 *  심리스 트래블로 넘어온 도착지 GameMode에 PlayerController들에게 호출
 	 */
 	virtual void InitSeamlessTravelPlayer(AController* NewController) override;
 	virtual void OnCountdownTimerFinished(ECountdownTimerType Type) override;
@@ -45,8 +48,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	int32 MinPlayers;
 
-	/* TSoftObjectPtr : 에셋의 경로를 문자열로 저장하는 방식
-	 * 메모리에 에셋을 로드하지 않고 필요할 때 로드하는 방식으로 최적화
+	/** TSoftObjectPtr : 에셋의 경로를 문자열로 저장하는 방식
+	 *  메모리에 에셋을 즉시 로드하지 않고 필요할 때 로드하는 방식으로 최적화
 	 */
 	UPROPERTY(EditdefaultsOnly)
 	TSoftObjectPtr<UWorld> DestinationMap;

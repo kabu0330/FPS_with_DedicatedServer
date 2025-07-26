@@ -9,8 +9,8 @@
 
 struct FProcessParameters;
 struct FServerParameters;
-/**
- * 
+/** 1. InitGameLift() aws GameLift Servers 기능 지원
+ *  2. 서버 트래블이 발생해도 GameLift Servers와 통신이 이어지도록 "ProcessParameters" 데이터 저장 
  */
 UCLASS()
 class DEDICATEDSERVERS_API UDS_GameInstanceSubsystem : public UGameInstanceSubsystem

@@ -51,5 +51,6 @@ void ADS_MatchGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
 	{
 		MatchStatus = EMatchStatus::SeamlessTravelling;
 		// SeamlessTravelling
+		TrySeamlessTravel(LobbyMap);
 	}
 }
