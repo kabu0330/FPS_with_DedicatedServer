@@ -3,6 +3,8 @@
 
 #include "Game/DS_MatchGameMode.h"
 
+#include "Player/DSPlayerController.h"
+
 ADS_MatchGameMode::ADS_MatchGameMode()
 {
 	bUseSeamlessTravel = true;
@@ -11,11 +13,6 @@ ADS_MatchGameMode::ADS_MatchGameMode()
 	MatchTimerHandle.Type = ECountdownTimerType::Match;
 	PostMatchTimerHandle.Type = ECountdownTimerType::PostMatch;
 	
-}
-
-ADS_MatchGameMode::~ADS_MatchGameMode()
-{
-	int a = 0;
 }
 
 void ADS_MatchGameMode::PostLogin(APlayerController* NewPlayer)
@@ -41,16 +38,30 @@ void ADS_MatchGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
 	{
 		MatchStatus = EMatchStatus::Match;
 		StartCountdownTimer(MatchTimerHandle);
+		SetClientInputEnabled(true);
 	}
 	if (Type == ECountdownTimerType::Match)
 	{
 		MatchStatus = EMatchStatus::PostMatch;
 		StartCountdownTimer(PostMatchTimerHandle);
+		SetClientInputEnabled(false);
 	}
 	if (Type == ECountdownTimerType::PostMatch)
 	{
 		MatchStatus = EMatchStatus::SeamlessTravelling;
 		// SeamlessTravelling
 		TrySeamlessTravel(LobbyMap);
+	}
+}
+
+void ADS_MatchGameMode::SetClientInputEnabled(bool bEnabled)
+{
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ADSPlayerController* DSPlayerController = Cast<ADSPlayerController>(It->Get());
+		if (IsValid(DSPlayerController))
+		{
+			DSPlayerController->Client_SetInputEnabled_Implementation(bEnabled);
+		}
 	}
 }

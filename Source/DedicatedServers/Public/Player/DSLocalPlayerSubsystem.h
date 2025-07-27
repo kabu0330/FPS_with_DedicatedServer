@@ -8,9 +8,9 @@
 #include "DSLocalPlayerSubsystem.generated.h"
 
 class IPortalManagement;
-class UPortalManager;
-/**
- * 
+
+/** 1. 사용자 정보를 PortalManager로부터 가져온다.
+ *  2. 주기적으로 Token을 갱신한다.
  */
 UCLASS()
 class DEDICATEDSERVERS_API UDSLocalPlayerSubsystem : public ULocalPlayerSubsystem

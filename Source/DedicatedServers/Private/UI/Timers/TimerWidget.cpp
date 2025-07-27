@@ -45,7 +45,7 @@ void UTimerWidget::TimerStarted(float InitialTime)
 {
 	bActive = true;
 	TextBlock_Time->SetRenderOpacity(1.f);
-	K2_OnTimerUpdated(InitialTime, TimerType);
+	K2_OnTimerStarted(InitialTime, TimerType);
 }
 
 void UTimerWidget::TimerStopped()

@@ -7,6 +7,49 @@ ADSPlayerController::ADSPlayerController()
 {
 }
 
+void ADSPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	if (IsLocalController())
+	{
+		DisableInput(this);
+	}
+}
+
+void ADSPlayerController::PostSeamlessTravel()
+{
+	Super::PostSeamlessTravel();
+
+	if (IsLocalController())
+	{
+		Server_Ping(GetWorld()->GetTimeSeconds());
+		DisableInput(this);
+	}
+}
+
+void ADSPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (GetNetMode() == NM_Standalone)
+	{
+		DisableInput(this);
+	}
+}
+
+void ADSPlayerController::Client_SetInputEnabled_Implementation(bool bEnabled)
+{
+	if (bEnabled)
+	{
+		EnableInput(this);
+	}
+	else
+	{
+		DisableInput(this);
+	}
+}
+
 void ADSPlayerController::ReceivedPlayer()
 {
 	Super::ReceivedPlayer();

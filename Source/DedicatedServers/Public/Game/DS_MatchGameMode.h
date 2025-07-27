@@ -16,7 +16,6 @@ class DEDICATEDSERVERS_API ADS_MatchGameMode : public ADS_GameModeBase
 
 public:
 	ADS_MatchGameMode();
-	~ADS_MatchGameMode();
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
@@ -34,6 +33,8 @@ protected:
 	TSoftObjectPtr<UWorld> LobbyMap;
 
 	virtual void OnCountdownTimerFinished(ECountdownTimerType Type) override;
+
+	void SetClientInputEnabled(bool bEnabled);
 	
 private:
 	UPROPERTY()
