@@ -42,6 +42,7 @@ void UDS_GameInstanceSubsystem::InitGameLift(const FServerParameters& ServerPara
         UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_RED);
         UE_LOG(LogDedicatedServers, Log, TEXT("ERROR: InitSDK failed : ("));
         FGameLiftError GameLiftError = InitSdkOutcome.GetError();
+        UE_LOG(LogDedicatedServers, Log, TEXT("ERROR Name: %s"), *GameLiftError.m_errorName);
         UE_LOG(LogDedicatedServers, Log, TEXT("ERROR: %s"), *GameLiftError.m_errorMessage);
         UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
         return;
@@ -81,6 +82,11 @@ void UDS_GameInstanceSubsystem::InitGameLift(const FServerParameters& ServerPara
 #endif
 
     bGameLiftInitialized = true;
+}
+
+void UDS_GameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+    Super::Initialize(Collection);
 }
 
 void UDS_GameInstanceSubsystem::BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule)

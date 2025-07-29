@@ -26,4 +26,6 @@ protected:
 
 	// Server Travel
 	void TrySeamlessTravel(TSoftObjectPtr<UWorld> DestinationMap);
+
+	void RemovePlayerSession(AController* Exiting);
 };

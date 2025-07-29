@@ -21,12 +21,15 @@ public:
 	
 	void InitGameLift(const FServerParameters& ServerParameters);
 
+protected:
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	
 private:
 	TSharedPtr<FProcessParameters> ProcessParameters;
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess))
 	bool bGameLiftInitialized;
-
+	
 	void BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule);
 	void ParesCommandLinePort();
 };

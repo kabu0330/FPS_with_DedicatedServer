@@ -3,9 +3,12 @@
 
 #include "Game/DS_LobbyGameMode.h"
 
+#include "HttpModule.h"
 #include "DedicatedServers/DedicatedServers.h"
 #include "Game/DS_GameInstanceSubsystem.h"
+#include "Interfaces/IHttpResponse.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/DSPlayerController.h"
 
 ADS_LobbyGameMode::ADS_LobbyGameMode()
 {
@@ -20,18 +23,43 @@ void ADS_LobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
     CheckAndStartLobbyCountdown();
+    UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_LobbyGameMode PostLogin for %s"), *NewPlayer->GetName());
 }
 
 void ADS_LobbyGameMode::InitSeamlessTravelPlayer(AController* NewController)
 {
     Super::InitSeamlessTravelPlayer(NewController);
     CheckAndStartLobbyCountdown();
+    UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_LobbyGameMode InitSeamlessTravelPlayer for %s"), *NewController->GetName());
+}
+
+FString ADS_LobbyGameMode::InitNewPlayer(APlayerController* NewPlayerController, const FUniqueNetIdRepl& UniqueId,
+    const FString& Options, const FString& Portal)
+{
+    FString InitializedString = Super::InitNewPlayer(NewPlayerController, UniqueId, Options, Portal);
+    
+    const FString PlayerSessionId = UGameplayStatics::ParseOption(Options, TEXT("PlayerSessionId"));
+    const FString Username = UGameplayStatics::ParseOption(Options, TEXT("Username"));
+
+    if (ADSPlayerController* PlayerController = Cast<ADSPlayerController>(NewPlayerController); IsValid(PlayerController))
+    {
+        PlayerController->PlayerSessionId = PlayerSessionId;
+        PlayerController->Username = Username;
+    }
+    
+    UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_LobbyGameMode InitNewPlayer for %s"), *NewPlayerController->GetName());
+    
+    return InitializedString;
 }
 
 void ADS_LobbyGameMode::Logout(AController* Exiting)
 {
     Super::Logout(Exiting);
     CheckAndStopLobbyCountdown();
+
+    UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_LobbyGameMode Logout for %s"), *Exiting->GetName());
+
+    RemovePlayerSession(Exiting);
 }
 
 void ADS_LobbyGameMode::CheckAndStartLobbyCountdown()
@@ -52,12 +80,71 @@ void ADS_LobbyGameMode::CheckAndStopLobbyCountdown()
     }
 }
 
+void ADS_LobbyGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
+    FString& ErrorMessage)
+{
+    Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+
+    const FString PlayerSessionId = UGameplayStatics::ParseOption(Options, TEXT("PlayerSessionId"));
+    const FString Username = UGameplayStatics::ParseOption(Options, TEXT("Username"));
+
+    UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_LobbyGameMode PreLogin for %s"), *Username);
+    TryAcceptPlayerSession(PlayerSessionId, Username, ErrorMessage);
+}
+
+void ADS_LobbyGameMode::TryAcceptPlayerSession(const FString& PlayerSessionId, const FString& Username,
+                                               FString& OutErrorMessage)
+{
+    if (PlayerSessionId.IsEmpty() || Username.IsEmpty())
+    {
+        OutErrorMessage = TEXT("Invalid player session id or username");
+        return;
+    }
+#if WITH_GAMELIFT
+    Aws::GameLift::Server::Model::DescribePlayerSessionsRequest DescribePlayerSessionsRequest;
+    DescribePlayerSessionsRequest.SetPlayerSessionId(TCHAR_TO_ANSI(*PlayerSessionId));
+
+    const auto& DescribePlayerSessionsOutcome = Aws::GameLift::Server::DescribePlayerSessions(DescribePlayerSessionsRequest);
+    if (!DescribePlayerSessionsOutcome.IsSuccess())
+    {
+        OutErrorMessage = TEXT("DescribePlayerSessions failed");
+        return;
+    }
+
+    const auto& DescribePlayerSessionsResult = DescribePlayerSessionsOutcome.GetResult();
+    // 플레이어 세션 수와 PlayerSessions 배열을 반환한다.
+    int32 Count = 0;
+    const Aws::GameLift::Server::Model::PlayerSession* PlayerSessions = DescribePlayerSessionsResult.GetPlayerSessions(Count);
+    if (PlayerSessions == nullptr || Count == 0)
+    {
+        OutErrorMessage = TEXT("GetPlayerSessions failed");
+        return;
+    }
+
+    for (int32 i = 0; i < Count; ++i)
+    {
+        const Aws::GameLift::Server::Model::PlayerSession& PlayerSession =  PlayerSessions[i];
+        if (!Username.Equals(PlayerSession.GetPlayerId())) continue;
+        if (PlayerSession.GetStatus() != Aws::GameLift::Server::Model::PlayerSessionStatus::RESERVED)
+        {
+            OutErrorMessage = FString::Printf(TEXT("Player session %s is not reserved"), *PlayerSessionId);
+            return;
+        }
+
+        const auto& AcceptPlayerSessionOutcome = Aws::GameLift::Server::AcceptPlayerSession(TCHAR_TO_ANSI(*PlayerSessionId));
+        OutErrorMessage = AcceptPlayerSessionOutcome.IsSuccess() ? TEXT("") :FString::Printf( TEXT("AcceptPlayerSession failed"));
+    } // OutErrorMessage가 빈 문자열이라면 성공적으로 플레이어 세션을 수락했음을 의미한다.
+#endif
+    
+}
+
 void ADS_LobbyGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
 {
     Super::OnCountdownTimerFinished(Type);
 
     if (Type == ECountdownTimerType::LobbyCountdown)
     {
+        StopCountdownTimer(LobbyCountdownTimer);
         LobbyStatus = ELobbyStatus::SeamlessTravelling;
         TrySeamlessTravel(DestinationMap);
     }
@@ -66,7 +153,7 @@ void ADS_LobbyGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
 void ADS_LobbyGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	
+    UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_LobbyGameMode BeginPlay"));
 	InitGameLift();
 }
 
@@ -79,6 +166,7 @@ void ADS_LobbyGameMode::InitGameLift()
 			FServerParameters ServerParameters;
 		    SetServerParameters(ServerParameters);
 		    DSGameInstanceSubsystem->InitGameLift(ServerParameters);
+		    UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_LobbyGameMode InitGameLift() end..."));
 		}
 	}
 }
@@ -171,7 +259,7 @@ void ADS_LobbyGameMode::SetServerParameters(FServerParameters& OutServerParamete
             OutServerParameters.m_sessionToken = TCHAR_TO_UTF8(*glAnywhereSessionToken);
             UE_LOG(LogDedicatedServers, Log, TEXT("glAnywhereSessionToken succeeded!"));
         }
-       
+   
     //}
     
         UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_YELLOW);
@@ -185,5 +273,40 @@ void ADS_LobbyGameMode::SetServerParameters(FServerParameters& OutServerParamete
         UE_LOG(LogDedicatedServers, Log, TEXT(">>>> Secret Key: %s"), *OutServerParameters.m_secretKey);
         UE_LOG(LogDedicatedServers, Log, TEXT(">>>> Session Token: %s"), *OutServerParameters.m_sessionToken);
         UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
+    
+
 }
 
+void ADS_LobbyGameMode::FindGameLiftAnywhereServerIP()
+{
+    TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
+    Request->OnProcessRequestComplete().BindUObject(this, & ADS_LobbyGameMode::FindGameLiftAnywhereServerIP_Response);
+
+    Request->SetURL(TEXT("https://checkip.amazonaws.com"));
+    Request->SetVerb(TEXT("GET"));
+    Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
+    Request->SetHeader(TEXT("Content-Type"), TEXT("text/plain"));
+	
+    Request->ProcessRequest();
+}
+
+void ADS_LobbyGameMode::FindGameLiftAnywhereServerIP_Response(FHttpRequestPtr Request, FHttpResponsePtr Response,
+                                                              bool bWasSuccessful)
+{
+    if (!bWasSuccessful)
+    {
+        UE_LOG(LogDedicatedServers, Warning, TEXT("FindGameLiftAnywhereServerIP_Response is Failed..."));
+        return;
+    }
+	
+    FString AnywhereIP = TEXT("");
+    if (Response.IsValid())
+    {
+        AnywhereIP = Response->GetContentAsString().TrimStartAndEnd();
+        UE_LOG(LogDedicatedServers, Warning, TEXT("AnywhereIP : %s"), *AnywhereIP);
+    }
+    else
+    {
+        UE_LOG(LogDedicatedServers, Error, TEXT("FindGameLiftAnywhereServerIP_Response is Failed..."));
+    }
+}

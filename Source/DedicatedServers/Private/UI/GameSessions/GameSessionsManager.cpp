@@ -42,7 +42,7 @@ void UGameSessionsManager::FindOrCreateGameSession_Response(FHttpRequestPtr Requ
 {
 	if (!bWasSuccessful)
 	{
-		BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);
+		BroadcastJoinGameSessionMessage.Broadcast(TEXT("FindOrCreateGameSession Response Failed..."), true);
 	}
 	
 	TSharedPtr<FJsonObject> JsonObject;
@@ -51,7 +51,7 @@ void UGameSessionsManager::FindOrCreateGameSession_Response(FHttpRequestPtr Requ
 	{
 		if (ContainsErrors(JsonObject, true))
 		{
-			BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);
+			BroadcastJoinGameSessionMessage.Broadcast(TEXT("FindOrCreateGameSession Response Type is Error."), true);
 			return;
 		}
 		
@@ -87,11 +87,16 @@ void UGameSessionsManager::FindOrCreateGameSession_Response(FHttpRequestPtr Requ
 
 void UGameSessionsManager::HandleGameSessionStatus(const FString& Status, const FString& SessionId)
 {
+	// 플레이어 접속 처리
 	if (Status.Equals(TEXT("ACTIVE")))
 	{
 		BroadcastJoinGameSessionMessage.Broadcast(TEXT("Found activate Game Session. Creating a Player Session..."), false);
-		
-		TryCreatePlayerSession(GetUniquePlayerId(), SessionId);
+
+		if (UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem(); IsValid(LocalPlayerSubsystem))
+		{
+			//TryCreatePlayerSession(GetUniquePlayerId(), SessionId);
+			TryCreatePlayerSession(LocalPlayerSubsystem->GetUsername(), SessionId);
+		}
 	}
 	else if (Status.Equals(TEXT("ACTIVATING")))
 	{
@@ -107,7 +112,7 @@ void UGameSessionsManager::HandleGameSessionStatus(const FString& Status, const 
 	}
 	else
 	{
-		BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);
+		BroadcastJoinGameSessionMessage.Broadcast(TEXT("GameSessionStatus is Not ACTIVE or ACTIVATING"), true);
 	}
 }
 
@@ -147,7 +152,7 @@ void UGameSessionsManager::TryCreatePlayerSession(const FString& PlayerId, const
 }
 
 void UGameSessionsManager::CreatePlayerSession_Response(FHttpRequestPtr Request, FHttpResponsePtr Response,
-	bool bWasSuccessful)
+                                                        bool bWasSuccessful)
 {
 	TSharedPtr<FJsonObject> JsonObject;
 	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
@@ -155,7 +160,7 @@ void UGameSessionsManager::CreatePlayerSession_Response(FHttpRequestPtr Request,
 	{
 		if (ContainsErrors(JsonObject, true))
 		{
-			BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);
+			BroadcastJoinGameSessionMessage.Broadcast(TEXT("CreatePlayerSession Response is Failed..."), true);
 			return;
 		}
 		
@@ -170,10 +175,27 @@ void UGameSessionsManager::CreatePlayerSession_Response(FHttpRequestPtr Request,
 			LocalPlayerController->SetInputMode(InputModeData);
 			LocalPlayerController->SetShowMouseCursor(false);
 		}
-
+		
 		// 레벨 전환
+		BroadcastJoinGameSessionMessage.Broadcast(TEXT("Open Lobby Level..."), true);
+		const FString Options = "PlayerSessionId=" + PlayerSession.PlayerSessionId + "?Username=" + PlayerSession.PlayerId;
+		
 		const FString IpAndPort = PlayerSession.IpAddress + TEXT(":") + FString::FromInt(PlayerSession.Port);
 		const FName Address(*IpAndPort);
-		UGameplayStatics::OpenLevel(this, Address);
+		UGameplayStatics::OpenLevel(this, Address, true, Options);
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

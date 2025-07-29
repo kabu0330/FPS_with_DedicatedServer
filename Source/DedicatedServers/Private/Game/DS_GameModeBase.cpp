@@ -3,6 +3,7 @@
 
 #include "Game/DS_GameModeBase.h"
 
+#include "aws/gamelift/server/GameLiftServerAPI.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/DSPlayerController.h"
 
@@ -19,7 +20,6 @@ void ADS_GameModeBase::StartCountdownTimer(FCountdownTimerHandle& CountdownTimer
 	CountdownTimerHandle.TimerFinishedDelegate.BindWeakLambda(this, [&]()
 	{
 		OnCountdownTimerFinished(CountdownTimerHandle.Type);
-		StopCountdownTimer(CountdownTimerHandle);
 	});
 
 	// 종료 타이머 설정
@@ -99,6 +99,7 @@ void ADS_GameModeBase::OnCountdownTimerFinished(ECountdownTimerType Type)
 void ADS_GameModeBase::TrySeamlessTravel(TSoftObjectPtr<UWorld> DestinationMap)
 {
 	const FString MapName = DestinationMap.ToSoftObjectPath().GetAssetName();
+	
 	/** 서버 트래블은 패키징에서만 정상 동작하므로 테스트 환경에서 확인할 수 있도록 코드를 분리
 	 * GIsEditor 매크로를 통해서 에디터 모드인지 아닌지를 구분할 수 있다.
 	 */
@@ -112,3 +113,19 @@ void ADS_GameModeBase::TrySeamlessTravel(TSoftObjectPtr<UWorld> DestinationMap)
 		GetWorld()->ServerTravel(MapName);
 	}
 }
+
+void ADS_GameModeBase::RemovePlayerSession(AController* Exiting)
+{
+	ADSPlayerController* PlayerController = Cast<ADSPlayerController>(Exiting);
+	if (!IsValid(PlayerController)) return;
+
+#if WITH_GAMELIFT
+	const FString& PlayerSessionId = PlayerController->PlayerSessionId;
+	if (!PlayerSessionId.IsEmpty())
+	{
+		Aws::GameLift::Server::RemovePlayerSession(TCHAR_TO_ANSI(*PlayerSessionId));
+	}
+#endif
+}
+
+
