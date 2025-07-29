@@ -81,7 +81,7 @@ void ADS_MatchGameMode::SetClientInputEnabled(bool bEnabled)
 		ADSPlayerController* DSPlayerController = Cast<ADSPlayerController>(It->Get());
 		if (IsValid(DSPlayerController))
 		{
-			DSPlayerController->Client_SetInputEnabled_Implementation(bEnabled);
+			DSPlayerController->Client_SetInputEnabled(bEnabled);
 		}
 	}
 }
