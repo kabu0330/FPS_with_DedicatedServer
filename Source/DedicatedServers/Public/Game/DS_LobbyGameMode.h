@@ -67,8 +67,13 @@ private:
 	void InitGameLift();
 	void SetServerParameters(FServerParameters& OutServerParameters);
 	void TryAcceptPlayerSession(const FString& PlayerSessionId, const FString& Username, FString& OutErrorMessage);
+	void AddPlayerInfoToLobbyState(AController* Player) const;
+	void RemovePlayerInfoFromLobbyState(AController* Player) const;
 
+	
 	// 미사용
 	void FindGameLiftAnywhereServerIP();
 	void FindGameLiftAnywhereServerIP_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	
+	
 };
