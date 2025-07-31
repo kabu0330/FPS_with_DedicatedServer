@@ -3,7 +3,7 @@
 
 namespace HTTPStatusMessage
 {
-	const FString SomethingWentWrong{TEXT("Something went wrong!")};
+	const FString SomethingWentWrong{TEXT("예기치 못한 문제가 발생했습니다.")};
 }
 
 void FDSMetaData::Dump() const

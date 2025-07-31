@@ -123,8 +123,16 @@ void UPortalManager::SignUp_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 				FString Exception = JsonObject->GetStringField(TEXT("name"));
 				if (Exception.Equals(TEXT("UsernameExistsException")))
 				{
-					ConfirmStatusMessageDelegate.Broadcast(TEXT("이미 사용 중인 UserName입니다. 이름을 변경해주세요."), true);
+					SignUpStatusMessageDelegate.Broadcast(TEXT("이미 사용 중인 Username입니다. 이름을 변경해주세요."), true);
 					return;
+				}
+			}
+			else if (JsonObject->HasField(TEXT("errorType")))
+			{
+				FString Exception = JsonObject->GetStringField(TEXT("errorType"));
+				if (Exception.Contains(TEXT("UsernameExistsException")))
+				{
+					SignUpStatusMessageDelegate.Broadcast(TEXT("이미 사용 중인 Username입니다. 이름을 변경해주세요."), true);
 				}
 			}
 			SignUpStatusMessageDelegate.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);

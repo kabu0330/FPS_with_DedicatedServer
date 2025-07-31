@@ -66,12 +66,12 @@ FLobbyPlayerInfoDelta ALobbyState::ComputePlayerInfoDelta(const TArray<FLobbyPla
 	
 	for (const auto& OldPlayerInfo : OldArray)
 	{
-		if (!NewMap.Contains(OldPlayerInfo.Username))
+		if (!NewMap.Contains(OldPlayerInfo.Username)) // 신규 배열에서 사라진 Username이 있다면 삭제된 것
 		{
 			Delta.RemovedPlayers.Add(OldPlayerInfo);
 		}
 	}
-	for (const auto& NewPlayerInfo : NewArray)
+	for (const auto& NewPlayerInfo : NewArray) // 기존 배열에 없던 Username이 있으면 신규 사용자가 있는 것
 	{
 		if (!OldMap.Contains(NewPlayerInfo.Username))
 		{
