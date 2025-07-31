@@ -6,6 +6,7 @@
 #include "UI/HTTP/HTTPRequestManager.h"
 #include "GameStatsManager.generated.h"
 
+struct FDSRecordMatchStatsInput;
 /**
  * 
  */
@@ -13,5 +14,7 @@ UCLASS()
 class DEDICATEDSERVERS_API UGameStatsManager : public UHTTPRequestManager
 {
 	GENERATED_BODY()
-	
+
+public:
+	void RecordMatchStats(const FDSRecordMatchStatsInput& RecordMatchStatsInput);
 };
