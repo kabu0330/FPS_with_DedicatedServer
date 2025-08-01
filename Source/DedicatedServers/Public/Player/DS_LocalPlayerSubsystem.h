@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/LocalPlayerSubsystem.h"
 #include "UI/HTTP/HTTPRequestTypes.h"
-#include "DSLocalPlayerSubsystem.generated.h"
+#include "DS_LocalPlayerSubsystem.generated.h"
 
 class IPortalManagement;
 
@@ -13,7 +13,7 @@ class IPortalManagement;
  *  2. 주기적으로 Token을 갱신한다.
  */
 UCLASS()
-class DEDICATEDSERVERS_API UDSLocalPlayerSubsystem : public ULocalPlayerSubsystem
+class DEDICATEDSERVERS_API UDS_LocalPlayerSubsystem : public ULocalPlayerSubsystem
 {
 	GENERATED_BODY()
 

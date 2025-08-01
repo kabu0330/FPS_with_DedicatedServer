@@ -10,7 +10,7 @@
 #include "Interfaces/IHttpResponse.h"
 #include "Kismet/GameplayStatics.h"
 #include "Lobby/LobbyState.h"
-#include "Player/DSPlayerController.h"
+#include "Player/DS_PlayerController.h"
 
 ADS_LobbyGameMode::ADS_LobbyGameMode()
 {
@@ -57,7 +57,7 @@ void ADS_LobbyGameMode::InitSeamlessTravelPlayer(AController* NewController)
 
 void ADS_LobbyGameMode::AddPlayerInfoToLobbyState(AController* Player) const
 {
-    ADSPlayerController* PlayerController = Cast<ADSPlayerController>(Player);
+    ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(Player);
     ADS_GameState* DSGameState = GetGameState<ADS_GameState>();
     if (IsValid(DSGameState) && IsValid(DSGameState->LobbyState) && IsValid(PlayerController))
     {
@@ -68,7 +68,7 @@ void ADS_LobbyGameMode::AddPlayerInfoToLobbyState(AController* Player) const
 
 void ADS_LobbyGameMode::RemovePlayerInfoFromLobbyState(AController* Player) const
 {
-    ADSPlayerController* PlayerController = Cast<ADSPlayerController>(Player);
+    ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(Player);
     ADS_GameState* DSGameState = GetGameState<ADS_GameState>();
     if (IsValid(DSGameState) && IsValid(DSGameState->LobbyState) && IsValid(PlayerController))
     {
@@ -114,7 +114,7 @@ FString ADS_LobbyGameMode::InitNewPlayer(APlayerController* NewPlayerController,
     const FString PlayerSessionId = UGameplayStatics::ParseOption(Options, TEXT("PlayerSessionId"));
     const FString Username = UGameplayStatics::ParseOption(Options, TEXT("Username"));
 
-    if (ADSPlayerController* PlayerController = Cast<ADSPlayerController>(NewPlayerController); IsValid(PlayerController))
+    if (ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(NewPlayerController); IsValid(PlayerController))
     {
         PlayerController->PlayerSessionId = PlayerSessionId;
         PlayerController->Username = Username;

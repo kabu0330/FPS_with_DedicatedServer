@@ -8,7 +8,7 @@
 #include "TimerWidget.generated.h"
 
 class UTextBlock;
-class ADSPlayerController;
+class ADS_PlayerController;
 
 /**
  * 
@@ -29,7 +29,7 @@ protected:
 	ECountdownTimerType TimerType = ECountdownTimerType::None;
 
 	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<ADSPlayerController> OwningPlayerController;
+	TObjectPtr<ADS_PlayerController> OwningPlayerController;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bActive = false;

@@ -11,7 +11,7 @@
 
 #include "Data/API/APIData.h"
 #include "GameplayTags/DedicatedServersTags.h"
-#include "Player/DSLocalPlayerSubsystem.h"
+#include "Player/DS_LocalPlayerSubsystem.h"
 #include "UI/HTTP/HTTPRequestTypes.h"
 #include "UI/Portal/PortalManager.h"
 
@@ -28,7 +28,7 @@ void UGameSessionsManager::JoinGameSession()
 	Request->SetVerb(TEXT("POST"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
-	UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem();
+	UDS_LocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem();
 	if (IsValid(LocalPlayerSubsystem))
 	{
 		Request->SetHeader(TEXT("Authorization"), LocalPlayerSubsystem->GetAuthenticationResult().AccessToken);
@@ -92,7 +92,7 @@ void UGameSessionsManager::HandleGameSessionStatus(const FString& Status, const 
 	{
 		BroadcastJoinGameSessionMessage.Broadcast(TEXT("Found activate Game Session. Creating a Player Session..."), false);
 
-		if (UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem(); IsValid(LocalPlayerSubsystem))
+		if (UDS_LocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem(); IsValid(LocalPlayerSubsystem))
 		{
 			//TryCreatePlayerSession(GetUniquePlayerId(), SessionId);
 			TryCreatePlayerSession(LocalPlayerSubsystem->GetUsername(), SessionId);

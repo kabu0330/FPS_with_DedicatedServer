@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/DSPlayerController.h"
+#include "Player/DS_PlayerController.h"
 #include "ShooterPlayerController.generated.h"
 
 struct FInputActionValue;
@@ -17,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuitMenuOpen, bool, bOpen);
  * 
  */
 UCLASS()
-class FPSTEMPLATE_API AShooterPlayerController : public ADSPlayerController
+class FPSTEMPLATE_API AShooterPlayerController : public ADS_PlayerController
 {
 	GENERATED_BODY()
 public:

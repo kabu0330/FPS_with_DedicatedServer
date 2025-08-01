@@ -9,7 +9,7 @@
 #include "Data/API/APIData.h"
 #include "GameplayTags/DedicatedServersTags.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/DSLocalPlayerSubsystem.h"
+#include "Player/DS_LocalPlayerSubsystem.h"
 #include "UI/Interface/HUDManagement.h"
 #include "Gameframework/HUD.h"
 
@@ -61,7 +61,7 @@ void UPortalManager::SignIn_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 
 		// LocalPlayerSubsystem에 엑세스 토큰 등과 같은 중요한 데이터를 보관한다.
 		// 레벨 이동을 해도 데이터가 고유하게 유지되는 클래스
-		UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem();
+		UDS_LocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem();
 		if (IsValid(LocalPlayerSubsystem))
 		{
 			LocalPlayerSubsystem->InitializeTokens(InitiateAuthResponse.AuthenticationResult, this);
@@ -239,7 +239,7 @@ void UPortalManager::RefreshTokens_Response(FHttpRequestPtr Request, FHttpRespon
 		FDSInitiateAuthResponse InitiateAuthResponse;
 		FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &InitiateAuthResponse);
 		
-		UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem();
+		UDS_LocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem();
 		if (IsValid(LocalPlayerSubsystem))
 		{
 			LocalPlayerSubsystem->UpdateTokens(

@@ -4,25 +4,25 @@
 #include "UI/Portal/Dropdown/AccountDropdown.h"
 
 #include "Components/TextBlock.h"
-#include "Player/DSLocalPlayerSubsystem.h"
+#include "Player/DS_LocalPlayerSubsystem.h"
 
 void UAccountDropdown::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetLocalPlayerSubsystem();
+	UDS_LocalPlayerSubsystem* LocalPlayerSubsystem = GetLocalPlayerSubsystem();
 	if (IsValid(LocalPlayerSubsystem))
 	{
 		TextBlock_ButtonText->SetText(FText::FromString(LocalPlayerSubsystem->GetUsername()));
 	}
 }
 
-UDSLocalPlayerSubsystem* UAccountDropdown::GetLocalPlayerSubsystem() const
+UDS_LocalPlayerSubsystem* UAccountDropdown::GetLocalPlayerSubsystem() const
 {
 	APlayerController* PlayerController = GetOwningPlayer();
 	if (IsValid(PlayerController) && IsValid(PlayerController->GetLocalPlayer()))
 	{
-		UDSLocalPlayerSubsystem* LocalPlayerSubsystem= PlayerController->GetLocalPlayer()->GetSubsystem<UDSLocalPlayerSubsystem>();
+		UDS_LocalPlayerSubsystem* LocalPlayerSubsystem= PlayerController->GetLocalPlayer()->GetSubsystem<UDS_LocalPlayerSubsystem>();
 		if (IsValid(LocalPlayerSubsystem))
 		{
 			return LocalPlayerSubsystem;

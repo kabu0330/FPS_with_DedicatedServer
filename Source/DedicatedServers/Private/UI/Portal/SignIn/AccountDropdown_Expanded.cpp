@@ -4,7 +4,7 @@
 #include "UI/Portal/SignIn/AccountDropdown_Expanded.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
-#include "Player/DSLocalPlayerSubsystem.h"
+#include "Player/DS_LocalPlayerSubsystem.h"
 #include "UI/Portal/PortalManager.h"
 
 void UAccountDropdown_Expanded::NativeConstruct()
@@ -17,7 +17,7 @@ void UAccountDropdown_Expanded::NativeConstruct()
 	Button_SignOut->OnHovered.AddDynamic(this, &UAccountDropdown_Expanded::SignOutButton_Hover);
 	Button_SignOut->OnUnhovered.AddDynamic(this, &UAccountDropdown_Expanded::SignOutButton_Unhover);
 
-	UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetLocalPlayerSubsystem();
+	UDS_LocalPlayerSubsystem* LocalPlayerSubsystem = GetLocalPlayerSubsystem();
 	if (IsValid(LocalPlayerSubsystem))
 	{
 		TextBlock_Email->SetText(FText::FromString(LocalPlayerSubsystem->GetEmail()));
@@ -59,7 +59,7 @@ void UAccountDropdown_Expanded::SignOutButton_OnClicked()
 	Button_SignOut->SetIsEnabled(false);
 
 	check(PortalManager);
-	UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetLocalPlayerSubsystem();
+	UDS_LocalPlayerSubsystem* LocalPlayerSubsystem = GetLocalPlayerSubsystem();
 	if (IsValid(LocalPlayerSubsystem))
 	{
 		FDSAuthenticationResult AuthResult = LocalPlayerSubsystem->GetAuthenticationResult();
@@ -67,12 +67,12 @@ void UAccountDropdown_Expanded::SignOutButton_OnClicked()
 	}
 }
 
-UDSLocalPlayerSubsystem* UAccountDropdown_Expanded::GetLocalPlayerSubsystem()
+UDS_LocalPlayerSubsystem* UAccountDropdown_Expanded::GetLocalPlayerSubsystem()
 {
 	APlayerController* PlayerController = GetOwningPlayer();
 	if (IsValid(PlayerController) && IsValid(PlayerController->GetLocalPlayer()))
 	{
-		UDSLocalPlayerSubsystem* LocalPlayerSubsystem= PlayerController->GetLocalPlayer()->GetSubsystem<UDSLocalPlayerSubsystem>();
+		UDS_LocalPlayerSubsystem* LocalPlayerSubsystem= PlayerController->GetLocalPlayer()->GetSubsystem<UDS_LocalPlayerSubsystem>();
 		if (IsValid(LocalPlayerSubsystem))
 		{
 			return LocalPlayerSubsystem;

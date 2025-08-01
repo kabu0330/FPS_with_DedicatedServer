@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Types/DSTypes.h"
-#include "DSPlayerController.generated.h"
+#include "DS_PlayerController.generated.h"
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimerStateChangedDelegate, float, Time, ECountdownTimerType, Type);
@@ -13,11 +13,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimerStateChangedDelegate, float
  * 
  */
 UCLASS()
-class DEDICATEDSERVERS_API ADSPlayerController : public APlayerController
+class DEDICATEDSERVERS_API ADS_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 public:
-	ADSPlayerController();
+	ADS_PlayerController();
 
 	virtual void ReceivedPlayer() override;
 	virtual void OnRep_PlayerState() override;

@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "AccountDropdown_Expanded.generated.h"
 
-class UDSLocalPlayerSubsystem;
+class UDS_LocalPlayerSubsystem;
 class UPortalManager;
 class UButton;
 class UTextBlock;
@@ -45,7 +45,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UPortalManager> PortalManager;
 	
-	UDSLocalPlayerSubsystem* GetLocalPlayerSubsystem();
+	UDS_LocalPlayerSubsystem* GetLocalPlayerSubsystem();
 	
 	UFUNCTION()
 	void SignOutButton_Hover();

@@ -3,7 +3,7 @@
 
 #include "Game/DS_MatchGameMode.h"
 
-#include "Player/DSPlayerController.h"
+#include "Player/DS_PlayerController.h"
 
 ADS_MatchGameMode::ADS_MatchGameMode()
 {
@@ -64,6 +64,8 @@ void ADS_MatchGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
 		MatchStatus = EMatchStatus::PostMatch;
 		StartCountdownTimer(PostMatchTimerHandle);
 		SetClientInputEnabled(false);
+		
+		OnMatchEnded();
 	}
 	if (Type == ECountdownTimerType::PostMatch)
 	{
@@ -78,10 +80,15 @@ void ADS_MatchGameMode::SetClientInputEnabled(bool bEnabled)
 {
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
-		ADSPlayerController* DSPlayerController = Cast<ADSPlayerController>(It->Get());
+		ADS_PlayerController* DSPlayerController = Cast<ADS_PlayerController>(It->Get());
 		if (IsValid(DSPlayerController))
 		{
 			DSPlayerController->Client_SetInputEnabled(bEnabled);
 		}
 	}
+}
+
+void ADS_MatchGameMode::OnMatchEnded()
+{
+	
 }

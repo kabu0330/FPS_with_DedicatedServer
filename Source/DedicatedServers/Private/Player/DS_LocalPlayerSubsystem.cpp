@@ -1,12 +1,12 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/DSLocalPlayerSubsystem.h"
+#include "Player/DS_LocalPlayerSubsystem.h"
 
 #include "UI/Portal/PortalManager.h"
 #include "UI/Interface/PortalManagement.h"
 
-void UDSLocalPlayerSubsystem::InitializeTokens(const FDSAuthenticationResult& AuthResult, TScriptInterface<IPortalManagement> PortalManager)
+void UDS_LocalPlayerSubsystem::InitializeTokens(const FDSAuthenticationResult& AuthResult, TScriptInterface<IPortalManagement> PortalManager)
 {
 	AuthenticationResult = AuthResult;
 	PortalManagementInterface = PortalManager;
@@ -17,7 +17,7 @@ void UDSLocalPlayerSubsystem::InitializeTokens(const FDSAuthenticationResult& Au
 	SetRefreshTokenTimer();
 }
 
-void UDSLocalPlayerSubsystem::SetRefreshTokenTimer()
+void UDS_LocalPlayerSubsystem::SetRefreshTokenTimer()
 {
 	UWorld* World = GetWorld();
 	if (IsValid(World) && IsValid(PortalManagementInterface.GetObject()))
@@ -32,7 +32,7 @@ void UDSLocalPlayerSubsystem::SetRefreshTokenTimer()
 	}
 }
 
-void UDSLocalPlayerSubsystem::UpdateTokens(const FString& AccessToken, const FString& IdToken)
+void UDS_LocalPlayerSubsystem::UpdateTokens(const FString& AccessToken, const FString& IdToken)
 {
 	AuthenticationResult.AccessToken = AccessToken;
 	AuthenticationResult.IdToken = IdToken;
@@ -40,27 +40,27 @@ void UDSLocalPlayerSubsystem::UpdateTokens(const FString& AccessToken, const FSt
 	SetRefreshTokenTimer();
 }
 
-FDSAuthenticationResult UDSLocalPlayerSubsystem::GetAuthenticationResult() const
+FDSAuthenticationResult UDS_LocalPlayerSubsystem::GetAuthenticationResult() const
 {
 	return AuthenticationResult;
 }
 
-FString UDSLocalPlayerSubsystem::GetUsername() const
+FString UDS_LocalPlayerSubsystem::GetUsername() const
 {
 	return Username;
 }
 
-FString UDSLocalPlayerSubsystem::GetEmail() const
+FString UDS_LocalPlayerSubsystem::GetEmail() const
 {
 	return Email;
 }
 
-void UDSLocalPlayerSubsystem::SetUsername(const FString& Name)
+void UDS_LocalPlayerSubsystem::SetUsername(const FString& Name)
 {
 	Username = Name;
 }
 
-void UDSLocalPlayerSubsystem::SetEmail(const FString& EmailAddress)
+void UDS_LocalPlayerSubsystem::SetEmail(const FString& EmailAddress)
 {
 	Email = EmailAddress;
 }

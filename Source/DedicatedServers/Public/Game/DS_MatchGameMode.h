@@ -37,6 +37,7 @@ protected:
 	virtual void OnCountdownTimerFinished(ECountdownTimerType Type) override;
 
 	void SetClientInputEnabled(bool bEnabled);
+	void OnMatchEnded();
 	
 private:
 	UPROPERTY()

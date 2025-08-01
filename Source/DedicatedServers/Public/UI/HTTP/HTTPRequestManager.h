@@ -11,7 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAPIRequestSucceeded);
 
 class UAPIData;
 class FJsonObject;
-class UDSLocalPlayerSubsystem;
+class UDS_LocalPlayerSubsystem;
 
 /** HTTP Response 파싱과 관련된 편의 기능 지원
  * 
@@ -22,7 +22,7 @@ class DEDICATEDSERVERS_API UHTTPRequestManager : public UObject
 	GENERATED_BODY()
 
 public:
-	UDSLocalPlayerSubsystem* GetDSLocalPlayerSubsystem() const;
+	UDS_LocalPlayerSubsystem* GetDSLocalPlayerSubsystem() const;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly)

@@ -5,10 +5,10 @@
 
 #include "JsonObjectConverter.h"
 #include "DedicatedServers/DedicatedServers.h"
-#include "Player/DSLocalPlayerSubsystem.h"
+#include "Player/DS_LocalPlayerSubsystem.h"
 #include "UI/HTTP/HTTPRequestTypes.h"
 
-UDSLocalPlayerSubsystem* UHTTPRequestManager::GetDSLocalPlayerSubsystem() const
+UDS_LocalPlayerSubsystem* UHTTPRequestManager::GetDSLocalPlayerSubsystem() const
 {
 	APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
 	if (IsValid(LocalPlayerController))
@@ -16,7 +16,7 @@ UDSLocalPlayerSubsystem* UHTTPRequestManager::GetDSLocalPlayerSubsystem() const
 		ULocalPlayer* LocalPlayer = LocalPlayerController->GetLocalPlayer();
 		if (IsValid(LocalPlayer))
 		{
-			return LocalPlayer->GetSubsystem<UDSLocalPlayerSubsystem>();
+			return LocalPlayer->GetSubsystem<UDS_LocalPlayerSubsystem>();
 		}
 	}
 	return nullptr;

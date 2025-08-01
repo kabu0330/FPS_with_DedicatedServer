@@ -5,13 +5,13 @@
 
 #include "Components/TextBlock.h"
 #include "Kismet/KismetStringLibrary.h"
-#include "Player/DSPlayerController.h"
+#include "Player/DS_PlayerController.h"
 
 void UTimerWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	OwningPlayerController = Cast<ADSPlayerController>(GetOwningPlayer());
+	OwningPlayerController = Cast<ADS_PlayerController>(GetOwningPlayer());
 	if (IsValid(OwningPlayerController))
 	{
 		OwningPlayerController->OnTimerUpdated.AddDynamic(this, &UTimerWidget::OnTimerUpdated);

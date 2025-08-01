@@ -6,7 +6,7 @@
 #include "Dropdown.h"
 #include "AccountDropdown.generated.h"
 
-class UDSLocalPlayerSubsystem;
+class UDS_LocalPlayerSubsystem;
 /**
  * 
  */
@@ -19,6 +19,6 @@ protected:
 	virtual void NativeConstruct() override;
 
 private:
-	UDSLocalPlayerSubsystem* GetLocalPlayerSubsystem() const;
+	UDS_LocalPlayerSubsystem* GetLocalPlayerSubsystem() const;
 	
 };

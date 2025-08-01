@@ -5,7 +5,7 @@
 
 #include "aws/gamelift/server/GameLiftServerAPI.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/DSPlayerController.h"
+#include "Player/DS_PlayerController.h"
 
 void ADS_GameModeBase::StartCountdownTimer(FCountdownTimerHandle& CountdownTimerHandle)
 {
@@ -66,7 +66,7 @@ void ADS_GameModeBase::StopCountdownTimer(FCountdownTimerHandle& CountdownTimerH
 	// 모든 클라이언트에게 타이머를 종료하라고 알린다.
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
-		ADSPlayerController* DSPlayerController = Cast<ADSPlayerController>(Iterator->Get());
+		ADS_PlayerController* DSPlayerController = Cast<ADS_PlayerController>(Iterator->Get());
 		if (IsValid(DSPlayerController))
 		{
 			// 서버 : 얘들아 시간 다 됐어. 카운트다운 Stop이야!
@@ -79,7 +79,7 @@ void ADS_GameModeBase::UpdateCountdownTimer(const FCountdownTimerHandle& Countdo
 {
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
-		ADSPlayerController* DSPlayerController = Cast<ADSPlayerController>(Iterator->Get());
+		ADS_PlayerController* DSPlayerController = Cast<ADS_PlayerController>(Iterator->Get());
 		if (IsValid(DSPlayerController))
 		{
 			const float CountdownTimeLeft =
@@ -116,7 +116,7 @@ void ADS_GameModeBase::TrySeamlessTravel(TSoftObjectPtr<UWorld> DestinationMap)
 
 void ADS_GameModeBase::RemovePlayerSession(AController* Exiting)
 {
-	ADSPlayerController* PlayerController = Cast<ADSPlayerController>(Exiting);
+	ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(Exiting);
 	if (!IsValid(PlayerController)) return;
 
 #if WITH_GAMELIFT
