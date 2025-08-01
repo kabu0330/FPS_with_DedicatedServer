@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "Player/DS_MatchPlayerState.h"
 #include "MatchPlayerState.generated.h"
 
 enum class ESpecialElimType : uint16;
@@ -16,11 +17,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnScoreChanged, int32, NewScore);
  * 
  */
 UCLASS()
-class FPSTEMPLATE_API AMatchPlayerState : public APlayerState
+class FPSTEMPLATE_API AMatchPlayerState : public ADS_MatchPlayerState
 {
 	GENERATED_BODY()
 public:
 	AMatchPlayerState();
+	virtual void OnMatchEnded(const FString& Username) override;
 
 	void AddScoredElim();
 	void AddDefeat();

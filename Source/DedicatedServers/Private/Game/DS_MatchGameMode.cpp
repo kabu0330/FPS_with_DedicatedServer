@@ -3,6 +3,7 @@
 
 #include "Game/DS_MatchGameMode.h"
 
+#include "Player/DS_MatchPlayerState.h"
 #include "Player/DS_PlayerController.h"
 
 ADS_MatchGameMode::ADS_MatchGameMode()
@@ -90,5 +91,14 @@ void ADS_MatchGameMode::SetClientInputEnabled(bool bEnabled)
 
 void ADS_MatchGameMode::OnMatchEnded()
 {
-	
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (ADS_PlayerController* DSPlayerController = Cast<ADS_PlayerController>(It->Get()); IsValid(DSPlayerController))
+		{
+			if (ADS_MatchPlayerState* MatchPlayerState = Cast<ADS_MatchPlayerState>(DSPlayerController->PlayerState); IsValid(MatchPlayerState))
+			{
+				MatchPlayerState->OnMatchEnded(DSPlayerController->Username);
+			}
+		}
+	}
 }

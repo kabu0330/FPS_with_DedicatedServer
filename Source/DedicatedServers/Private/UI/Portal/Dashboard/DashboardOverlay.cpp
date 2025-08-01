@@ -5,6 +5,7 @@
 
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "UI/GameStats/GameStatsManager.h"
 #include "UI/Portal/Dashboard/CareerPage.h"
 #include "UI/Portal/Dashboard/GamePage.h"
 #include "UI/Portal/Dashboard/LeaderboardPage.h"
@@ -12,6 +13,13 @@
 void UDashboardOverlay::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	check(IsValid(GameStatsManagerClass));
+	GameStatsManager = NewObject<UGameStatsManager>(this, GameStatsManagerClass);
+	
+	GameStatsManager->OnRetrieveMatchStatsResponseReceived.AddDynamic(CareerPage, &UCareerPage::OnRetrieveMatchStats);
+	GameStatsManager->RetrieveMatchStatsStatusMessage.AddDynamic(CareerPage, &UCareerPage::SetStatusMessage);
+	
 	Button_Game->OnClicked.AddDynamic(this, &UDashboardOverlay::ShowGamePage);
 	Button_Career->OnClicked.AddDynamic(this, &UDashboardOverlay::ShowCareerPage);
 	Button_Leaderboard->OnClicked.AddDynamic(this, &UDashboardOverlay::ShowLeaderboardPage);
@@ -21,15 +29,31 @@ void UDashboardOverlay::NativeConstruct()
 
 void UDashboardOverlay::ShowGamePage()
 {
+	DisableButtons(Button_Game);
 	WidgetSwitcher->SetActiveWidget(GamePage);
 }
 
 void UDashboardOverlay::ShowCareerPage()
 {
+	DisableButtons(Button_Career);
 	WidgetSwitcher->SetActiveWidget(CareerPage);
+	GameStatsManager->RetrieveMatchStats();
 }
 
 void UDashboardOverlay::ShowLeaderboardPage()
 {
+	DisableButtons(Button_Leaderboard);
 	WidgetSwitcher->SetActiveWidget(LeaderboardPage);
 }
+
+void UDashboardOverlay::DisableButtons(UButton* Button) const
+{
+	Button_Game->SetIsEnabled(true);
+	Button_Career->SetIsEnabled(true);
+	Button_Leaderboard->SetIsEnabled(true);
+	
+	Button->SetIsEnabled(false);
+}
+
+
+

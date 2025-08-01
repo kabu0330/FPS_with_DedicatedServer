@@ -3,7 +3,7 @@
 
 namespace HTTPStatusMessage
 {
-	const FString SomethingWentWrong{TEXT("예기치 못한 문제가 발생했습니다.")};
+	const FString SomethingWentWrong{TEXT("알 수 없는 문제입니다.")};
 }
 
 void FDSMetaData::Dump() const
@@ -31,8 +31,8 @@ void FDSListFleetsResponse::Dump() const
 
 void FDSGameSession::Dump() const
 {
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_PURPLE);
 	UE_LOG(LogDedicatedServers, Log, TEXT("--- GameSession DUMP---"));
-	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_YELLOW);
 	UE_LOG(LogDedicatedServers, Log, TEXT("  CreationTime: %s"), *CreationTime);
 	UE_LOG(LogDedicatedServers, Log, TEXT("  CreatorId: %s"), *CreatorId);
 	UE_LOG(LogDedicatedServers, Log, TEXT("  CurrentPlayerSessionCount: %d"), CurrentPlayerSessionCount);
@@ -55,13 +55,13 @@ void FDSGameSession::Dump() const
 	UE_LOG(LogDedicatedServers, Log, TEXT("  Status: %s"), *Status);
 	UE_LOG(LogDedicatedServers, Log, TEXT("  StatusReason: %s"), *StatusReason);
 	UE_LOG(LogDedicatedServers, Log, TEXT("  TerminationTime: %s"), *TerminationTime);
-	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
 	UE_LOG(LogDedicatedServers, Log, TEXT("--- END GameSession DUMP---"));
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
 }
 void FDSPlayerSession::Dump() const
 {
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_PURPLE);
 	UE_LOG(LogDedicatedServers, Log, TEXT("--- FDSPlayerSession DUMP ---"));
-	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_YELLOW);
 	UE_LOG(LogDedicatedServers, Log, TEXT("CreationTime: %s"), *CreationTime);
 	UE_LOG(LogDedicatedServers, Log, TEXT("DnsName: %s"), *DnsName);
 	UE_LOG(LogDedicatedServers, Log, TEXT("FleetArn: %s"), *FleetArn);
@@ -74,8 +74,8 @@ void FDSPlayerSession::Dump() const
 	UE_LOG(LogDedicatedServers, Log, TEXT("Port: %d"), Port);
 	UE_LOG(LogDedicatedServers, Log, TEXT("Status: %s"), *Status);
 	UE_LOG(LogDedicatedServers, Log, TEXT("TerminationTime: %s"), *TerminationTime);
-	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
 	UE_LOG(LogDedicatedServers, Log, TEXT("--- END FDSPlayerSession DUMP ---"));
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
 }
 
 void FDSCodeDeliveryDetails::Dump() const
@@ -87,14 +87,14 @@ void FDSCodeDeliveryDetails::Dump() const
 
 void FDSSignUpResponse::Dump() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("--- FDSSignUpResponse DUMP ---"));
-	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_YELLOW);
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_PURPLE);
+	UE_LOG(LogDedicatedServers, Log, TEXT("--- FDSSignUpResponse DUMP ---"));
 	CodeDeliveryDetails.Dump();
 	UE_LOG(LogDedicatedServers, Log, TEXT("Session: %s"), *Session);
 	UE_LOG(LogDedicatedServers, Log, TEXT("UserConfirmed: %s"), UserConfirmed ? TEXT("true") : TEXT("false"));
 	UE_LOG(LogDedicatedServers, Log, TEXT("UserSub: %s"), *UserSub);
+	UE_LOG(LogDedicatedServers, Log, TEXT("--- END FDSSignUpResponse DUMP ---"));
 	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
-	UE_LOG(LogTemp, Warning, TEXT("--- END FDSSignUpResponse DUMP ---"));
 }
 
 void FDSNewDeviceMetadata::Dump() const
@@ -117,6 +117,7 @@ void FDSAuthenticationResult::Dump() const
 
 void FDSInitiateAuthResponse::Dump() const
 {
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_PURPLE);
 	UE_LOG(LogDedicatedServers, Log, TEXT("--- FDSSignInResponse DUMP ---"));
 	AuthenticationResult.Dump();
 
@@ -137,4 +138,29 @@ void FDSInitiateAuthResponse::Dump() const
 	UE_LOG(LogDedicatedServers, Log, TEXT("  Session: %s"), *Session);
 	UE_LOG(LogDedicatedServers, Log, TEXT("  email: %s"), *email);
 	UE_LOG(LogDedicatedServers, Log, TEXT("--- END FDSSignInResponse DUMP ---"));
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
+}
+
+void FDSRetrieveMatchStatsResponse::Dump() const
+{
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_PURPLE);
+	UE_LOG(LogDedicatedServers, Log, TEXT("--- FDSRetrieveMatchStatsResponse Dump ---"));
+	UE_LOG(LogDedicatedServers, Log, TEXT("Username: %s"), *username);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Email: %s"), *email);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Database ID: %s"), *databaseid);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Scored Elims: %d"), scoredElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Highest Elims: %d"), highestElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Dethrone Elims: %d"), dethroneElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Defeats: %d"), defeats);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Hits: %d"), hits);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Misses: %d"), misses);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Headshot Elims: %d"), headShootElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Highest Streak: %d"), hightestStreak);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Revenge Elims: %d"), revengeElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Show Stopper Elims: %d"), showStopperElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Got First Blood: %d"), gotFirstBlood);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Match Wins: %d"), matchWins);
+	UE_LOG(LogDedicatedServers, Log, TEXT("Match Losses: %d"), matchLosses);
+	UE_LOG(LogDedicatedServers, Log, TEXT("----------------------------------------"));
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
 }

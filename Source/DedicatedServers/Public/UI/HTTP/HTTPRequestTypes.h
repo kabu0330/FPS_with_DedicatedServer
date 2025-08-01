@@ -270,7 +270,7 @@ struct FDSMatchStats
 	GENERATED_BODY()
 
 	UPROPERTY()
-	int32 ScoredElims{};
+	int32 scoredElims{};
 
 	UPROPERTY()
 	int32 defeats{};
@@ -289,6 +289,9 @@ struct FDSMatchStats
 
 	UPROPERTY()
 	int32 hightestStreak{};
+
+	UPROPERTY()
+	int32 dethroneElims{};
 
 	UPROPERTY()
 	int32 revengeElims{};
@@ -316,5 +319,64 @@ struct FDSRecordMatchStatsInput
 
 	UPROPERTY()
 	FDSMatchStats matchStats{};
+};
+
+USTRUCT()
+struct FDSRetrieveMatchStatsResponse
+{
+	GENERATED_BODY()
+
+	// 멤버 변수명이 반드시 파스칼 표기법을 준수해야 한다면 meta를 사용
+	//UPROPERTY(meta = (JsonProperty = "hightestStreak")
+	//int32 HightestStreak{};
 	
+	UPROPERTY()
+	int32 hightestStreak{};
+
+	UPROPERTY()
+	int32 showStopperElims{};
+
+	UPROPERTY()
+	int32 dethroneElims{};
+
+	UPROPERTY()
+	int32 gotFirstBlood{};
+
+	UPROPERTY()
+	int32 defeats{};
+
+	UPROPERTY()
+	int32 scoredElims{};
+
+	UPROPERTY()
+	FString email{};
+
+	UPROPERTY()
+	int32 highestElims{};
+
+	UPROPERTY()
+	int32 misses{};
+
+	UPROPERTY()
+	int32 revengeElims{};
+
+	UPROPERTY()
+	int32 matchLosses{};
+
+	UPROPERTY()
+	FString databaseid{};
+
+	UPROPERTY()
+	FString username{};
+
+	UPROPERTY()
+	int32 headShootElims{};
+
+	UPROPERTY()
+	int32 hits{};
+
+	UPROPERTY()
+	int32 matchWins{};
+
+	void Dump() const;
 };

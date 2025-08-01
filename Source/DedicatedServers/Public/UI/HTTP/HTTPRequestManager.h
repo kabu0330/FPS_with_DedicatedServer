@@ -28,7 +28,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UAPIData> APIData;
 
-	bool ContainsErrors(TSharedPtr<FJsonObject> JsonObject, bool bPrintLog);
+	bool ContainsErrors(TSharedPtr<FJsonObject> JsonObject, bool bPrintLog = true);
 	void DumpMetaData(TSharedPtr<FJsonObject> JsonObject);
 
 	FString SerializeJsonContent(const TMap<FString, FString>& Params);
