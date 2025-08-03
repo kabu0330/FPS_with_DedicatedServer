@@ -7,6 +7,8 @@
 #include "Components/EditableTextBox.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetSwitcher.h"
+#include "Player/DS_LocalPlayerSubsystem.h"
+#include "Runtime/Renderer/Internal/SceneTextures.h"
 #include "UI/Portal/PortalManager.h"
 #include "UI/API/GameSessions/JoinGame.h"
 #include "UI/Portal/SignIn/ConfirmSignUpPage.h"
@@ -14,6 +16,7 @@
 #include "UI/Portal/SignIn/SignInQuitPage.h"
 #include "UI/Portal/SignIn/SignUpPage.h"
 #include "UI/Portal/SignIn/SuccessConfirmedPage.h"
+
 
 void USignInOverlay::NativeConstruct()
 {
@@ -47,12 +50,16 @@ void USignInOverlay::NativeConstruct()
 
 	// Success Confirmed 
 	SuccessConfirmedPage->Button_OK->OnClicked.AddDynamic(this, &USignInOverlay::ShowSignInPage);
+
+	ShowSignInPage();
+	AutoSignIn();
 }
 
 void USignInOverlay::ShowSignInPage()
 {
 	check(IsValid(WidgetSwitcher) && IsValid(SignInPage));
 	WidgetSwitcher->SetActiveWidget(SignInPage);
+	SignInPage->Button_SignIn->SetIsEnabled(true);
 }
 
 void USignInOverlay::ShowSignQuitPage()
@@ -81,18 +88,23 @@ void USignInOverlay::ShowSuccessConfirmedPage()
 
 void USignInOverlay::SignInButtonClicked()
 {
-	const FString& UserName = SignInPage->TextBox_UserName->GetText().ToString();
+	const FString& Username = SignInPage->TextBox_Username->GetText().ToString();
 	const FString& Password = SignInPage->TextBox_Password->GetText().ToString();
-	PortalManager->SignIn(UserName, Password);
+	if (UDS_LocalPlayerSubsystem* DSLocalPlayerSubsystem = PortalManager->GetDSLocalPlayerSubsystem(); IsValid(DSLocalPlayerSubsystem))
+	{
+		DSLocalPlayerSubsystem->SetPassword(Password);
+	}
+	
+	PortalManager->SignIn(Username, Password);
 }
 
 void USignInOverlay::SignUpButtonClicked()
 {
 	// 비밀번호 확인 기능은 Sign Up Page에서 수행한다.
-	const FString& UserName = SignUpPage->TextBox_UserName->GetText().ToString();
+	const FString& Username = SignUpPage->TextBox_Username->GetText().ToString();
 	const FString& Password = SignUpPage->TextBox_Password->GetText().ToString();
 	const FString& Email = SignUpPage->TextBox_Email->GetText().ToString();
-	PortalManager->SignUp(UserName, Password, Email);
+	PortalManager->SignUp(Username, Password, Email);
 }
 
 void USignInOverlay::ConfirmSignUpButtonClicked()
@@ -113,4 +125,18 @@ void USignInOverlay::OnConfirmSucceeded()
 {
 	ConfirmSignUpPage->ClearTextBoxes();
 	ShowSuccessConfirmedPage();
+}
+
+void USignInOverlay::AutoSignIn()
+{
+	if (UDS_LocalPlayerSubsystem* DSLocalPlayerSubsystem = PortalManager->GetDSLocalPlayerSubsystem(); IsValid(DSLocalPlayerSubsystem))
+	{
+		const FString& Username = DSLocalPlayerSubsystem->GetUsername();
+		const FString& Password = DSLocalPlayerSubsystem->GetPassword();
+		
+		if (Username.IsEmpty() || Password.IsEmpty()) return;
+
+		SignInPage->Button_SignIn->SetIsEnabled(false);
+		PortalManager->SignIn(Username, Password);
+	}
 }

@@ -19,8 +19,8 @@ void USignInPage::UpdateStatusMessage(const FString& Message, bool bShouldResetW
 void USignInPage::NativeConstruct()
 {
 	Super::NativeConstruct();
-	if (TextBox_UserName)
+	if (TextBox_Username)
 	{
-		TextBox_UserName->SetKeyboardFocus();
+		TextBox_Username->SetKeyboardFocus();
 	}
 }

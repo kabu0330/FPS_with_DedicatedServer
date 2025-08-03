@@ -18,7 +18,7 @@ class DEDICATEDSERVERS_API USignInPage : public UUserWidget
 	GENERATED_BODY()
 public:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UEditableTextBox> TextBox_UserName;
+	TObjectPtr<UEditableTextBox> TextBox_Username;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UEditableTextBox> TextBox_Password;

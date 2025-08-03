@@ -68,11 +68,11 @@ void UGameStatsManager::RetrieveMatchStats()
 }
 
 void UGameStatsManager::RetrieveMatchStats_Response(FHttpRequestPtr Request, FHttpResponsePtr Response,
-	bool bWasSuccessful)
+                                                    bool bWasSuccessful)
 {
 	if (!bWasSuccessful)
 	{
-		OnRetrieveMatchStatsResponseReceived.Broadcast(FDSRetrieveMatchStatsResponse());
+		OnRetrieveMatchStatsResponse.Broadcast(FDSRetrieveMatchStatsResponse());
 		RetrieveMatchStatsStatusMessage.Broadcast(TEXT("데이터를 가져오는데 실패했습니다. (fail)"), false);
 		UE_LOG(LogDedicatedServers, Error, TEXT("RetrieveMatchStats_Response Failed..."));
 		return;
@@ -84,7 +84,7 @@ void UGameStatsManager::RetrieveMatchStats_Response(FHttpRequestPtr Request, FHt
 	{
 		if (ContainsErrors(JsonObject, true))
 		{
-			OnRetrieveMatchStatsResponseReceived.Broadcast(FDSRetrieveMatchStatsResponse());
+			OnRetrieveMatchStatsResponse.Broadcast(FDSRetrieveMatchStatsResponse());
 			RetrieveMatchStatsStatusMessage.Broadcast(TEXT("데이터를 가져오는데 실패했습니다. (error)"), false);
 			return;
 		}
@@ -93,7 +93,116 @@ void UGameStatsManager::RetrieveMatchStats_Response(FHttpRequestPtr Request, FHt
 		FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &RetrieveMatchStatsResponse);
 		RetrieveMatchStatsResponse.Dump();
 		
-		OnRetrieveMatchStatsResponseReceived.Broadcast(RetrieveMatchStatsResponse);
+		OnRetrieveMatchStatsResponse.Broadcast(RetrieveMatchStatsResponse);
 		RetrieveMatchStatsStatusMessage.Broadcast(TEXT(""), false);
 	}
+}
+
+void UGameStatsManager::UpdateLeaderboard(const TArray<FString>& WinnerUsername)
+{
+	check(APIData);
+
+	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
+	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::GameStatsAPI::UpdateLeaderboard);
+	Request->OnProcessRequestComplete().BindUObject(this, &UGameStatsManager::UpdateLeaderboard_Response);
+	Request->SetURL(APIUrl);
+	Request->SetVerb("POST");
+	Request->SetHeader("Content-Type", "application/json");
+
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
+	TArray<TSharedPtr<FJsonValue>> PlayerIdJsonArray;
+
+	for (const FString& Username : WinnerUsername)
+	{
+		PlayerIdJsonArray.Add(MakeShareable(new FJsonValueString(Username)));
+	}
+	JsonObject->SetArrayField(TEXT("playerIds"), PlayerIdJsonArray);
+	FString Content;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Content);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+	Request->SetContentAsString(Content);
+	
+	Request->ProcessRequest();
+}
+
+void UGameStatsManager::UpdateLeaderboard_Response(FHttpRequestPtr Request, FHttpResponsePtr Response,
+                                                   bool bWasSuccessful)
+{
+	if (!bWasSuccessful)
+	{
+		UE_LOG(LogDedicatedServers, Error, TEXT("UpdateLeaderboard_Response Failed..."));
+	}
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+	if (FJsonSerializer::Deserialize(JsonReader, JsonObject))
+	{
+		if (ContainsErrors(JsonObject, true))
+		{
+			return;
+		}
+
+		UE_LOG(LogDedicatedServers, Error, TEXT("UpdateLeaderboard_Response Succeeded!"));
+		OnUpdatedLeaderboardSucceeded.Broadcast();
+	}
+}
+
+void UGameStatsManager::RetrieveLeaderboard()
+{
+	check(APIData);
+	RetrieveLeaderboardMessage.Broadcast(TEXT("랭킹 검색 중입니다..."), false);
+
+	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
+	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::GameStatsAPI::RetrieveLeaderboard);
+	Request->OnProcessRequestComplete().BindUObject(this, &UGameStatsManager::RetrieveLeaderboard_Response);
+	Request->SetURL(APIUrl);
+	Request->SetVerb("GET");
+	Request->SetHeader("Content-Type", "application/json");
+	Request->ProcessRequest();
+}
+
+void UGameStatsManager::RetrieveLeaderboard_Response(FHttpRequestPtr Request, FHttpResponsePtr Response,
+	bool bWasSuccessful)
+{
+	if (!bWasSuccessful)
+	{
+		RetrieveLeaderboardMessage.Broadcast(TEXT("검색에 실패했습니다."), false);
+		UE_LOG(LogDedicatedServers, Error, TEXT("RetrieveLeaderboard_Response Failed..."));
+		return;
+	}
+
+	TArray<FDSLeaderboardItem> LeaderboardItems;
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+	if (FJsonSerializer::Deserialize(JsonReader, JsonObject))
+	{
+		if (ContainsErrors(JsonObject, true))
+		{
+			RetrieveLeaderboardMessage.Broadcast(TEXT("검색에 실패했습니다."), false);
+			return;
+		}
+		
+		const TArray<TSharedPtr<FJsonValue>>* LeaderboardArray;
+		if (JsonObject->TryGetArrayField(TEXT("Leaderboard"), LeaderboardArray))
+		{
+			for (const TSharedPtr<FJsonValue>& ItemValue : *LeaderboardArray)
+			{
+				TSharedPtr<FJsonObject> ItemObject = ItemValue->AsObject();
+				if (ItemObject.IsValid())
+				{
+					FDSLeaderboardItem Item;
+					if (FJsonObjectConverter::JsonObjectToUStruct(ItemObject.ToSharedRef(), &Item))
+					{
+						LeaderboardItems.Add(Item);
+					}
+					else
+					{
+						UE_LOG(LogDedicatedServers, Error, TEXT("Failed to parse Leaderboard..."));
+						return;
+					}
+				}
+			}
+		}
+	}
+	RetrieveLeaderboardMessage.Broadcast(TEXT(""), false);
+	OnRetrieveLeaderboard.Broadcast(LeaderboardItems);
 }

@@ -7,10 +7,12 @@
 #include "UI/HTTP/HTTPRequestManager.h"
 #include "GameStatsManager.generated.h"
 
+struct FDSLeaderboardItem;
 struct FDSRetrieveMatchStatsResponse;
 struct FDSRecordMatchStatsInput;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRetrieveMatchStatsResponseReceived, const FDSRetrieveMatchStatsResponse&, RetrieveMatchStatsResponse);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRetrieveMatchStatsResponse, const FDSRetrieveMatchStatsResponse&, MatchStatsResponse);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRetrieveLeaderboard, TArray<FDSLeaderboardItem>&, Leaderboard);
 /**
  * 
  */
@@ -22,14 +24,27 @@ class DEDICATEDSERVERS_API UGameStatsManager : public UHTTPRequestManager
 public:
 	void RecordMatchStats(const FDSRecordMatchStatsInput& RecordMatchStatsInput);
 	void RetrieveMatchStats();
+	void UpdateLeaderboard(const TArray<FString>& WinnerUsername);
+	void RetrieveLeaderboard();
+	
 
 	UPROPERTY(BlueprintAssignable)
 	FAPIStatusMessgae RetrieveMatchStatsStatusMessage;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnRetrieveMatchStatsResponseReceived OnRetrieveMatchStatsResponseReceived;
+	FOnRetrieveMatchStatsResponse OnRetrieveMatchStatsResponse;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnAPIRequestSucceeded OnUpdatedLeaderboardSucceeded;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnRetrieveLeaderboard OnRetrieveLeaderboard;
+
+	UPROPERTY(BlueprintAssignable)
+	FAPIStatusMessgae RetrieveLeaderboardMessage;
 private:
 	void RecordMatchStats_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	void RetrieveMatchStats_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void UpdateLeaderboard_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void RetrieveLeaderboard_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 };

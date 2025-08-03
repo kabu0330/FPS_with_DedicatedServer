@@ -30,6 +30,8 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UWidgetSwitcher> WidgetSwitcher;
+
+	void AutoSignIn();
 	
 protected:
 	virtual void NativeConstruct() override;

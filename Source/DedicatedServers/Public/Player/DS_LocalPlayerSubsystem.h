@@ -25,8 +25,10 @@ public:
 	
 	FString GetUsername() const;
 	FString GetEmail() const;
+	FString GetPassword() const;
 	void SetUsername(const FString& Name);
 	void SetEmail(const FString& EmailAddress);
+	void SetPassword(const FString& InputPassword);
 	
 private:
 	UPROPERTY()
@@ -40,4 +42,5 @@ private:
 
 	FString Username;
 	FString Email;
+	FString Password{};
 };

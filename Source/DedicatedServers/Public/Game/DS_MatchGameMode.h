@@ -6,6 +6,7 @@
 #include "DS_GameModeBase.h"
 #include "DS_MatchGameMode.generated.h"
 
+class UGameStatsManager;
 /** 1. 실제 컨텐츠 레벨의 부모 클래스
  *  2. 전투 관련 타이머 + 심리스 서버 트래블(로비 복귀)
  */
@@ -21,6 +22,9 @@ public:
 	virtual void Logout(AController* Exiting) override;
 	virtual void InitSeamlessTravelPlayer(AController* NewController) override;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameStatsManager> GameStatsManagerClass;
+
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	FCountdownTimerHandle PreMatchTimerHandle;
@@ -34,13 +38,22 @@ protected:
 	UPROPERTY(EditdefaultsOnly)
 	TSoftObjectPtr<UWorld> LobbyMap;
 
+	virtual void BeginPlay() override;
 	virtual void OnCountdownTimerFinished(ECountdownTimerType Type) override;
-
+	virtual void OnMatchEnded();
+	
 	void SetClientInputEnabled(bool bEnabled);
-	void OnMatchEnded();
+	void EndMatchForPlayerStats();
+	void UpdateLeaderboard(const TArray<FString>& LeaderboardNames);
+
+	UFUNCTION()
+	void OnLeaderboardUpdated();
 	
 private:
 	UPROPERTY()
 	EMatchStatus MatchStatus;
+	
+	UPROPERTY()
+	TObjectPtr<UGameStatsManager> GameStatsManager;
 	
 };

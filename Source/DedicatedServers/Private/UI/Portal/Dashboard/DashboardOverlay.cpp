@@ -17,8 +17,11 @@ void UDashboardOverlay::NativeConstruct()
 	check(IsValid(GameStatsManagerClass));
 	GameStatsManager = NewObject<UGameStatsManager>(this, GameStatsManagerClass);
 	
-	GameStatsManager->OnRetrieveMatchStatsResponseReceived.AddDynamic(CareerPage, &UCareerPage::OnRetrieveMatchStats);
+	GameStatsManager->OnRetrieveMatchStatsResponse.AddDynamic(CareerPage, &UCareerPage::OnRetrieveMatchStats);
 	GameStatsManager->RetrieveMatchStatsStatusMessage.AddDynamic(CareerPage, &UCareerPage::SetStatusMessage);
+	
+	GameStatsManager->OnRetrieveLeaderboard.AddDynamic(LeaderboardPage, &ULeaderboardPage::PopulateLeaderboard);
+	GameStatsManager->RetrieveLeaderboardMessage.AddDynamic(LeaderboardPage, &ULeaderboardPage::SetStatusMessage);
 	
 	Button_Game->OnClicked.AddDynamic(this, &UDashboardOverlay::ShowGamePage);
 	Button_Career->OnClicked.AddDynamic(this, &UDashboardOverlay::ShowCareerPage);
@@ -44,6 +47,7 @@ void UDashboardOverlay::ShowLeaderboardPage()
 {
 	DisableButtons(Button_Leaderboard);
 	WidgetSwitcher->SetActiveWidget(LeaderboardPage);
+	GameStatsManager->RetrieveLeaderboard();
 }
 
 void UDashboardOverlay::DisableButtons(UButton* Button) const

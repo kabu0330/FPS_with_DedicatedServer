@@ -55,6 +55,11 @@ FString UDS_LocalPlayerSubsystem::GetEmail() const
 	return Email;
 }
 
+FString UDS_LocalPlayerSubsystem::GetPassword() const
+{
+	return Password;
+}
+
 void UDS_LocalPlayerSubsystem::SetUsername(const FString& Name)
 {
 	Username = Name;
@@ -63,4 +68,9 @@ void UDS_LocalPlayerSubsystem::SetUsername(const FString& Name)
 void UDS_LocalPlayerSubsystem::SetEmail(const FString& EmailAddress)
 {
 	Email = EmailAddress;
+}
+
+void UDS_LocalPlayerSubsystem::SetPassword(const FString& InputPassword)
+{
+	Password = InputPassword;
 }

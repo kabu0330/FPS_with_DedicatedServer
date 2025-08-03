@@ -380,3 +380,22 @@ struct FDSRetrieveMatchStatsResponse
 
 	void Dump() const;
 };
+
+USTRUCT()
+struct FDSLeaderboardItem
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString databaseid{};
+
+	UPROPERTY()
+	FString username{};
+
+	UPROPERTY()
+	int32 matchWins{};
+
+	UPROPERTY()
+	int32 place{};
+	
+};

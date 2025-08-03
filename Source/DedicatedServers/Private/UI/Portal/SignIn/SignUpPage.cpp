@@ -11,7 +11,7 @@ void USignUpPage::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	TextBox_UserName->OnTextChanged.AddDynamic(this, &USignUpPage::UpdateSignUpButtonState);
+	TextBox_Username->OnTextChanged.AddDynamic(this, &USignUpPage::UpdateSignUpButtonState);
 	TextBox_Email->OnTextChanged.AddDynamic(this, &USignUpPage::UpdateSignUpButtonState);
 	
 	TextBox_Password->OnTextChanged.AddDynamic(this, &USignUpPage::UpdatePasswordStatus);
@@ -19,9 +19,9 @@ void USignUpPage::NativeConstruct()
 
 	Button_SignUp->SetIsEnabled(false);
 	
-	if (TextBox_UserName)
+	if (TextBox_Username)
 	{
-		TextBox_UserName->SetKeyboardFocus();
+		TextBox_Username->SetKeyboardFocus();
 	}
 }
 
@@ -37,8 +37,8 @@ void USignUpPage::UpdateStatusMessage(const FString& Message, bool bShouldResetW
 void USignUpPage::UpdateSignUpButtonState(const FText& Text)
 {
 	constexpr int UserNameLength = 2;
-	const bool bIsUsernameValid = !TextBox_UserName->GetText().ToString().IsEmpty() &&
-		TextBox_UserName->GetText().ToString().Len() >= UserNameLength;
+	const bool bIsUsernameValid = !TextBox_Username->GetText().ToString().IsEmpty() &&
+		TextBox_Username->GetText().ToString().Len() >= UserNameLength;
 
 	const bool bIsValidEmail = IsValidEmail(TextBox_Email->GetText().ToString());
 	const bool bIsEmailEmpty = !TextBox_Email->GetText().ToString().IsEmpty();
@@ -152,7 +152,7 @@ bool USignUpPage::IsStrongPassword(const FString& Password, FString& StatusMessa
 
 void USignUpPage::ClearTextBoxes()
 {
-	TextBox_UserName->SetText(FText::GetEmpty());
+	TextBox_Username->SetText(FText::GetEmpty());
 	TextBox_Email->SetText(FText::GetEmpty());
 	TextBox_Password->SetText(FText::GetEmpty());
 	TextBox_ConfirmPassword->SetText(FText::GetEmpty());

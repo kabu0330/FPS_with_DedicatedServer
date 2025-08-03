@@ -23,8 +23,11 @@ public:
 	void UpdateLeader();
 	bool HasFirstBloodBeenHad() const { return bHasFirstBloodBeenHad; }
 	bool IsTiedForTheLead(AMatchPlayerState* PlayerState);
+	TArray<AMatchPlayerState*> GetLeaders() const;
+	
 protected:
 	virtual void BeginPlay() override;
+	
 private:
 
 	UPROPERTY()

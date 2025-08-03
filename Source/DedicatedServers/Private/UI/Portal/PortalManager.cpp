@@ -284,6 +284,14 @@ void UPortalManager::SignOut_Response(FHttpRequestPtr Request, FHttpResponsePtr 
 		{
 			return;
 		}
+
+		if (UDS_LocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem(); IsValid(LocalPlayerSubsystem))
+		{
+			LocalPlayerSubsystem->SetUsername("");
+			LocalPlayerSubsystem->SetEmail("");
+			LocalPlayerSubsystem->SetPassword("");
+		}
+		
 		APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
 		// 부모 포인터가 자식 인스턴스를 가리키고 있다.(업캐스팅)
 		// true라면 인터페이스가 제시한 순수 가상함수를 반드시 구현한 상태이니까 부모 포인터로 자식 인스턴스의 함수를 호출할 수 있다.
