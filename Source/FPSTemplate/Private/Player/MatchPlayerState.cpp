@@ -28,15 +28,20 @@ AMatchPlayerState::AMatchPlayerState()
 	bWinner = false;
 }
 
-void AMatchPlayerState::OnMatchEnded(const FString& Username)
+void AMatchPlayerState::DetermineMatchWinner()
 {
-	Super::OnMatchEnded(Username);
-
 	AMatchGameState* MatchGameState = Cast<AMatchGameState>(GetWorld()->GetGameState());
 	if (IsValid(MatchGameState))
 	{
 		bWinner = MatchGameState->GetLeader() == this;
 	}
+}
+
+void AMatchPlayerState::OnMatchEnded(const FString& Username)
+{
+	Super::OnMatchEnded(Username);
+
+	DetermineMatchWinner();
 
 	FDSRecordMatchStatsInput RecordMatchStatsInput;
 	RecordMatchStatsInput.username = Username;

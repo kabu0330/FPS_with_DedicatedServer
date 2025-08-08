@@ -141,7 +141,7 @@ void UGameStatsManager::UpdateLeaderboard_Response(FHttpRequestPtr Request, FHtt
 			return;
 		}
 
-		UE_LOG(LogDedicatedServers, Error, TEXT("UpdateLeaderboard_Response Succeeded!"));
+		UE_LOG(LogDedicatedServers, Warning, TEXT("UpdateLeaderboard_Response Succeeded!"));
 		OnUpdatedLeaderboardSucceeded.Broadcast();
 	}
 }

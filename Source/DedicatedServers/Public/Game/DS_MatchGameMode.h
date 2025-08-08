@@ -42,12 +42,7 @@ protected:
 	virtual void OnCountdownTimerFinished(ECountdownTimerType Type) override;
 	virtual void OnMatchEnded();
 	
-	void SetClientInputEnabled(bool bEnabled);
-	void EndMatchForPlayerStats();
 	void UpdateLeaderboard(const TArray<FString>& LeaderboardNames);
-
-	UFUNCTION()
-	void OnLeaderboardUpdated();
 	
 private:
 	UPROPERTY()
@@ -56,4 +51,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<UGameStatsManager> GameStatsManager;
 	
+	void SetClientInputEnabled(bool bEnabled);
+	void EndMatchForPlayerStats();
+
+	UFUNCTION()
+	void OnLeaderboardUpdated();
 };
