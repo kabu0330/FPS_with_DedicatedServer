@@ -307,6 +307,8 @@ struct FDSMatchStats
 
 	UPROPERTY()
 	int32 matchLosses{};
+
+	void Dump() const;
 };
 
 USTRUCT()
@@ -319,6 +321,8 @@ struct FDSRecordMatchStatsInput
 
 	UPROPERTY()
 	FDSMatchStats matchStats{};
+
+	void Dump() const;
 };
 
 USTRUCT()

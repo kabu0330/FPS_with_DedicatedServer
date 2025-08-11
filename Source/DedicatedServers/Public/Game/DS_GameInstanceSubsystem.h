@@ -7,12 +7,13 @@
 #include "GameLiftServerSDK.h"
 #include "DS_GameInstanceSubsystem.generated.h"
 
+class UGameStatsManager;
 struct FProcessParameters;
 struct FServerParameters;
 /** 1. InitGameLift() aws GameLift Servers 기능 지원
  *  2. 서버 트래블이 발생해도 GameLift Servers와 통신이 이어지도록 "ProcessParameters" 데이터 저장 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class DEDICATEDSERVERS_API UDS_GameInstanceSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
@@ -20,6 +21,9 @@ public:
 	UDS_GameInstanceSubsystem();
 	
 	void InitGameLift(const FServerParameters& ServerParameters);
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameStatsManager> GameStatsManagerClass;
 
 protected:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
@@ -30,6 +34,8 @@ private:
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess))
 	bool bGameLiftInitialized;
 	
+	
 	void BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule);
 	void ParesCommandLinePort();
+	
 };

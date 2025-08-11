@@ -23,7 +23,7 @@ class FPSTEMPLATE_API AMatchPlayerState : public ADS_MatchPlayerState
 public:
 	AMatchPlayerState();
 	void DetermineMatchWinner();
-	virtual void OnMatchEnded(const FString& Username) override;
+	virtual void OnMatchEnded() override;
 
 	void AddScoredElim();
 	void AddDefeat();

@@ -14,6 +14,8 @@
 
 void UGameStatsManager::RecordMatchStats(const FDSRecordMatchStatsInput& RecordMatchStatsInput)
 {
+	RecordMatchStatsInput.Dump();
+	
 	FString JsonString;
 	FJsonObjectConverter::UStructToJsonObjectString(
 		FDSRecordMatchStatsInput::StaticStruct(), &RecordMatchStatsInput, JsonString
@@ -40,7 +42,10 @@ void UGameStatsManager::RecordMatchStats_Response(FHttpRequestPtr Request, FHttp
 	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 	if (FJsonSerializer::Deserialize(JsonReader, JsonObject))
 	{
-		ContainsErrors(JsonObject, true);
+		if (ContainsErrors(JsonObject, true)) return;
+
+		UE_LOG(LogDedicatedServers, Warning, TEXT("RecordMatchStats_Response Succeeded!"));
+		OnUpdatedGameStatsSucceeded.Broadcast();
 	}
 }
 
@@ -98,7 +103,7 @@ void UGameStatsManager::RetrieveMatchStats_Response(FHttpRequestPtr Request, FHt
 	}
 }
 
-void UGameStatsManager::UpdateLeaderboard(const TArray<FString>& WinnerUsername)
+void UGameStatsManager::UpdateLeaderboard(const TArray<FString>& PlayerNames)
 {
 	check(APIData);
 
@@ -112,9 +117,10 @@ void UGameStatsManager::UpdateLeaderboard(const TArray<FString>& WinnerUsername)
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
 	TArray<TSharedPtr<FJsonValue>> PlayerIdJsonArray;
 
-	for (const FString& Username : WinnerUsername)
+	for (const FString& Username : PlayerNames)
 	{
 		PlayerIdJsonArray.Add(MakeShareable(new FJsonValueString(Username)));
+		UE_LOG(LogDedicatedServers, Warning, TEXT("UpdateLeaderboard PlayerId: %s"), *Username);
 	}
 	JsonObject->SetArrayField(TEXT("playerIds"), PlayerIdJsonArray);
 	FString Content;

@@ -141,6 +141,34 @@ void FDSInitiateAuthResponse::Dump() const
 	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
 }
 
+void FDSMatchStats::Dump() const
+{
+	UE_LOG(LogDedicatedServers, Log, TEXT("  scoredElims: %d"), scoredElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  defeats: %d"), defeats);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  hits: %d"), hits);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  misses: %d"), misses);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  headShootElims: %d"), headShootElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  highestElims: %d"), highestElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  hightestStreak: %d"), hightestStreak);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  dethroneElims: %d"), dethroneElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  revengeElims: %d"), revengeElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  showStopperElims: %d"), showStopperElims);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  gotFirstBlood: %d"), gotFirstBlood);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  matchWins: %d"), matchWins);
+	UE_LOG(LogDedicatedServers, Log, TEXT("  matchLosses: %d"), matchLosses);
+
+}
+
+void FDSRecordMatchStatsInput::Dump() const
+{
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_PURPLE);
+	UE_LOG(LogDedicatedServers, Log, TEXT("--- FDSRecordMatchStatsInput Dump ---"));
+	UE_LOG(LogDedicatedServers, Log, TEXT("  username: %s"), *username);
+	matchStats.Dump();
+	UE_LOG(LogDedicatedServers, Log, TEXT("----------------------------------------"));
+	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
+}
+
 void FDSRetrieveMatchStatsResponse::Dump() const
 {
 	UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_PURPLE);

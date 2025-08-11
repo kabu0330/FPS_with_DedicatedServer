@@ -4,6 +4,7 @@
 #include "Player/MatchPlayerState.h"
 
 #include "Data/SpecialElimData.h"
+#include "DedicatedServers/DedicatedServers.h"
 #include "Game/MatchGameState.h"
 #include "ShooterTypes/ShooterTypes.h"
 #include "UI/Elims/SpecialElimWidget.h"
@@ -37,14 +38,15 @@ void AMatchPlayerState::DetermineMatchWinner()
 	}
 }
 
-void AMatchPlayerState::OnMatchEnded(const FString& Username)
+void AMatchPlayerState::OnMatchEnded()
 {
-	Super::OnMatchEnded(Username);
+	Super::OnMatchEnded();
 
 	DetermineMatchWinner();
 
 	FDSRecordMatchStatsInput RecordMatchStatsInput;
-	RecordMatchStatsInput.username = Username;
+	RecordMatchStatsInput.username = DefaultUsername;
+	UE_LOG(LogTemp, Warning, TEXT("Recording match stats for %s"), *DefaultUsername);
 
 	RecordMatchStatsInput.matchStats.defeats = Defeats;
 	RecordMatchStatsInput.matchStats.hits = Hits;
@@ -58,7 +60,7 @@ void AMatchPlayerState::OnMatchEnded(const FString& Username)
 	RecordMatchStatsInput.matchStats.gotFirstBlood = bFirstBlood ? 1 : 0;
 	RecordMatchStatsInput.matchStats.matchWins = bWinner ? 1 : 0;
 	RecordMatchStatsInput.matchStats.matchLosses = bWinner ? 0 : 1;
-
+	
 	RecordMatchStats(RecordMatchStatsInput);
 }
 

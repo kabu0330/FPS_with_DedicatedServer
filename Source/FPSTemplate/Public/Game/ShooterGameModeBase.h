@@ -29,5 +29,5 @@ public:
 	float RespawnTime;
 
 protected:
-	virtual void OnMatchEnded() override;
+	virtual void OnGameStatsUpdated() override;
 };

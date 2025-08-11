@@ -60,7 +60,7 @@ void AMatchGameState::UpdateLeader()
 			}
 		}
 	}
-
+	
 	bHasFirstBloodBeenHad = true;
 }
 

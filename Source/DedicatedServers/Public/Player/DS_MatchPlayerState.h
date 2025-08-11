@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DS_DefaultPlayerState.h"
 #include "GameFramework/PlayerState.h"
 #include "DS_MatchPlayerState.generated.h"
 
@@ -12,17 +13,18 @@ class UGameStatsManager;
  * 
  */
 UCLASS()
-class DEDICATEDSERVERS_API ADS_MatchPlayerState : public APlayerState
+class DEDICATEDSERVERS_API ADS_MatchPlayerState : public ADS_DefaultPlayerState
 {
 	GENERATED_BODY()
 public:
-	virtual void OnMatchEnded(const FString& Username);
+	virtual void OnMatchEnded();
 
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UGameStatsManager> GameStatsManagerClass;
+	// UPROPERTY(EditDefaultsOnly)
+	// TSubclassOf<UGameStatsManager> GameStatsManagerClass;
 
 protected:
 	virtual void BeginPlay() override;
+
 	void RecordMatchStats(const FDSRecordMatchStatsInput& RecordMatchStatsInput) const;
 	
 private:

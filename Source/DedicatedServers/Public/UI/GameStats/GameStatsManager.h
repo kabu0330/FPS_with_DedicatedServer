@@ -24,7 +24,7 @@ class DEDICATEDSERVERS_API UGameStatsManager : public UHTTPRequestManager
 public:
 	void RecordMatchStats(const FDSRecordMatchStatsInput& RecordMatchStatsInput);
 	void RetrieveMatchStats();
-	void UpdateLeaderboard(const TArray<FString>& WinnerUsername);
+	void UpdateLeaderboard(const TArray<FString>& PlayerNames);
 	void RetrieveLeaderboard();
 	
 
@@ -35,6 +35,9 @@ public:
 	FOnRetrieveMatchStatsResponse OnRetrieveMatchStatsResponse;
 
 	UPROPERTY(BlueprintAssignable)
+	FOnAPIRequestSucceeded OnUpdatedGameStatsSucceeded;
+	
+	UPROPERTY(BlueprintAssignable)
 	FOnAPIRequestSucceeded OnUpdatedLeaderboardSucceeded;
 
 	UPROPERTY(BlueprintAssignable)
@@ -42,6 +45,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FAPIStatusMessgae RetrieveLeaderboardMessage;
+	
 private:
 	void RecordMatchStats_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	void RetrieveMatchStats_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);

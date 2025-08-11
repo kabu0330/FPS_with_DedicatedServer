@@ -59,9 +59,10 @@ void AShooterGameModeBase::RequestRespawn(ACharacter* ElimmedCharacter, AControl
 	}
 }
 
-void AShooterGameModeBase::OnMatchEnded()
+void AShooterGameModeBase::OnGameStatsUpdated()
 {
-	Super::OnMatchEnded();
+	Super::OnGameStatsUpdated();
+	UE_LOG(LogTemp, Warning, TEXT("OnGameStatsUpdated"));
 
 	TArray<FString> LeaderIds;
 	if (AMatchGameState* MatchGameState = GetGameState<AMatchGameState>(); IsValid(MatchGameState))
@@ -69,9 +70,10 @@ void AShooterGameModeBase::OnMatchEnded()
 		TArray<AMatchPlayerState*> Leaders = MatchGameState->GetLeaders();
 		for (AMatchPlayerState* Leader : Leaders)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Leader: %s"), *Leader->GetUsername());
 			if (ADS_PlayerController* LeaderPlayerController = Cast<ADS_PlayerController>(Leader->GetPlayerController()); IsValid(LeaderPlayerController))
 			{
-				LeaderIds.Add(LeaderPlayerController->Username);
+				LeaderIds.Add(Leader->GetUsername());
 			}
 		}
 	}

@@ -5,6 +5,7 @@
 
 #include "aws/gamelift/server/GameLiftServerAPI.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/DS_DefaultPlayerState.h"
 #include "Player/DS_PlayerController.h"
 
 void ADS_GameModeBase::StartCountdownTimer(FCountdownTimerHandle& CountdownTimerHandle)
@@ -105,7 +106,7 @@ void ADS_GameModeBase::TrySeamlessTravel(TSoftObjectPtr<UWorld> DestinationMap)
 	 */
 	if (GIsEditor)
 	{
-		// 리슨 서버 환경의 PIE에서 ServerTravel처럼 동작
+		// 리슨 서버 환경의 PIE(Play In Editor)에서 ServerTravel처럼 동작
 		UGameplayStatics::OpenLevelBySoftObjectPtr(this, DestinationMap);
 	}
 	else
@@ -118,9 +119,11 @@ void ADS_GameModeBase::RemovePlayerSession(AController* Exiting)
 {
 	ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(Exiting);
 	if (!IsValid(PlayerController)) return;
-
+	ADS_DefaultPlayerState* PlayerState = PlayerController->GetPlayerState<ADS_DefaultPlayerState>();
+	if (!IsValid(PlayerState)) return;
+		
 #if WITH_GAMELIFT
-	const FString& PlayerSessionId = PlayerController->PlayerSessionId;
+	const FString& PlayerSessionId = PlayerState->GetPlayerSessionId();
 	if (!PlayerSessionId.IsEmpty())
 	{
 		Aws::GameLift::Server::RemovePlayerSession(TCHAR_TO_ANSI(*PlayerSessionId));

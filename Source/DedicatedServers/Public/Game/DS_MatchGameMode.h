@@ -22,6 +22,8 @@ public:
 	virtual void Logout(AController* Exiting) override;
 	virtual void InitSeamlessTravelPlayer(AController* NewController) override;
 
+	UGameStatsManager* GetGameStatsManager();
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UGameStatsManager> GameStatsManagerClass;
 
@@ -41,9 +43,12 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void OnCountdownTimerFinished(ECountdownTimerType Type) override;
 	virtual void OnMatchEnded();
+
+	UFUNCTION()
+	virtual void OnGameStatsUpdated();
 	
 	void UpdateLeaderboard(const TArray<FString>& LeaderboardNames);
-	
+
 private:
 	UPROPERTY()
 	EMatchStatus MatchStatus;
@@ -53,7 +58,6 @@ private:
 	
 	void SetClientInputEnabled(bool bEnabled);
 	void EndMatchForPlayerStats();
-
-	UFUNCTION()
-	void OnLeaderboardUpdated();
+	void CreateGameStatsManager();
+	
 };

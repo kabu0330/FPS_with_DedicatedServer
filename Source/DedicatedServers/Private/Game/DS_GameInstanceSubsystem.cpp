@@ -4,6 +4,7 @@
 #include "Game/DS_GameInstanceSubsystem.h"
 
 #include "DedicatedServers/DedicatedServers.h"
+#include "UI/GameStats/GameStatsManager.h"
 
 UDS_GameInstanceSubsystem::UDS_GameInstanceSubsystem()
 {
@@ -84,14 +85,9 @@ void UDS_GameInstanceSubsystem::InitGameLift(const FServerParameters& ServerPara
     bGameLiftInitialized = true;
 }
 
-void UDS_GameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
-{
-    Super::Initialize(Collection);
-}
-
 void UDS_GameInstanceSubsystem::BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule)
 {
-        ProcessParameters = MakeShared<FProcessParameters>();
+    ProcessParameters = MakeShared<FProcessParameters>();
 
     //When a game session is created, Amazon GameLift Servers sends an activation request to the game server and passes along the game session object containing game properties and other settings.
     //Here is where a game server should take action based on the game session object.
@@ -150,3 +146,10 @@ void UDS_GameInstanceSubsystem::ParesCommandLinePort()
         }
     }
 }
+
+void UDS_GameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+    Super::Initialize(Collection);
+}
+
+

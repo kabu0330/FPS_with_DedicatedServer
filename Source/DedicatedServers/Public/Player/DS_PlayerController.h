@@ -39,13 +39,6 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnTimerStateChangedDelegate OnTimerStopped;
 
-	UPROPERTY(BlueprintreadOnly, Category = "Player")
-	FString Username = "";
-
-	UPROPERTY(BlueprintreadOnly, Category = "Player")
-	FString PlayerSessionId = "";
-	
-	
 protected:
 	UFUNCTION(Server, Reliable)
 	void Server_Ping(float TimeOfRequest);
@@ -55,7 +48,6 @@ protected:
 
 private:
 	float SingleTripTime{};
-	
 };
 
 

@@ -3,6 +3,9 @@
 
 #include "Game/DS_MatchGameMode.h"
 
+#include "DedicatedServers/DedicatedServers.h"
+#include "Game/DS_GameInstanceSubsystem.h"
+#include "GameFramework/GameStateBase.h"
 #include "Player/DS_MatchPlayerState.h"
 #include "Player/DS_PlayerController.h"
 #include "UI/GameStats/GameStatsManager.h"
@@ -49,13 +52,30 @@ void ADS_MatchGameMode::InitSeamlessTravelPlayer(AController* NewController)
 	}
 }
 
+void ADS_MatchGameMode::CreateGameStatsManager()
+{
+	check(GameStatsManagerClass);
+	if (IsValid(GameStatsManager)) return;
+	GameStatsManager = NewObject<UGameStatsManager>(this, GameStatsManagerClass);
+	
+	if (!IsValid(GameStatsManager)) return;
+	GameStatsManager->OnUpdatedGameStatsSucceeded.AddDynamic(this, &ADS_MatchGameMode::OnGameStatsUpdated);
+	UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_MatchGameMode BeginPlay GameStatsManager is created"));
+}
+
+UGameStatsManager* ADS_MatchGameMode::GetGameStatsManager()
+{
+	if (!IsValid(GameStatsManager))
+	{
+		CreateGameStatsManager();
+	}
+	return GameStatsManager;
+}
+
 void ADS_MatchGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GameStatsManager = NewObject<UGameStatsManager>(this, GameStatsManagerClass);
-	check(IsValid(GameStatsManager));
-	GameStatsManager->OnUpdatedLeaderboardSucceeded.AddDynamic(this, &ADS_MatchGameMode::OnLeaderboardUpdated);
+	CreateGameStatsManager();
 }
 
 void ADS_MatchGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
@@ -115,18 +135,20 @@ void ADS_MatchGameMode::EndMatchForPlayerStats()
 		{
 			if (ADS_MatchPlayerState* MatchPlayerState = Cast<ADS_MatchPlayerState>(DSPlayerController->PlayerState); IsValid(MatchPlayerState))
 			{
-				MatchPlayerState->OnMatchEnded(DSPlayerController->Username);
+				MatchPlayerState->OnMatchEnded();
 			}
 		}
 	}
 }
 
-void ADS_MatchGameMode::OnLeaderboardUpdated()
+void ADS_MatchGameMode::OnMatchEnded()
 {
 	EndMatchForPlayerStats();
 }
 
-void ADS_MatchGameMode::OnMatchEnded()
+void ADS_MatchGameMode::OnGameStatsUpdated()
 {
-	//EndMatchForPlayerStats();
+	// Content Moudule: ShooterGameMode override
+	// UpdateLeaderboard()
 }
+

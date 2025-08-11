@@ -70,6 +70,7 @@ private:
 	void AddPlayerInfoToLobbyState(AController* Player) const;
 	void RemovePlayerInfoFromLobbyState(AController* Player) const;
 
+	void RecordUserInformation(APlayerController* NewPlayerController, const FString& Options);
 	
 	// 미사용
 	void FindGameLiftAnywhereServerIP();
