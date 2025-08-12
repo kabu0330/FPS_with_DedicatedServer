@@ -77,7 +77,6 @@ void UPortalManager::SignIn_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 				HUDManagementInterface->OnSignIn();
 			}
 		}
-		
 	}
 }
 

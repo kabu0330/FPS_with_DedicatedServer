@@ -88,12 +88,14 @@ void ADS_GameModeBase::UpdateCountdownTimer(const FCountdownTimerHandle& Countdo
 			// 서버 : 얘들아, 지금 4초 남았어!
 			DSPlayerController->Client_TimerUpdated(CountdownTimeLeft, CountdownTimerHandle.Type);
 			// 클라 : 서버가 0.2초 전에 얘기했으니까 지금은 3.8초 남았네. 델리게이트야 3.8초로 전파해.
+			// 위젯 : 3.8초 확인
 		}
 	}
 }
 
 void ADS_GameModeBase::OnCountdownTimerFinished(ECountdownTimerType Type)
 {
+	// LobbyGameMode override
 	// MatchGameMode override
 }
 

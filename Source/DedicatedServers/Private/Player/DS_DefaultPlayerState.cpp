@@ -41,7 +41,7 @@ void ADS_DefaultPlayerState::OverrideWith(APlayerState* PlayerState)
 	{
 		DefaultUsername = NewPlayerState->DefaultUsername;
 		DefaultPlayerSessionId = NewPlayerState->DefaultPlayerSessionId;
-		UE_LOG(LogTemp, Warning, TEXT("OverrideWith Username: %s"), *NewPlayerState->DefaultUsername);
+		UE_LOG(LogTemp, Warning, TEXT("OverrideWith Username: %s"), *DefaultUsername);
 	}
 }
 

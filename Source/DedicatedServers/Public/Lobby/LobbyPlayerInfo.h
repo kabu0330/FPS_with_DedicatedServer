@@ -3,6 +3,8 @@
 #include "Net/Serialization/FastArraySerializer.h"
 #include "LobbyPlayerInfo.generated.h"
 
+class AGameState;
+
 USTRUCT(BlueprintType)
 struct FLobbyPlayerInfo : public FFastArraySerializerItem
 {
@@ -13,7 +15,11 @@ struct FLobbyPlayerInfo : public FFastArraySerializerItem
 	
 	UPROPERTY(BlueprintReadWrite)
 	FString Username{};
+
+	void PostReplicatedAdd(const FLobbyPlayerInfoArray& InArraySerializer);
+	void PreReplicatedRemove(const FLobbyPlayerInfoArray& InArraySerializer);
 };
+
 /** Fast TArray Serializer
  *  1. 언리얼 엔진에서 제공하는 고성능 직렬화 매커니즘
  *  2. 각 원소에 고유 ID와 버전 번호를 부여
@@ -28,12 +34,18 @@ struct FLobbyPlayerInfoArray : public FFastArraySerializer
 	UPROPERTY()
 	TArray<FLobbyPlayerInfo> Items;
 
+	UPROPERTY()
+	AGameState* GameState;
+
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
 	{
 		return FastArrayDeltaSerialize<FLobbyPlayerInfo, FLobbyPlayerInfoArray>(Items, DeltaParams, *this);
 	}
 	void AddPlayer(const FLobbyPlayerInfo& NewPlayerInfo);
 	void RemovePlayer(const FString& Username);
+
+	AGameState* GetOwner() const;
+	void SetOwner(AGameState* InGameState);
 };
 
 template<>

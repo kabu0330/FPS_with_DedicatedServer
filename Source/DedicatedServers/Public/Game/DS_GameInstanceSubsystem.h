@@ -22,9 +22,6 @@ public:
 	
 	void InitGameLift(const FServerParameters& ServerParameters);
 
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UGameStatsManager> GameStatsManagerClass;
-
 protected:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	
@@ -33,7 +30,6 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess))
 	bool bGameLiftInitialized;
-	
 	
 	void BindCallback(FGameLiftServerSDKModule* GameLiftSdkModule);
 	void ParesCommandLinePort();

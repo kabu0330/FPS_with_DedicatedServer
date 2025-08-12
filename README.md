@@ -328,7 +328,8 @@ export const handler = async (event) => {
 성공적으로 응답을 받으면 사용자 풀에 해당 계정이 생성됩니다. 그러나 인증이 완료되지 않았음으로 로그인은 할 수 없습니다. 
 
 ```cpp
-void UPortalManager::SignUp_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void UPortalManager::SignUp_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, 
+		bool bWasSuccessful)
 {
 	if (!bWasSuccessful)
 	{
@@ -434,41 +435,25 @@ void UPortalManager::Confirm(const FString& ConfirmationCode)
 2. 일치하면 ```LocalPlayerSubsystem```에 사용자 정보 및 토큰을 저장합니다.
 3. 서버 접속 버튼이 있는 위젯으로 전환합니다.
 
+<p>
+
 #### 로그인
 사용자 이름과 비밀번호를 입력하고 버튼을 누르면 HTTP 요청이 진행됩니다.
 
-```cpp
-void UPortalManager::SignIn(const FString& Username, const FString& Password)
-{
-	SignInStatusMessageDelegate.Broadcast(TEXT("사용자 확인 중..."), false);
-	
-	check(APIData);
-	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
-	Request->OnProcessRequestComplete().BindUObject(this, & UPortalManager::SignIn_Response);
-
-	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::PortalAPI::SignIn);
-	Request->SetURL(APIUrl);
-	Request->SetVerb(TEXT("POST"));
-	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-
-	LastUserName = Username;
-	TMap<FString, FString> Params = {
-		{TEXT("username"), Username},
-		{TEXT("password"), Password}
-	};
-	const FString Content = SerializeJsonContent(Params);
-	Request->SetContentAsString(Content);
-	Request->ProcessRequest(); 
-}
-```
+<p>
 
 응답이 에러가 아니라면 Response를 파싱하여 데이터를 ```LocalPlayerSubsystem```에 저장합니다. 사용자 정보 뿐만 아니라 액세스 토큰, ID토큰, 리프레시 토큰도 포함됩니다.
-로그인 성공 시, ```PortalHUD```는 기존의 로그인을 담당하던 ```SignInOverlay``` 위젯을 제거하고 ```DashboardOverlay```위젯으로 교체합니다. 그러나, ```PortalManager```는 어떤 ```HUD```가 존재하는지 알 필요가 없습니다.
+로그인 성공 시, ```PortalHUD```는 기존의 로그인을 담당하던 ```SignInOverlay``` 위젯을 제거하고 ```DashboardOverlay```위젯으로 교체합니다. 
+
+<p>
+
+그러나, ```PortalManager```는 어떤 ```HUD```가 존재하는지 알 필요가 없습니다.
 결합도를 낮추기 위해 ```IHUDManagement```라는 인터페이스 클래스를 별도로 만들어 함수를 호출합니다.
 
 
 ```cpp
-void UPortalManager::SignIn_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void UPortalManager::SignIn_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, 
+		bool bWasSuccessful)
 {
 	if (!bWasSuccessful)
 	{
@@ -530,10 +515,10 @@ void APortalHUD::OnSignIn()
 }
 ```
 
-</details>
+</details><p>
 
 
-<details>
+<p><details>
 <summary>구현 코드: LocalPlayersubsystem 토큰 갱신 로직 (클릭)</summary><p>
 
 토큰 갱신 과정은 아래와 같습니다.
@@ -619,7 +604,8 @@ void UDS_LocalPlayerSubsystem::SetRefreshTokenTimer()
 ```UpdateToken```함수에서 다시 ```SetRefreshTokenTimer```함수를 호출하여 게임을 종료하기 전까지 계속 일정 시간마다 토큰 갱신을 예약하는 구조로 만들었습니다.
 
 ```cpp
-void UPortalManager::RefreshTokens_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void UPortalManager::RefreshTokens_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, 
+		bool bWasSuccessful)
 {
 	if (!bWasSuccessful) return;
 	
@@ -644,7 +630,7 @@ void UPortalManager::RefreshTokens_Response(FHttpRequestPtr Request, FHttpRespon
 }
 ```
 
-</details>
+</details><p>
 
 ___
 
@@ -764,6 +750,7 @@ export const handler = async (event) => {
   }
 };
 ```
+
 </details>
 
 
@@ -771,7 +758,7 @@ export const handler = async (event) => {
 
 ```cpp
 void UGameSessionsManager::FindOrCreateGameSession_Response(FHttpRequestPtr Request, FHttpResponsePtr Response,
-	bool bWasSuccessful)
+		bool bWasSuccessful)
 {
 	if (!bWasSuccessful)
 	{
@@ -862,7 +849,7 @@ void UGameSessionsManager::HandleGameSessionStatus(const FString& Status, const 
 }
 ```
 
-```TryCreatePlayerSession```함수의 응답을 확인하여 플레이어 세션 생성에 성공하면 서버로 레벨을 전환합니다. 이 때, 플레이어 세션 ID와 사용자 이름을 Options으로 전달합니다.
+```TryCreatePlayerSession```함수의 응답을 확인하여 플레이어 세션 생성에 성공하면 서버로 레벨을 전환합니다. 이 때, 플레이어 세션 ID와 사용자 이름을 **Options**으로 전달합니다.
 서버 GameMode에서는 이 Options를 파싱하여 사용자 정보를 입력하는데, 상세 코드는 하단의 **심리스 서버 트래블** 항목에서 설명하겠습니다.
 
 ```cpp
@@ -899,7 +886,7 @@ void UGameSessionsManager::CreatePlayerSession_Response(FHttpRequestPtr Request,
 		
 		const FString IpAndPort = PlayerSession.IpAddress + TEXT(":") 
 								  + FString::FromInt(PlayerSession.Port);
-								  
+
 		const FName Address(*IpAndPort);
 		UGameplayStatics::OpenLevel(this, Address, true, Options);
 	}
@@ -910,6 +897,253 @@ void UGameSessionsManager::CreatePlayerSession_Response(FHttpRequestPtr Request,
 
 ___
 
+### 심리스 서버 트래블 (Seamless Server Travel / ```LobbyGameMode```, ```GameInstanceSubsystem```)
+
+<p align="center">
+ <img alt="이미지" src=".\ReadmeImages\seamless_travel.gif" >
+</p>
+
+심리스 서버 트래블은 로비(Server Default Map)에서 게임 월드로 진입하거나 로비로 되돌아올 때, 플레이어의 접속을 끊지 않고 자연스럽게 맵을 전환하는 기능입니다.
+* AWS GameLift 연결 유지 및 데이터 보존 : ```LobbyGameMode```는 서버 기본 맵의 게임 모드로 GameLift SDK 호출 및 서버에 접속한 클라이언트의 데이터를 검사하고 네트워크 동기화를 수행합니다. 실제 GameLift SDK 호출 및 상태 관리는 프로그램의 생명주기 동안 유지되는 ```GameInstanceSubsystem```에 캡슐화하여 심리스 트래블 간에도 안정적으로 GameLift와 통신이 가능합니다.
+* 클라이언트 연결 유지 데이터 보존 : ```PlayerController```, ```PlayerState``` 등 핵심 액터는 파괴되지 않고 다음 레벨로 이관됩니다. 덕분에 플레이어는 재로그인할 필요 없이 자신의 데이터를 그대로 유지한 채 게임을 이어갈 수 있습니다.
+
+<p><details>
+<summary>구현 코드: 서버 트래블 간 GameLift SDK 통신 유지를 위한 사전 작업 (클릭)</summary><p>
+
+서버 트래블을 구현하기 위한 준비 작업으로는 아래와 같습니다.
+1. 기존 ```DS_GameModeBase```클래스가 가지고 있던 GameLift SDK를 이전
+2. ```LobbyGameMode```는 GameLift 통신의 핵심인 ```ServerParameters``` 변수를 생성하고 AWS CLI 커맨드만 설정합니다.
+3. ```GameInstanceSubsystem```는 ```LobbyGameMode```으로부터 ```ServerParameters```를 전달받아 ```InitGameLift```함수를 호출합니다.
+4. ```GameInstanceSubsystem```의 ```ServerParameters```로 GameLift와 통신합니다.
+
+<p>
+
+로직을 구현한 이유는 다음과 같습니다. <p>
+레벨이 전환될 때 기존 ```GameMode```는 파괴되므로, ```GameMode```가 ```ServerParameters```를 소유한다면 서버 트래블 시, GameLift 통신에 필요한 ```ServerParameters```를 잃게 됩니다. <P>
+이 문제를 해결하기 위해 프로그램 생명주기와 같은 ```GameInstanceSubsystem```이 ```ServerParameters```를 소유하도록 로직을 수정했습니다. 게임 모드가 파괴되도 상관 없습니다. 프로그램이 종료되기 전까지 멤버의 수명이 유지되니까요. <p>
+
+먼저 ```LobbyGameMode```의 BeginPlay에서 ```ServerParameters```를 생성하고 ```GameInstanceSubsystem```의 ```InitGameLift```함수를 호출합니다.
+
+```cpp
+void ADS_LobbyGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+    UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_LobbyGameMode BeginPlay"));
+	InitGameLift();
+}
+
+void ADS_LobbyGameMode::InitGameLift()
+{
+	if (UGameInstance* GameInstance = GetGameInstance(); IsValid(GameInstance))
+	{
+		if (DSGameInstanceSubsystem = GameInstance->GetSubsystem<UDS_GameInstanceSubsystem>(); 
+				IsValid(DSGameInstanceSubsystem))
+		{
+			FServerParameters ServerParameters;
+		    SetServerParameters(ServerParameters);
+		    DSGameInstanceSubsystem->InitGameLift(ServerParameters);
+		    UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_LobbyGameMode InitGameLift() end..."));
+		}
+	}
+}
+```
+
+```GameInstanceSubsystem```에서 bool변수를 활용하여 최초 1회만 ```ServerParameters```를 초기화하고 저장합니다. 이로써 게임모드가 파괴되어도 GameLift와 지속적으로 통신할 수 있는 준비가 되었습니다.
+
+```cpp
+void UDS_GameInstanceSubsystem::InitGameLift(const FServerParameters& ServerParameters)
+{
+	if (bGameLiftInitialized) return;
+
+#if WITH_GAMELIFT
+    FGameLiftServerSDKModule* GameLiftSdkModule = 
+			&FModuleManager::LoadModuleChecked<FGameLiftServerSDKModule>(FName("GameLiftServerSDK"));
+    ...
+    BindCallback(GameLiftSdkModule);
+    ParesCommandLinePort();
+    ...
+    if (ProcessReadyOutcome.IsSuccess())
+    {
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_GREEN);
+        UE_LOG(LogDedicatedServers, Log, TEXT("Process Ready!"));
+        UE_LOG(LogDedicatedServers, SetColor, TEXT("%s"), COLOR_NONE);
+    }
+    ...
+#endif
+
+    bGameLiftInitialized = true;
+}
+```
+
+</details>
+
+<p><details>
+<summary>구현 코드: 서버 트래블 시작 및 완료 처리 로직 (클릭)</summary><p>
+
+클라이언트가 ```OpenLevel```함수를 통해 서버에 접속한 이후 데이터 처리 과정은 아래와 같습니다.
+1. ```LobbyGameMode```의 ```PreLogin```함수에서 ```OpenLevel```의 매개변수로 입력한 **Options**를 파싱하여 플레이어 세션과 사용자명을 추출하고, 해당 데이터 정보를 토대로 GameLift와 통신하여 플레이어 세션 수락을 요청합니다.
+2. ```InitNewPlayer```함수에서 ```PlayerState```에 플레이어 세션과 사용자명을 저장합니다.
+3. ```PostLogin```함수에서 서버에 접속한 사용자 정보를 ```GameState```에 추가하고, 서버 트래블이 가능한 조건인지 검사 후 서버 트래블 카운트다운을 시작합니다.
+4. 카운트다운이 끝나면 ```ServerTravel```을 호출합니다.
+
+<p>
+
+<p><details>
+<summary><b>1. 플레이어 접속 및 데이터 초기화 (Options 파싱)</b></summary><p>
+
+```InitNewPlayer```함수에서 서버가 사용자를 식별할 수 있도록 Options를 파싱한 데이터를 ```PlayerState```에 저장합니다.
+
+```cpp
+FString ADS_LobbyGameMode::InitNewPlayer(APlayerController* NewPlayerController, 
+		const FUniqueNetIdRepl& UniqueId, const FString& Options, const FString& Portal)
+{
+    FString InitializedString = Super::InitNewPlayer(NewPlayerController, UniqueId, Options, Portal);
+    
+    RecordUserInformation(NewPlayerController, Options);
+    
+    return InitializedString;
+}
+
+void ADS_LobbyGameMode::RecordUserInformation(APlayerController* NewPlayerController, 
+		const FString& Options)
+{
+    const FString PlayerSessionId = UGameplayStatics::ParseOption(Options, TEXT("PlayerSessionId"));
+    const FString Username = UGameplayStatics::ParseOption(Options, TEXT("Username"));
+    
+    ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(NewPlayerController);
+    if (!IsValid(PlayerController))
+    {
+        ...
+    }
+    
+    ADS_DefaultPlayerState* PlayerState = NewPlayerController->GetPlayerState<ADS_DefaultPlayerState>(); 
+    if (IsValid(PlayerState))
+    {
+        if (!PlayerSessionId.IsEmpty())
+        {
+            PlayerState->SetPlayerSessionId(PlayerSessionId);
+        }
+        if (!Username.IsEmpty())
+        {
+            PlayerState->SetUsername(Username);
+        }
+        ...
+    }
+}
+```
+
+</details><p>
+
+<p><details>
+<summary><b>2. PlayerState 데이터 보존 (CopyProperties)</b></summary><p>
+
+```PlayerState```에 저장한 데이터가 심리스 트래블 중에 유실되지 않도록 ```CopyProperties```함수와 ```OverrideWith```함수를 통해 새 ```PlayerState```에 기존 데이터를, 그리고 다시 기존 ```PlayerState```에 새 데이터를 덮어씁니다.
+이 과정은 서버에서만 이루어지므로 멤버에 Replicated 속성을 추가하여 동기화가 자동으로 이루어집니다.
+
+
+```cpp
+void ADS_DefaultPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ADS_DefaultPlayerState, DefaultUsername);
+	DOREPLIFETIME(ADS_DefaultPlayerState, DefaultPlayerSessionId);
+}
+
+void ADS_DefaultPlayerState::CopyProperties(APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+
+	// Seamless Travel을 했을 때 데이터가 초기화되는 문제를 해결하기 위한 방법으로 시도
+	if (ADS_DefaultPlayerState* NewPlayerState = Cast<ADS_DefaultPlayerState>(PlayerState); 
+			IsValid(NewPlayerState))
+	{
+		NewPlayerState->DefaultUsername = DefaultUsername;
+		NewPlayerState->DefaultPlayerSessionId = DefaultPlayerSessionId;
+		UE_LOG(LogTemp, Warning, TEXT("CopyProperties Username: %s"), *NewPlayerState->DefaultUsername);
+	}
+}
+
+void ADS_DefaultPlayerState::OverrideWith(APlayerState* PlayerState)
+{
+	Super::OverrideWith(PlayerState);
+	if (ADS_DefaultPlayerState* NewPlayerState = Cast<ADS_DefaultPlayerState>(PlayerState); 
+			IsValid(NewPlayerState))
+	{
+		DefaultUsername = NewPlayerState->DefaultUsername;
+		DefaultPlayerSessionId = NewPlayerState->DefaultPlayerSessionId;
+		UE_LOG(LogTemp, Warning, TEXT("OverrideWith Username: %s"), *DefaultUsername);
+	}
+}
+```
+
+</details><p>
+
+<p><details>
+<summary><b>3. 로비 상태 관리 및 트래블 시작</b></summary><p>
+
+```PostLogin```함수에서 방금 접속한 클라이언트의 정보를 ```GameState```에 추가합니다.
+```GameState```의 배열에 해당 클라이언트 정보가 추가되며 네트워크 복제가 이루어집니다. 이 과정은 아래 **서버 접속자 리스트** 항목에서 자세히 설명하겠습니다.
+
+```cpp
+void ADS_LobbyGameMode::AddPlayerInfoToLobbyState(AController* Player) const
+{
+    if (LobbyStatus == ELobbyStatus::SeamlessTravelling) return;
+
+    ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(Player);
+    ADS_GameState* DSGameState = GetGameState<ADS_GameState>();
+    ADS_DefaultPlayerState* PlayerState = PlayerController->GetPlayerState<ADS_DefaultPlayerState>();
+    if (IsValid(DSGameState) && IsValid(DSGameState->LobbyState) 
+			&& IsValid(PlayerController) && IsValid(PlayerState))
+    {
+        FLobbyPlayerInfo PlayerInfo(PlayerState->GetUsername());
+        DSGameState->LobbyState->AddPlayerInfo(PlayerInfo);
+    }
+}
+```
+
+```PostLogin```함수에서 현재 서버에 접속 중인 인원을 확인하여 게임 시작에 필요한 최소 인원이 존재하면 서버 트래블을 위한 카운트다운을 시작합니다.
+
+```cpp
+void ADS_LobbyGameMode::CheckAndStartLobbyCountdown()
+{
+    if (GetNumPlayers() >= MinPlayers && LobbyStatus == ELobbyStatus::WaitingForPlayers)
+    {
+        LobbyStatus = ELobbyStatus::CountdownToSeamlessTravel;
+        StartCountdownTimer(LobbyCountdownTimer);
+    }
+}
+```
+
+반대로 중간에 클라이언트가 서버에서 나가 ```Logout``` 함수가 호출된다면 다시 인원 수를 계산하여 서버 트래블 카운트다운을 지속할지, 중단할지 결정합니다. <p>
+
+카운트다운이 끝나면 ```ServerTravel```함수를 호출합니다. 이 함수는 서버에서만 동작하므로, 테스트 환경에서 심리스 트래블처럼 보이기 위한 로직을 별도로 추가했습니다.
+또한 서버 트래블은 ```LobbyGameMode```뿐만 아니라 모든 ```GameMode```가 사용할 수 있어야 하므로 부모 클래스에 구현했습니다.
+```cpp
+void ADS_GameModeBase::TrySeamlessTravel(TSoftObjectPtr<UWorld> DestinationMap)
+{
+	const FString MapName = DestinationMap.ToSoftObjectPath().GetAssetName();
+
+	if (GIsEditor)
+	{
+		// 리슨 서버 환경의 PIE(Play In Editor)에서 ServerTravel처럼 동작
+		UGameplayStatics::OpenLevelBySoftObjectPtr(this, DestinationMap);
+	}
+	else
+	{
+		GetWorld()->ServerTravel(MapName);
+	}
+}
+```
+
+게임 모드마다 ```InitSeamlessTravelPlayer```함수를 구현하여 심리스 트래블로 해당 레벨에 도착하면 수행할 기능을 구현했습니다.
+```LobbyGameMode```라면 다시 심리스 트래블을 할 조건을 갖췄는지 검사하고, ```MatchGameMode```라면 게임을 시작할 준비를 합니다.
+
+</details>
+
+</details><p>
+
+
+___
 
 ### 서버 접속자 리스트 (```Fast TArray```, ```GameState```)
 게임에 참여 중인 모든 플레이어의 목록을 실시간으로 동기화하여 UI에 표시하는 기능입니다. 서버의 ```GameState```가 모든 클라이언트에 복제되는 정보를 관리하며, ```Fast TArray```를 사용해 효율적으로 네트워크 동기화를 구현했습니다.
@@ -918,8 +1152,26 @@ ___
 
 
 <p><details>
-<summary>구현 코드: (클릭)</summary><p>
+<summary>구현 코드: Fast TArray Serializer의 구현 (클릭)</summary><p>
+
+
+
 </details><p>
+
+<p><details>
+<summary>구현 코드: GameState의 생성과 브로드캐스트 (클릭)</summary><p>
+
+
+
+</details><p>
+
+<p><details>
+<summary>구현 코드: 접속자 목록 리스트 구현 (클릭)</summary><p>
+
+
+
+</details><p>
+
 
 ___
 
@@ -931,18 +1183,11 @@ ___
 
 <p><details>
 <summary>구현 코드: (클릭)</summary><p>
+
+
+
 </details><p>
 
-___
-
-### 심리스 서버 트래블 (Seamless Server Travel / ```LobbyGameMode```, ```GameInstanceSubsystem```)
-로비(Server Default Map)에서 게임 월드로 진입하거나 로비로 되돌아올 때, 플레이어의 접속을 끊지 않고 자연스럽게 맵을 전환하는 기능입니다.
-* AWS GameLift 연결 유지 및 데이터 보존 : ```LobbyGameMode```는 서버 기본 맵의 게임 모드로 GameLift SDK 호출 및 서버에 접속한 클라이언트의 데이터를 검사하고 네트워크 동기화를 수행합니다. 실제 GameLift SDK 호출 및 상태 관리는 프로그램의 생명주기 동안 유지되는 ```GameInstanceSubsystem```에 캡슐화하여 심리스 트래블 간에도 안정적으로 GameLift와 통신이 가능합니다.
-* 클라이언트 연결 유지 데이터 보존 : ```PlayerController```, ```PlayerState``` 등 핵심 액터는 파괴되지 않고 다음 레벨로 이관됩니다. 덕분에 플레이어는 재로그인할 필요 없이 자신의 데이터를 그대로 유지한 채 게임을 이어갈 수 있습니다.
-
-<p><details>
-<summary>구현 코드: (클릭)</summary><p>
-</details><p>
 
 ___
 
@@ -953,5 +1198,8 @@ ___
 
 <p><details>
 <summary>구현 코드: (클릭)</summary><p>
+
+
+
 </details><p>
 

@@ -110,10 +110,11 @@ void ADS_LobbyGameMode::AddPlayerInfoToLobbyState(AController* Player) const
     ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(Player);
     ADS_GameState* DSGameState = GetGameState<ADS_GameState>();
     ADS_DefaultPlayerState* PlayerState = PlayerController->GetPlayerState<ADS_DefaultPlayerState>();
-    if (IsValid(DSGameState) && IsValid(DSGameState->LobbyState) && IsValid(PlayerController) && IsValid(PlayerState))
+    if (IsValid(DSGameState) && /*IsValid(DSGameState->LobbyState) &&*/ IsValid(PlayerController) && IsValid(PlayerState))
     {
         FLobbyPlayerInfo PlayerInfo(PlayerState->GetUsername());
-        DSGameState->LobbyState->AddPlayerInfo(PlayerInfo);
+        DSGameState->GetPlayerList().AddPlayer(PlayerInfo);
+        //DSGameState->LobbyState->AddPlayerInfo(PlayerInfo);
     }
 }
 
@@ -136,9 +137,10 @@ void ADS_LobbyGameMode::RemovePlayerInfoFromLobbyState(AController* Player) cons
     ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(Player);
     ADS_GameState* DSGameState = GetGameState<ADS_GameState>();
     ADS_DefaultPlayerState* PlayerState = PlayerController->GetPlayerState<ADS_DefaultPlayerState>();
-    if (IsValid(DSGameState) && IsValid(DSGameState->LobbyState) && IsValid(PlayerController) && IsValid(PlayerState))
+    if (IsValid(DSGameState) && /*IsValid(DSGameState->LobbyState) &&*/ IsValid(PlayerController) && IsValid(PlayerState))
     {
-        DSGameState->LobbyState->RemovePlayerInfo(PlayerState->GetUsername());
+        DSGameState->GetPlayerList().RemovePlayer(PlayerState->GetUsername());
+        //DSGameState->LobbyState->RemovePlayerInfo(PlayerState->GetUsername());
     }
 }
 

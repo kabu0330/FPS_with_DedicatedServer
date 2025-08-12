@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "LobbyPlayerBox.generated.h"
 
+class ADS_GameState;
 class ALobbyState;
 struct FLobbyPlayerInfo;
 class UPlayerLabel;
@@ -28,6 +29,7 @@ public:
 protected:
 	virtual void NativeOnInitialized() override;
 	void UpdatePlayerInfo(ALobbyState* LobbyState);
+	void UpdatePlayerInfo(ADS_GameState* GameState);
 	
 	UFUNCTION()
 	void OnLobbyStateInitialized(ALobbyState* LobbyState);

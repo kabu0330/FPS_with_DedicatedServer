@@ -1,5 +1,23 @@
 ﻿#include "Lobby/LobbyPlayerInfo.h"
 
+#include "Game/DS_GameState.h"
+
+void FLobbyPlayerInfo::PostReplicatedAdd(const FLobbyPlayerInfoArray& InArraySerializer)
+{
+	if (ADS_GameState* GameState = Cast<ADS_GameState>(InArraySerializer.GetOwner()))
+	{
+		GameState->OnPlayerAddedDelegate.Broadcast(*this);
+	}
+}
+
+void FLobbyPlayerInfo::PreReplicatedRemove(const FLobbyPlayerInfoArray& InArraySerializer)
+{
+	if (ADS_GameState* GameState = Cast<ADS_GameState>(InArraySerializer.GetOwner()))
+	{
+		GameState->OnPlayerRemovedDelegate.Broadcast(*this);
+	}
+}
+
 void FLobbyPlayerInfoArray::AddPlayer(const FLobbyPlayerInfo& NewPlayerInfo)
 {
 	int32 Index = Items.Add(NewPlayerInfo);
@@ -20,4 +38,14 @@ void FLobbyPlayerInfoArray::RemovePlayer(const FString& Username)
 			break;
 		}
 	}
+}
+
+AGameState* FLobbyPlayerInfoArray::GetOwner() const
+{
+	return GameState;
+}
+
+void FLobbyPlayerInfoArray::SetOwner(AGameState* InGameState)
+{
+	GameState = InGameState;
 }
