@@ -15,6 +15,12 @@ void ADS_MatchPlayerState::OnMatchEnded()
 void ADS_MatchPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
+
+	TakeGameStatsManager();
+}
+
+void ADS_MatchPlayerState::TakeGameStatsManager()
+{
 	if (HasAuthority())
 	{
 		ADS_MatchGameMode* GameMode = Cast<ADS_MatchGameMode>(GetWorld()->GetAuthGameMode());
@@ -23,7 +29,6 @@ void ADS_MatchPlayerState::BeginPlay()
 			GameStatsManager = GameMode->GetGameStatsManager();
 		}
 	}
-	//GameStatsManager = NewObject<UGameStatsManager>(this, GameStatsManagerClass);
 }
 
 void ADS_MatchPlayerState::RecordMatchStats(const FDSRecordMatchStatsInput& RecordMatchStatsInput) const
@@ -31,3 +36,5 @@ void ADS_MatchPlayerState::RecordMatchStats(const FDSRecordMatchStatsInput& Reco
 	check(IsValid(GameStatsManager));
 	GameStatsManager->RecordMatchStats(RecordMatchStatsInput);
 }
+
+

@@ -20,7 +20,10 @@ struct FLobbyPlayerInfoDelta
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerInfoChanged, const FLobbyPlayerInfo&, PlayerInfo);
-
+/** 1. 플레이어의 username 정보를 기록
+ *  2. 플레이어가 접속(추가)했을 때의 데이터와 플레이어가 퇴장(제거)했을 때의 데이터로 구분
+ *  3. 클라에도 복제해줘야 하는 배열이므로 Fast TArray Serializer로 배열 생성
+ */
 UCLASS()
 class DEDICATEDSERVERS_API ALobbyState : public AInfo
 {

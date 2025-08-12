@@ -9,7 +9,7 @@
 class ALobbyState;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLobbyStateInitialized, ALobbyState*, LobbyState);
-/**
+/** 1. LobbyLevel에서 현재 서버에 접속한 플레이어 리스트를 관리한다. 
  * 
  */
 UCLASS()

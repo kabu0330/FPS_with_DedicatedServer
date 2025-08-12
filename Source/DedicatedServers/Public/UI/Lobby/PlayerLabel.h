@@ -7,7 +7,7 @@
 #include "PlayerLabel.generated.h"
 
 class UTextBlock;
-/**
+/** 1. Lobby의 스크롤 박스에 한줄씩 추가할 라벨
  * 
  */
 UCLASS()

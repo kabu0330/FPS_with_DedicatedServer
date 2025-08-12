@@ -9,8 +9,8 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimerStateChangedDelegate, float, Time, ECountdownTimerType, Type);
-/**
- * 
+/** 1. 입력 통제
+ *  2. 서버와 지연 시간을 계산하여 게임 카운트다운 시간 동기화
  */
 UCLASS()
 class DEDICATEDSERVERS_API ADS_PlayerController : public APlayerController

@@ -9,8 +9,8 @@
 
 struct FDSRecordMatchStatsInput;
 class UGameStatsManager;
-/**
- * 
+/** 1. 게임이 끝나고 플레이 기록을 DB에 저장하는 기능을 제공하는 부모 클래스
+ *  2. 컨텐츠 모듈에서 해당 클래스를 상속하여 플레이 데이터를 기록해야 함
  */
 UCLASS()
 class DEDICATEDSERVERS_API ADS_MatchPlayerState : public ADS_DefaultPlayerState
@@ -18,9 +18,6 @@ class DEDICATEDSERVERS_API ADS_MatchPlayerState : public ADS_DefaultPlayerState
 	GENERATED_BODY()
 public:
 	virtual void OnMatchEnded();
-
-	// UPROPERTY(EditDefaultsOnly)
-	// TSubclassOf<UGameStatsManager> GameStatsManagerClass;
 
 protected:
 	virtual void BeginPlay() override;
@@ -30,4 +27,6 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<UGameStatsManager> GameStatsManager;
+
+	void TakeGameStatsManager();
 };

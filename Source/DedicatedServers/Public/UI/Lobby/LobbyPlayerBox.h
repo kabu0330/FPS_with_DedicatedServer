@@ -10,7 +10,7 @@ class ALobbyState;
 struct FLobbyPlayerInfo;
 class UPlayerLabel;
 class UScrollBox;
-/**
+/** 1. Lobby에서 현재 서버에 접속한 사용자 이름을 출력할 스크롤 박스 위젯
  * 
  */
 UCLASS()

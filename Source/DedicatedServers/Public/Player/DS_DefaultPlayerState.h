@@ -6,8 +6,8 @@
 #include "GameFramework/PlayerState.h"
 #include "DS_DefaultPlayerState.generated.h"
 
-/**
- * 
+/** 1. 플레이어의 기본 정보를 저장
+ *  
  */
 UCLASS()
 class DEDICATEDSERVERS_API ADS_DefaultPlayerState : public APlayerState

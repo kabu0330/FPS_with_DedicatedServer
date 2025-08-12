@@ -70,6 +70,7 @@ void UTimerWidget::OnTimerUpdated(float CountdownTimeLeft, ECountdownTimerType T
 	K2_OnTimerUpdated(CountdownTimeLeft, TimerType);
 }
 
+
 void UTimerWidget::OnTimerStopped(float CountdownTimeLeft, ECountdownTimerType Type)
 {
 	if (Type != TimerType) return;

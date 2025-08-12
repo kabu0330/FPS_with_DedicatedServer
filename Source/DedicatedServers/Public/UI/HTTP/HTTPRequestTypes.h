@@ -6,7 +6,9 @@ namespace HTTPStatusMessage
 {
 	extern DEDICATEDSERVERS_API const FString SomethingWentWrong;
 }
-
+/** HTTP Response를 언리얼 리플렉션을 통해 손쉽게 파싱하기 위한 구조체
+ * 
+ */
 USTRUCT()
 struct FDSMetaData
 {

@@ -13,8 +13,8 @@ class UAPIData;
 class FJsonObject;
 class UDS_LocalPlayerSubsystem;
 
-/** HTTP Response 파싱과 관련된 편의 기능 지원
- * 
+/** 1. API Gateway Endpoint 설정  
+ *  2. HTTP Response 파싱과 관련된 편의 기능 지원
  */
 UCLASS(Blueprintable)
 class DEDICATEDSERVERS_API UHTTPRequestManager : public UObject

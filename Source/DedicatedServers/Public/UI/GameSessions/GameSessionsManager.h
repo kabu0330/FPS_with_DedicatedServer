@@ -7,8 +7,9 @@
 #include "UI/HTTP/HTTPRequestManager.h"
 #include "GameSessionsManager.generated.h"
 
-/**
- * 
+/** 1. 게임 세션 생성
+ *  2. 플레이어 세션 생성
+ *  3. 서버 접속(Open Level)
  */
 UCLASS()
 class DEDICATEDSERVERS_API UGameSessionsManager : public UHTTPRequestManager
