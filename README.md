@@ -332,7 +332,7 @@ void UPortalManager::SignUp_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 {
 	if (!bWasSuccessful)
 	{
-		SignUpStatusMessageDelegate.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);
+		SignUpStatusMessageDelegate.Broadcast(HTTPStatusMessage::SomethingWentWrong);
 	}
 	
 	TSharedPtr<FJsonObject> JsonObject;
@@ -346,7 +346,7 @@ void UPortalManager::SignUp_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 				FString Exception = JsonObject->GetStringField(TEXT("name"));
 				if (Exception.Equals(TEXT("UsernameExistsException")))
 				{
-					SignUpStatusMessageDelegate.Broadcast(TEXT("이미 사용 중인 Username입니다. 이름을 변경해주세요."), true);
+					SignUpStatusMessageDelegate.Broadcast(TEXT("이미 사용 중인 Username입니다. 이름을 변경해주세요."));
 					return;
 				}
 			}
@@ -355,10 +355,10 @@ void UPortalManager::SignUp_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 				FString Exception = JsonObject->GetStringField(TEXT("errorType"));
 				if (Exception.Contains(TEXT("UsernameExistsException")))
 				{
-					SignUpStatusMessageDelegate.Broadcast(TEXT("이미 사용 중인 Username입니다. 이름을 변경해주세요."), true);
+					SignUpStatusMessageDelegate.Broadcast(TEXT("이미 사용 중인 Username입니다. 이름을 변경해주세요."));
 				}
 			}
-			SignUpStatusMessageDelegate.Broadcast(HTTPStatusMessage::SomethingWentWrong, true);
+			SignUpStatusMessageDelegate.Broadcast(HTTPStatusMessage::SomethingWentWrong);
 			return;
 		}
 		
@@ -504,7 +504,8 @@ void UPortalManager::SignIn_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 		APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
 		if (IsValid(LocalPlayerController))
 		{
-			if (IHUDManagement* HUDManagementInterface = Cast<IHUDManagement>(LocalPlayerController->GetHUD()))
+			if (IHUDManagement* HUDManagementInterface = 
+				Cast<IHUDManagement>(LocalPlayerController->GetHUD()))
 			{
 				HUDManagementInterface->OnSignIn();
 			}
@@ -555,7 +556,8 @@ class DEDICATEDSERVERS_API UDS_LocalPlayerSubsystem : public ULocalPlayerSubsyst
 	GENERATED_BODY()
 
 public:
-	void InitializeTokens(const FDSAuthenticationResult& AuthResult, TScriptInterface<IPortalManagement> PortalManager);
+	void InitializeTokens(const FDSAuthenticationResult& AuthResult, 
+			TScriptInterface<IPortalManagement> PortalManager);
 	void SetRefreshTokenTimer();
 	void UpdateTokens(const FString& AccessToken, const FString& IdToken);
 	FDSAuthenticationResult GetAuthenticationResult() const;
@@ -581,7 +583,8 @@ private:
 액세스 토큰이 만료되기 전, 일정 시간마다 갱신하도록 ```FTimerHandle```를 이용합니다.
 
 ```cpp
-void UDS_LocalPlayerSubsystem::InitializeTokens(const FDSAuthenticationResult& AuthResult, TScriptInterface<IPortalManagement> PortalManager)
+void UDS_LocalPlayerSubsystem::InitializeTokens(const FDSAuthenticationResult& AuthResult, 
+		TScriptInterface<IPortalManagement> PortalManager)
 {
 	AuthenticationResult = AuthResult;
 	PortalManagementInterface = PortalManager;
@@ -599,11 +602,15 @@ void UDS_LocalPlayerSubsystem::SetRefreshTokenTimer()
 	{
 		FTimerDelegate RefreshTokenDelegate;
 		RefreshTokenDelegate.BindLambda([this]()
-		{
-			PortalManagementInterface->RefreshTokens(AuthenticationResult.RefreshToken); // PortalManager에 요청
+		{	// PortalManager에 요청
+			PortalManagementInterface->RefreshTokens(AuthenticationResult.RefreshToken); 
 		});
 		
-		World->GetTimerManager().SetTimer(TokenRefreshTimer, RefreshTokenDelegate, TokenRefreshInterval, false);
+		World->GetTimerManager().SetTimer(
+			TokenRefreshTimer, 
+			RefreshTokenDelegate, 
+			TokenRefreshInterval, 
+			false);
 	}
 }
 ```
@@ -768,7 +775,8 @@ void UGameSessionsManager::FindOrCreateGameSession_Response(FHttpRequestPtr Requ
 {
 	if (!bWasSuccessful)
 	{
-		BroadcastJoinGameSessionMessage.Broadcast(TEXT("FindOrCreateGameSession Response Failed..."), true);
+		BroadcastJoinGameSessionMessage.Broadcast(
+			TEXT("FindOrCreateGameSession Response Failed..."), true);
 	}
 	
 	TSharedPtr<FJsonObject> JsonObject;
@@ -777,7 +785,8 @@ void UGameSessionsManager::FindOrCreateGameSession_Response(FHttpRequestPtr Requ
 	{
 		if (ContainsErrors(JsonObject, true))
 		{
-			BroadcastJoinGameSessionMessage.Broadcast(TEXT("FindOrCreateGameSession Response Type is Error."), true);
+			BroadcastJoinGameSessionMessage.Broadcast(
+				TEXT("FindOrCreateGameSession Response Type is Error."), true);
 			return;
 		}
 		
@@ -794,7 +803,9 @@ void UGameSessionsManager::FindOrCreateGameSession_Response(FHttpRequestPtr Requ
 		if (GameSessionJsonObject.IsValid())
 		{
 			FDSGameSession GameSession;
-			FJsonObjectConverter::JsonObjectToUStruct(GameSessionJsonObject.ToSharedRef(), &GameSession);
+			FJsonObjectConverter::JsonObjectToUStruct(
+				GameSessionJsonObject.ToSharedRef(), 
+				&GameSession);
 
 			const FString GameSessionId = GameSession.GameSessionId;
 			const FString GameSessionStatus = GameSession.Status;
@@ -817,9 +828,11 @@ void UGameSessionsManager::HandleGameSessionStatus(const FString& Status, const 
 	// 플레이어 접속 처리
 	if (Status.Equals(TEXT("ACTIVE")))
 	{
-		BroadcastJoinGameSessionMessage.Broadcast(TEXT("Found activate Game Session. Creating a Player Session..."), false);
+		BroadcastJoinGameSessionMessage.Broadcast(
+			TEXT("Found activate Game Session. Creating a Player Session..."), false);
 
-		if (UDS_LocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem(); IsValid(LocalPlayerSubsystem))
+		if (UDS_LocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem(); 
+			IsValid(LocalPlayerSubsystem))
 		{
 			//TryCreatePlayerSession(GetUniquePlayerId(), SessionId);
 			TryCreatePlayerSession(LocalPlayerSubsystem->GetUsername(), SessionId);
@@ -834,12 +847,17 @@ void UGameSessionsManager::HandleGameSessionStatus(const FString& Status, const 
 		APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
 		if (IsValid(LocalPlayerController))
 		{
-			LocalPlayerController->GetWorldTimerManager().SetTimer(CreateSessionTimer, CreateSessionDelegate, 0.5f, false);
+			LocalPlayerController->GetWorldTimerManager().SetTimer(
+				CreateSessionTimer, 
+				CreateSessionDelegate, 
+				0.5f, 
+				false);
 		}
 	}
 	else
 	{
-		BroadcastJoinGameSessionMessage.Broadcast(TEXT("GameSessionStatus is Not ACTIVE or ACTIVATING"), true);
+		BroadcastJoinGameSessionMessage.Broadcast(
+			TEXT("GameSessionStatus is Not ACTIVE or ACTIVATING"), true);
 	}
 }
 ```
@@ -857,7 +875,8 @@ void UGameSessionsManager::CreatePlayerSession_Response(FHttpRequestPtr Request,
 	{
 		if (ContainsErrors(JsonObject, true))
 		{
-			BroadcastJoinGameSessionMessage.Broadcast(TEXT("CreatePlayerSession Response is Failed..."), true);
+			BroadcastJoinGameSessionMessage.Broadcast(
+				TEXT("CreatePlayerSession Response is Failed..."), true);
 			return;
 		}
 		
@@ -875,9 +894,12 @@ void UGameSessionsManager::CreatePlayerSession_Response(FHttpRequestPtr Request,
 		
 		// 레벨 전환
 		BroadcastJoinGameSessionMessage.Broadcast(TEXT("Open Lobby Level..."), true);
-		const FString Options = "PlayerSessionId=" + PlayerSession.PlayerSessionId + "?Username=" + PlayerSession.PlayerId;
+		const FString Options = "PlayerSessionId=" + PlayerSession.PlayerSessionId 
+								+ "?Username=" + PlayerSession.PlayerId;
 		
-		const FString IpAndPort = PlayerSession.IpAddress + TEXT(":") + FString::FromInt(PlayerSession.Port);
+		const FString IpAndPort = PlayerSession.IpAddress + TEXT(":") 
+								  + FString::FromInt(PlayerSession.Port);
+								  
 		const FName Address(*IpAndPort);
 		UGameplayStatics::OpenLevel(this, Address, true, Options);
 	}
