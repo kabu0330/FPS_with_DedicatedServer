@@ -22,7 +22,7 @@
 14. ```GameState``` 및 ```Fast TArray``` 직렬화를 이용한 **실시간 접속자 목록 표시**
 15. **핑퐁(Ping-Pong) 방식의 RTT(왕복 시간) 계산을 통한 클라이언트-서버 간 타이머 동기화** 
 16. ```PlayerState```를 이용한 플레이어 정보(점수, 상태 등) 실시간 복제 및 게임 결과 기록
-17. **델리게이트 전파(Broadcast)을 이용한 위젯과 게임 로직 간 결합도 최소화(Decoupling) 설계** 
+17. **델리게이트 전파(Broadcast)를 이용한 위젯과 게임 로직 간 결합도 최소화(Decoupling) 설계** 
 
 
 ## 구현 상세
@@ -230,7 +230,7 @@ ___
 
 <p>
 <details>
-<summary>구현 코드: 회원가입 요청 및 응답 처리 (C++, Node.js)</summary><p>
+<summary>구현 코드: 회원가입 요청 및 응답 처리 (클릭)</summary><p>
 
 회원가입 로직은 아래의 과정으로 진행됩니다.
 1. 사용자의 입력을 검사하여 모든 조건이 만족되면 서버에 회원가입을 요청할 수 있는 버튼이 활성화됩니다.
@@ -259,7 +259,9 @@ bool USignUpPage::IsStrongPassword(const FString& Password, FString& StatusMessa
 
 <p align="center">
  <img alt="이미지" src=".\ReadmeImages\signup_page.gif">
-</p>
+<br>
+<align="center"> 비밀번호 정규식 검증 </align>
+</p><br>
 
 HTTP Request의 매개변수로 Username, Password, Email을 함께 전송하면 AWS Lambda에서 해당 데이터를 추출하여 자격을 검증합니다.
 ```cpp
@@ -427,7 +429,9 @@ void UPortalManager::Confirm(const FString& ConfirmationCode)
 
 <p align="center">
  <img alt="이미지" src=".\ReadmeImages\sign_in_page.gif">
-</p>
+<br>
+<align="center"> 로그인 과정 </align>
+</p><br>
 
 <details>
 <summary>구현 코드: 로그인 및 HUD 인터페이스 클래스 (클릭)</summary><p>
@@ -641,7 +645,9 @@ ___
 
 <p align="center">
  <img alt="이미지" src=".\ReadmeImages\open_level.gif">
-</p>
+<br>
+<align="center"> 게임 세션 생성 및 진행 상태 메시지 출력 </align>
+</p><br>
 
 접속한 플레이어가 AWS GameLift에 게임 세션을 요청하고 참여 가능한 세션을 찾거나 새로 생성하여 서버에 접속하는 과정입니다.
 * 상태 기반 관리 : '세션 검색 중', '서버 접속 중' 등 비동기적으로 처리되는 세션 과정의 상태를 명확히 관리합니다. 각 상태 변화는 델리게이트를 통해 UI에 전파되어 사용자에게 진행 과정을 직관적으로 보여줍니다.
@@ -904,7 +910,9 @@ ___
 
 <p align="center">
  <img alt="이미지" src=".\ReadmeImages\seamless_travel.gif" >
-</p>
+<br>
+<align="center"> 심리스 서버 트래블 </align>
+</p><br>
 
 심리스 서버 트래블은 로비(Server Default Map)에서 게임 월드로 진입하거나 로비로 되돌아올 때, 플레이어의 접속을 끊지 않고 자연스럽게 맵을 전환하는 기능입니다.
 * AWS GameLift 연결 유지 및 데이터 보존 : ```LobbyGameMode```는 서버 기본 맵의 게임 모드로 GameLift SDK 호출 및 서버에 접속한 클라이언트의 데이터를 검사하고 네트워크 동기화를 수행합니다. 실제 GameLift SDK 호출 및 상태 관리는 프로그램의 생명주기 동안 유지되는 ```GameInstanceSubsystem```에 캡슐화하여 심리스 트래블 간에도 안정적으로 GameLift와 통신이 가능합니다.
@@ -1151,7 +1159,9 @@ ___
 
 <p align="center">
  <img alt="이미지" src=".\ReadmeImages\lobby_widget.gif" >
-</p>
+<br>
+<align="center"> 서버 접속자 플레이어 라벨 갱신 </align>
+</p><br>
 
 게임에 참여 중인 모든 플레이어의 목록을 실시간으로 동기화하여 UI에 표시하는 기능입니다. 서버의 ```GameState```가 모든 클라이언트에 복제되는 정보를 관리하며, ```Fast TArray```를 사용해 효율적으로 네트워크 동기화를 구현했습니다.
 * ```GameState``` 활용 : ```GameState```는 게임의 전역 상태를 모든 클라이언트에 복제하는 클래스입니다. 여기에 접속자 정보를 두어 모든 클라이언트가 항상 동일한 플레이어 목록을 보도록 보장합니다.
