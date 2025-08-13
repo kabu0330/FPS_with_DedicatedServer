@@ -148,8 +148,8 @@ ___
 ```UHTTPRequestManager``` 클래스는 AWS 백엔드 서버와의 모든 HTTP 통신을 중앙에서 총괄하고 관리하는 중앙 집중형 매니저 클래스입니다. 
 이 클래스는 클라이언트와 AWS 백엔드(API Gateway, Lambda) 간의 모든 HTTP 요청/응답 사이클을 **캡슐화**하여, 게임 로직이나 위젯(Widget)이 직접 서버와 통신할 필요가 없도록 역할을 분리합니다.
 
-* 계층적 설계 : ```UHTTPRequestManager``` 클래스를 부모로 상속받아, 각 API 카테고리의 세부 로직을 처리하는 자식 클래스(```GameSessionManager```, ```PortalManager```, ...)를 구현하여 역할을 명확히 분리했습니다.
-* 데이터 기반 : ```APIData``` 데이터 에셋 멤버를 통해 Endpoint를 관리합니다.
+* 확장성을 고려한 계층적 설계 : ```UHTTPRequestManager``` 클래스를 부모로 상속받아, 각 API 카테고리의 세부 로직을 처리하는 자식 클래스(```GameSessionManager```, ```PortalManager```, ...)를 구현하여 역할을 명확히 분리했습니다.
+* 유지보수성을 높인 데이터 기반 관리 : ```Data Asset```으로 코드 수정 없이 API 엔드포인트를 변경할 수 있습니다. 
 * 오류 처리 및 파싱 : Json 응답을 파싱하고 오류를 검사하는 함수들을 내장하고 있습니다.
 
 <p>
@@ -219,7 +219,9 @@ ___
 
 <p align="center">
  <img alt="이미지" src=".\ReadmeImages\confirm_page.gif">
-</p>
+<br>
+<align="center"> 회원가입, 이메일 인증 과정 </align>
+</p><br>
 
 플레이어가 UMG로 제작된 UI를 통해 입력한 정보로 회원가입 및 로그인을 요청하고, 그 결과를 처리하는 전체 인증 과정입니다. 실제 자격 증명 관리는 AWS Cognito와 연동하여 수행되며 ```PortalManager``` 클래스는 이 과정의 클라이언트 측 로직을 총괄합니다.
 * 역할 분리 : UI는 사용자의 입력을 받아 ```PortalManager```에 전달하는 역할만 수행합니다. ```PortalManager```는 UI에 입력된 데이터를 바탕으로 서버와 통신하는 핵심 로직만을 처리합니다. 이를 통해 데이터 흐름과 역할을 명확히 분리했습니다.
