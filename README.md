@@ -23,7 +23,7 @@
 15. **핑퐁(Ping-Pong) 방식의 RTT(왕복 시간) 계산을 통한 클라이언트-서버 간 타이머 동기화** 
 16. ```PlayerState```를 이용한 플레이어 정보(점수, 상태 등) 실시간 복제 및 게임 결과 기록
 17. **델리게이트 전파(Broadcast)을 이용한 위젯과 게임 로직 간 결합도 최소화(Decoupling) 설계** 
-18. 플레이 레벨 디자인
+
 
 ## 구현 상세
 ### AWS 기반 서버리스 게임 백엔드 아키텍처
@@ -48,6 +48,7 @@ ___
 <p align="center">
  <img alt="이미지" src="./ReadmeImages/api_gateway_2.png">
 </p>
+
 * GameSession API : 서버 관련 Endpoint, 게임 세션 및 플레이어 세션 관리
 * GameStats API   : DB 관련 Endpoint, 플레이 기록 및 랭킹 시스템 업데이트 및 검색
 * Portal API      : 사용자 접속 관련 Endpoint, 회원가입, 인증, 로그인 등 사용자 관리 기능 제공
@@ -147,7 +148,7 @@ ___
 ```UHTTPRequestManager``` 클래스는 AWS 백엔드 서버와의 모든 HTTP 통신을 중앙에서 총괄하고 관리하는 중앙 집중형 매니저 클래스입니다. 
 이 클래스는 클라이언트와 AWS 백엔드(API Gateway, Lambda) 간의 모든 HTTP 요청/응답 사이클을 **캡슐화**하여, 게임 로직이나 위젯(Widget)이 직접 서버와 통신할 필요가 없도록 역할을 분리합니다.
 
-* 계층적 설계 : ```UHTTPRequestManager``` 클래스를 부모로 상속받아, 각 API 카테고리의 세부 로직을 처리하는 자식 클래스들을 구현하여 역할을 명확히 분리했습니다.
+* 계층적 설계 : ```UHTTPRequestManager``` 클래스를 부모로 상속받아, 각 API 카테고리의 세부 로직을 처리하는 자식 클래스(```GameSessionManager```, ```PortalManager```, ...)를 구현하여 역할을 명확히 분리했습니다.
 * 데이터 기반 : ```APIData``` 데이터 에셋 멤버를 통해 Endpoint를 관리합니다.
 * 오류 처리 및 파싱 : Json 응답을 파싱하고 오류를 검사하는 함수들을 내장하고 있습니다.
 
@@ -236,7 +237,7 @@ ___
 
 
 #### 회원가입
-**정규식(Regex)**을 이용해 비밀번호 강도(대/소문자, 숫자, 특수문자 포함)를 실시간으로 검증하는 로직을 구현했습니다.
+**정규식(Regex)**을 이용해 비밀번호 수준(대/소문자, 숫자, 특수문자 포함)을 실시간으로 검증하는 로직을 구현했습니다.
 ```cpp
 bool USignUpPage::IsStrongPassword(const FString& Password, FString& StatusMessage)
 {
@@ -286,7 +287,7 @@ void UPortalManager::SignUp(const FString& Username, const FString& Password, co
 ```
 
 
-<details>
+<p><details>
 <summary>node.js 기반 Lambda 함수 보기</summary><p>
 
 ```js
@@ -321,7 +322,7 @@ export const handler = async (event) => {
 
 };
 ```
-</details>
+</details><p>
 
 
 해당 결과의 응답이 도착하면 바인딩된 함수가 호출되며 Response를 파싱합니다. 응답이 에러인지 검사하고 실패 시, UI에 보여줄 텍스트를 델리게이트로 전파합니다.
@@ -524,9 +525,9 @@ void APortalHUD::OnSignIn()
 토큰 갱신 과정은 아래와 같습니다.
 1. ```PortalManager```에서 로그인 성공 시 ```LocalPlayerSubsystem```의 ```InitializeTokens```함수를 호출합니다.
 2. ```InitializeTokens```함수는 최초 1회 호출되며, 토큰 갱신에 필요한 설정을 하고 ```SetRefreshTokenTimer```함수를 호출합니다.
-3. ```SetRefreshTokenTimer```함수는 ```FTimerHandle```에 ```PortalManager```클래스의 ```RefreshTokens```함수 호출을 바인딩합니다.
+3. ```SetRefreshTokenTimer```함수는 타이머 핸들을 통해 ```PortalManager```클래스의 ```RefreshTokens```함수 호출을 예약합니다.
 4. 일정 시간이 경과되면, 타이머 핸들이 ```RefreshTokens```함수를 호출하며 서버에 토큰 갱신을 요청합니다.
-5. ```PortalManager```가 ```LocalPlayerSubsystem```의 ```UpdateTokens```함수를 호출하며 토큰을 갱신하고, 다시 토큰 갱신 타이머를 설정합니다.
+5. ```PortalManager```가 ```LocalPlayerSubsystem```의 ```UpdateTokens```함수를 호출하며 토큰을 갱신하고, 다시 ```RefreshTokens```함수 호출을 예약합니다.
 
 
 #### 토큰 갱신
@@ -661,7 +662,7 @@ ___
  <img alt="이미지" src=".\ReadmeImages\join_game_button.png">
 </p>
 
-<details>
+<p><details>
 <summary>구현 코드: Node.js 기반 Lambda 함수 로직 (클릭)</summary><p>
 
 ```js
@@ -751,7 +752,7 @@ export const handler = async (event) => {
 };
 ```
 
-</details>
+</details><p>
 
 
 게임 세션을 생성하거나 찾는데 성공했다면 ```HandleGameSessionStatus```함수를 호출합니다. 
@@ -1092,11 +1093,10 @@ void ADS_LobbyGameMode::AddPlayerInfoToLobbyState(AController* Player) const
     ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(Player);
     ADS_GameState* DSGameState = GetGameState<ADS_GameState>();
     ADS_DefaultPlayerState* PlayerState = PlayerController->GetPlayerState<ADS_DefaultPlayerState>();
-    if (IsValid(DSGameState) && IsValid(DSGameState->LobbyState) 
-			&& IsValid(PlayerController) && IsValid(PlayerState))
+    if (IsValid(DSGameState) && IsValid(PlayerController) && IsValid(PlayerState))		
     {
         FLobbyPlayerInfo PlayerInfo(PlayerState->GetUsername());
-        DSGameState->LobbyState->AddPlayerInfo(PlayerInfo);
+        DSGameState->GetPlayerList().AddPlayer(PlayerInfo);
     }
 }
 ```
@@ -1146,6 +1146,11 @@ void ADS_GameModeBase::TrySeamlessTravel(TSoftObjectPtr<UWorld> DestinationMap)
 ___
 
 ### 서버 접속자 리스트 (```Fast TArray```, ```GameState```)
+
+<p align="center">
+ <img alt="이미지" src=".\ReadmeImages\lobby_widget.gif" >
+</p>
+
 게임에 참여 중인 모든 플레이어의 목록을 실시간으로 동기화하여 UI에 표시하는 기능입니다. 서버의 ```GameState```가 모든 클라이언트에 복제되는 정보를 관리하며, ```Fast TArray```를 사용해 효율적으로 네트워크 동기화를 구현했습니다.
 * ```GameState``` 활용 : ```GameState```는 게임의 전역 상태를 모든 클라이언트에 복제하는 클래스입니다. 여기에 접속자 정보를 두어 모든 클라이언트가 항상 동일한 플레이어 목록을 보도록 보장합니다.
 * ```Fast TArray``` 활용 : 일반 ```TArray```복제와 달리, 배열 내 변경 사항이 있는 원소만 감지하여 복제하는 ```Fast TArray```를 사용했습니다. 이를 통해 불필요한 네트워크 트래픽을 최소화하여 성능을 향상시켰습니다.
@@ -1154,24 +1159,138 @@ ___
 <p><details>
 <summary>구현 코드: Fast TArray Serializer의 구현 (클릭)</summary><p>
 
+```Fast TArray```를 사용하는 이유는 다음과 같습니다.
+1. 일반 ```TArray```는 배열에 작은 변화만 생겨도 배열 전체를 비교하고 복제합니다. 100개의 데이터 중 하나가 바뀌어도 100개의 데이터를 비교하고 전송합니다. 
+2. 반면, ```Fast TArray```를 사용하면 배열 전체가 아닌 배열의 각 원소를 개별적으로 추적합니다.
+3. 각 원소에 **Replication ID**와 **Replication Key**가 부여되며 서버에서 특정 원소가 변경되면 변경된 원소의 **ID**와 **Value**만 클라이언트로 전송합니다.
+4. 클라이언트는 서버로부터 전달받은 ID와 일치하는 원소의 Value를 변경하고 Key를 갱신합니다.
+5. 순서를 보장하지 않으므로 순서가 중요한 로직에서는 사용하지 않습니다. <p>
 
+즉, ```Fast TArray```를 사용하면 배열 전체를 복제할 필요가 없어지고, 특정 원소만 값을 수정하도록 지시할 수 있으므로 효율적입니다. 
+현재 서버의 목적에 맞게 ```FFastArraySerializerItem```을 상속한 항목을 만듭니다.
+지금은 서버에 접속한 클라이언트의 사용자명을 알고 싶은 것이므로 Username만 가지고 있으면 됩니다.
 
-</details><p>
+```cpp
+USTRUCT(BlueprintType)
+struct FLobbyPlayerInfo : public FFastArraySerializerItem
+{
+	GENERATED_BODY()
 
-<p><details>
-<summary>구현 코드: GameState의 생성과 브로드캐스트 (클릭)</summary><p>
+	UPROPERTY(BlueprintReadWrite)
+	FString Username{};
 
+	FLobbyPlayerInfo() {}
+	FLobbyPlayerInfo(const FString& Name) : Username(Name) {}
 
+	void PostReplicatedAdd(const FLobbyPlayerInfoArray& InArraySerializer);
+	void PreReplicatedRemove(const FLobbyPlayerInfoArray& InArraySerializer);
+};
+
+USTRUCT()
+struct FLobbyPlayerInfoArray : public FFastArraySerializer
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TArray<FLobbyPlayerInfo> Items;
+
+	UPROPERTY()
+	AGameState* GameState;
+
+	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
+	{
+		return FastArrayDeltaSerialize<FLobbyPlayerInfo, FLobbyPlayerInfoArray>(Items, DeltaParams, *this);
+	}
+	void AddPlayer(const FLobbyPlayerInfo& NewPlayerInfo);
+	void RemovePlayer(const FString& Username);
+
+	AGameState* GetOwner() const;
+	void SetOwner(AGameState* InGameState);
+};
+
+template<>
+struct TStructOpsTypeTraits<FLobbyPlayerInfoArray> : public TStructOpsTypeTraitsBase2<FLobbyPlayerInfoArray>
+{
+	enum
+	{
+		WithNetDeltaSerializer = true,
+	};
+};
+```
 
 </details><p>
 
 <p><details>
 <summary>구현 코드: 접속자 목록 리스트 구현 (클릭)</summary><p>
 
+서버에서 접속자 리스트를 전송하여 클라이언트 위젯에 보여지는 과정은 아래와 같습니다.
+1. ```GameState```는 ```Fast TArray```인 ```FLobbyPlayerInfoArray```를 가지고 있습니다.
+2. 서버에 클라이언트가 접속할 때, ```Post Login```함수에서 ```FLobbyPlayerInfoArray```에 플레이어 정보를 배열에 추가합니다.
+3. ```FLobbyPlayerInfoArray```는 배열의 데이터가 변경되면 콜백 함수(```PostReplicatedAdd```)를 호출합니다.
+4. 콜백 함수는 플레이어가 추가되었다고 전파합니다.
+5. 클라이언트 위젯은 델리게이트에 바인딩된 함수가 호출되며 플레이어 라벨을 추가합니다. 
 
+<p align="center">
+ <img alt="이미지" src=".\ReadmeImages\player_label.png">
+</p>
+
+만약 클라이언트가 접속을 종료했다면 ```Logout```함수가 호출되며 해당 원소를 제거하고 전파하여 클라이언트에서 라벨을 지우는 형태로 동작합니다.
+
+<p>
+
+```GameState```는 ```FLobbyPlayerInfoArray```타입의 ```PlayerList```를 멤버로 가집니다. 클라이언트가 서버에 접속하면 ```PostLogin```함수에서 클라이언트 정보를 추가합니다.
+```cpp
+void ADS_LobbyGameMode::AddPlayerInfoToLobbyState(AController* Player) const
+{
+    if (LobbyStatus == ELobbyStatus::SeamlessTravelling) return;
+
+    ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(Player);
+    ADS_GameState* DSGameState = GetGameState<ADS_GameState>();
+    ADS_DefaultPlayerState* PlayerState = PlayerController->GetPlayerState<ADS_DefaultPlayerState>();
+    if (IsValid(DSGameState) && IsValid(PlayerController) && IsValid(PlayerState))
+    {
+        FLobbyPlayerInfo PlayerInfo(PlayerState->GetUsername());
+        DSGameState->GetPlayerList().AddPlayer(PlayerInfo);
+    }
+}
+```
+
+```Items.Add()```함수로 배열에 새 플레이어를 추가하고 ```MarkItemDirty```함수로 클라이언트들에게 배열에 변경이 있다고 알려줍니다.
+언리얼 리플리케이션 시스템이 ```PlayerList```가 **Dirty**상태를 감지하고 추가된 원소의 ID와 Value만 담은 데이터 패킷을 만들어 모든 클라이언트에 전송합니다.
+클라이언트가 ```PlayList```에 대한 복제 데이터를 수신하고 원소를 추가합니다. 이후 ```PostPelicatedAdd```함수가 호출되며 플레이어가 추가되었음을 전파합니다.
+```cpp
+void FLobbyPlayerInfoArray::AddPlayer(const FLobbyPlayerInfo& NewPlayerInfo)
+{
+	int32 Index = Items.Add(NewPlayerInfo);
+	MarkItemDirty(Items[Index]);
+	Items[Index].PostReplicatedAdd(*this);
+}
+
+void FLobbyPlayerInfo::PostReplicatedAdd(const FLobbyPlayerInfoArray& InArraySerializer)
+{
+	if (ADS_GameState* GameState = Cast<ADS_GameState>(InArraySerializer.GetOwner()))
+	{
+		GameState->OnPlayerAddedDelegate.Broadcast(*this);
+	}
+}
+```
+
+델리게이트가 전파되면, 위젯은 미리 바인딩해둔 ```CreateAndAddPlayerLabel``` 함수를 호출하여 플레이어 라벨을 생성하고 목록에 추가합니다.
+
+```cpp
+void ULobbyPlayerBox::CreateAndAddPlayerLabel(const FLobbyPlayerInfo& PlayerInfo)
+{
+	if (FindPlayerLabel(PlayerInfo.Username)) return;
+	
+	UPlayerLabel* PlayerLabel = CreateWidget<UPlayerLabel>(this, PlayerLabelClass);
+	if (!IsValid(PlayerLabel)) return;
+
+	PlayerLabel->SetUsername(PlayerInfo.Username);
+	ScrollBox_PlayerInfo->AddChild(PlayerLabel);
+}
+```
 
 </details><p>
-
 
 ___
 
@@ -1182,9 +1301,86 @@ ___
 * RTT 기반 오차 보정 : 클라이언트의 ```PlayerController```는 서버와 지속적으로 시간을 주고받는 **핑퐁** 로직을 통해 왕복 시간을 계산합니다. 왕복 시간의 절반 값을 지연 시간으로 간주하고, 이를 통해 서버의 기준 시간을 자신의 로컬 시점에 맞게 예측하여 오차를 보정합니다.
 
 <p><details>
-<summary>구현 코드: (클릭)</summary><p>
+<summary>구현 코드: 카운트다운 타이머와 왕복 시간 계산 (클릭)</summary><p>
 
+타이머 동기화는 크게 3단계로 이루어집니다. 
+1. 클라이언트는 서버와의 지연 시간을 계산해두고, 
+2. 서버가 주기적으로 "지금 몇 초 남았어"라고 알려주면, 
+3. 클라이언트는 미리 계산한 지연 시간을 적용하여 오차를 보정하고 UI를 업데이트합니다. <p>
 
+1단계: RTT(왕복 시간) 계산 및 지연 시간 확보 <p>
+
+플레이어 접속 직후(```ReceivedPlayer``` 또는 ```PostSeamlessTravel```) 최초 1회, 클라이언트는 서버로 Ping을 보내고 서버는 즉시 Pong으로 응답합니다. 클라이언트는 이 요청과 응답에 걸린 시간을 측정하여 RTT(왕복 시간)를 계산하고, 편도 지연 시간(```SingleTripTime```)을 미리 저장해 둡니다.
+```cpp
+void ADS_PlayerController::ReceivedPlayer()
+{
+	Super::ReceivedPlayer();
+	if (GetNetMode() == NM_Standalone) return;
+	if (IsLocalPlayerController())
+	{
+		Server_Ping(GetWorld()->GetTimeSeconds());
+	}
+}
+
+void ADS_PlayerController::Server_Ping_Implementation(float TimeOfRequest)
+{
+	// 서버는 수신하는 즉시 응답
+	Client_Pong(TimeOfRequest);	
+}
+
+void ADS_PlayerController::Client_Pong_Implementation(float TimeOfRequest)
+{
+	// 서버에서 타이머를 호출하면 클라와 타이머를 동기화 방법으로
+	// 클라가 핑을 보내면, 즉시 서버가 퐁을 보내서 "두 지연시간의 합 / 2 = 평균 지연시간"으로 판단
+	const float RoundTripTime = GetWorld()->GetTimeSeconds() - TimeOfRequest;
+	SingleTripTime = RoundTripTime * 0.5f; // 근사치
+}
+```
+
+2단계: 서버의 시간 전파 <p>
+
+서버의 ```GameMode```는 ```FTimerManager```를 이용해 1초마다 모든 클라이언트에게 현재 남은 시간을 전파(broadcast)하는 ```UpdateCountdownTimer``` 함수를 호출합니다. 이 함수는 모든 ```PlayerController```를 순회하며 ```Client_TimerUpdated```라는 RPC를 호출합니다.
+```cpp
+void ADS_GameModeBase::UpdateCountdownTimer(const FCountdownTimerHandle& CountdownTimerHandle)
+{
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		ADS_PlayerController* DSPlayerController = Cast<ADS_PlayerController>(Iterator->Get());
+		if (IsValid(DSPlayerController))
+		{
+			const float CountdownTimeLeft =
+				CountdownTimerHandle.CountdownTime - GetWorldTimerManager().GetTimerElapsed(CountdownTimerHandle.TimerFinishedHandle);
+			// 서버 : 얘들아, 지금 4초 남았어!
+			DSPlayerController->Client_TimerUpdated(CountdownTimeLeft, CountdownTimerHandle.Type);
+			// 클라 : 서버가 0.2초 전에 얘기했을테니까 지금은 3.8초 남았네. 델리게이트야 3.8초로 전파해.
+			// 위젯 : 3.8초 확인
+		}
+	}
+}
+```
+
+3단계: 클라이언트의 오차 보정 및 UI 업데이트<p>
+
+```PlayerController```는 서버로부터 남은 시간(```CountdownTimeLeft```)을 전달받으면, 1단계에서 미리 계산해 둔 편도 지연 시간(```SingleTripTime```)을 빼서 오차를 보정합니다. 이 보정된 최종 시간을 델리게이트로 다시 한번 전파하면, 위젯이 이를 수신하여 화면의 타이머를 갱신합니다.
+
+```cpp
+void ADS_PlayerController::Client_TimerUpdated_Implementation(float CountdownTimeLeft, ECountdownTimerType Type) const
+{
+	OnTimerUpdated.Broadcast(CountdownTimeLeft - SingleTripTime, Type);
+}
+
+void UTimerWidget::OnTimerUpdated(float CountdownTimeLeft, ECountdownTimerType Type)
+{
+	if (Type != TimerType) return;
+	
+	if (!bActive)
+	{
+		TimerStarted(CountdownTimeLeft);
+	}
+
+	UpdateCountdown(CountdownTimeLeft);
+}
+```
 
 </details><p>
 
@@ -1197,9 +1393,328 @@ ___
 * 랭킹 구현 : **DynamoDB**의 스캔(Scan) 기능을 활용하여, 기록된 모든 데이터 중에서 승수가 높은 상위 10명의 플레이어를 조회하는 리더보드를 구현했습니다. 이를 통해 UI에서 상위 랭커 목록을 조회할 수 있습니다.
 
 <p><details>
-<summary>구현 코드: (클릭)</summary><p>
+<summary>구현 코드: DB에 플레이 기록 및 조회하기 (클릭)</summary><p>
 
+
+플레이 타임이 종료되면 ```GameMode```는 ```PlayerState```를 순회하며 게임이 종료되었을 때 수행할 함수를 호출합니다.
+
+```cpp
+void ADS_MatchGameMode::EndMatchForPlayerStats()
+{
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (ADS_PlayerController* DSPlayerController = Cast<ADS_PlayerController>(It->Get()); IsValid(DSPlayerController))
+		{
+			if (ADS_MatchPlayerState* MatchPlayerState = Cast<ADS_MatchPlayerState>(DSPlayerController->PlayerState); IsValid(MatchPlayerState))
+			{
+				MatchPlayerState->OnMatchEnded();
+			}
+		}
+	}
+}
+
+```
+
+범용적인 서버 모듈과 게임 특화 로직이 담긴 컨텐츠 모듈 간의 의존성을 최소화하기 위해, ```PlayerState```의 상속과 가상 함수 재정의(override)를 활용했습니다. ```OnMatchEnded```의 실제 데이터 수집은 컨텐츠 모듈(```AMatchPlayerState```)에서 수행하고, 최종 전송 요청은 부모 클래스(```ADS_MatchPlayerState```)의 함수를 호출하여 서버 모듈에서 처리하도록 역할을 분리했습니다.
+
+```cpp
+void AMatchPlayerState::OnMatchEnded()
+{
+	Super::OnMatchEnded();
+
+	DetermineMatchWinner();
+
+	FDSRecordMatchStatsInput RecordMatchStatsInput;
+	RecordMatchStatsInput.username = DefaultUsername;
+	UE_LOG(LogTemp, Warning, TEXT("Recording match stats for %s"), *DefaultUsername);
+
+	RecordMatchStatsInput.matchStats.defeats = Defeats;
+	RecordMatchStatsInput.matchStats.hits = Hits;
+	RecordMatchStatsInput.matchStats.misses = Misses;
+	RecordMatchStatsInput.matchStats.scoredElims = ScoredElims;
+	RecordMatchStatsInput.matchStats.headShootElims = HeadShotElims;
+	RecordMatchStatsInput.matchStats.revengeElims = RevengeElims;
+	RecordMatchStatsInput.matchStats.dethroneElims = DethroneElims;
+	RecordMatchStatsInput.matchStats.showStopperElims = ShowStopperElims;
+	RecordMatchStatsInput.matchStats.hightestStreak = HighestStreak;
+	RecordMatchStatsInput.matchStats.gotFirstBlood = bFirstBlood ? 1 : 0;
+	RecordMatchStatsInput.matchStats.matchWins = bWinner ? 1 : 0;
+	RecordMatchStatsInput.matchStats.matchLosses = bWinner ? 0 : 1;
+	
+	RecordMatchStats(RecordMatchStatsInput);
+}
+```
+
+<p align="center">
+ <img alt="이미지" src=".\ReadmeImages\record_matchstats_log.png">
+</p><p>
+
+서버 계층에서 ```GameStatsManager``` 클래스를 통해 DB에 데이터를 기록합니다.
+
+```cpp
+void ADS_MatchPlayerState::RecordMatchStats(
+		const FDSRecordMatchStatsInput& RecordMatchStatsInput) const
+{
+	check(IsValid(GameStatsManager));
+	GameStatsManager->RecordMatchStats(RecordMatchStatsInput);
+}
+
+void UGameStatsManager::RecordMatchStats(const FDSRecordMatchStatsInput& RecordMatchStatsInput)
+{
+	RecordMatchStatsInput.Dump();
+	
+	FString JsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(
+		FDSRecordMatchStatsInput::StaticStruct(), &RecordMatchStatsInput, JsonString
+		);
+	
+	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
+	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::GameStatsAPI::RecordMatchStats);
+	Request->OnProcessRequestComplete().BindUObject(this, &UGameStatsManager::RecordMatchStats_Response);
+	Request->SetURL(APIUrl);
+	Request->SetVerb("POST");
+	Request->SetHeader("Content-Type", "application/json");
+	Request->SetContentAsString(JsonString);
+	Request->ProcessRequest();
+}
+```
+
+**RecordMatchStats Lambda** 함수는 클라이언트로부터 받은 username을 이용해 Cognito에서 플레이어의 고유 ID(sub)를 조회합니다. 이후 DynamoDB의 Players 테이블에서 해당 플레이어의 기존 기록을 가져와, 이번 경기의 결과를 **누적하여 갱신(Update)**합니다. 만약 기존 기록이 없다면 새로 생성합니다.
+
+<p><details>
+<summary>구현 코드: RecordMatchStats Lambda (Node.js)  (클릭)</summary><p>
+
+```js
+import { CognitoIdentityProviderClient, AdminGetUserCommand } from "@aws-sdk/client-cognito-identity-provider"; 
+import { DynamoDBClient, GetItemCommand, PutItemCommand } from "@aws-sdk/client-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+
+export const handler = async (event) => {
+  const cognitoClient = new CognitoIdentityProviderClient({region: process.env.REGION});
+  const dynamoDBClient = new DynamoDBClient({region: process.env.REGION});
+
+  console.log(event);
+
+  try {
+    const cognitoInput = { 
+      UserPoolId: process.env.USER_POOL_ID, 
+      Username: event.username
+    };
+    const cognitoCommand = new AdminGetUserCommand(cognitoInput);
+    const cognitoResponse = await cognitoClient.send(cognitoCommand);
+
+    const sub = cognitoResponse.UserAttributes.find(attribute => attribute.Name === "sub");
+    const email = cognitoResponse.UserAttributes.find(attribute => attribute.Name === "email");
+    
+    const getItemInput = {
+      TableName: "Players",
+      Key: marshall({databaseid: sub.Value}),
+    }
+    const getItemCommand = new GetItemCommand(getItemInput);
+    const getItemResponse = await dynamoDBClient.send(getItemCommand); 
+  
+    let existingDB = getItemResponse.Item ? unmarshall(getItemResponse.Item) :  { databaseid: sub.Value };
+    existingDB.username = event.username;
+
+    console.log(existingDB);
+
+    const eventMatchStats = event.matchStats;
+    for (const key in eventMatchStats) {
+        existingDB[key] = (existingDB[key] || 0) + eventMatchStats[key];
+    }
+
+    const putItemInput = {
+      TableName: "Players",
+      Item: marshall({...existingDB})
+    };
+    const putItemCommand = new PutItemCommand(putItemInput);
+    await dynamoDBClient.send(putItemCommand);
+
+    return {
+      statusCode: 200,
+      body: `Updated match stats for ${event.username}`
+    };
+
+  } catch (error) {
+    console.error("Error updating stats:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "Failed to update stats.", error: error.message })
+    };
+  }
+};
+```
+</details><p>
+
+<p align="center">
+ <img alt="이미지" src=".\ReadmeImages\player_table.png">
+</p>
+
+<p align="center">
+ <img alt="이미지" src=".\ReadmeImages\career_widget.png">
+</p>
 
 
 </details><p>
+
+
+
+<p><details>
+<summary>구현 코드: 랭킹 시스템 로직 (클릭)</summary><p>
+
+가장 승수가 높은 상위 플레이어 10명은 DB의 Leaderboard 테이블에 기록합니다. 이 과정은 ```RecordGameStats```가 완료된 이후, 델리게이트 전파를 통해 실행됩니다.
+<p>
+
+서버는 종료된 경기에서 가장 점수가 높은 플레이어를 ```MatchGameState->GetLeaders()```함수로 가져와 이름을 추출하고 해당 데이터를 서버 계층의 ```UpdateLeaderboard```함수로 전달합니다.
+```cpp
+void AShooterGameModeBase::OnGameStatsUpdated()
+{
+	Super::OnGameStatsUpdated();
+	UE_LOG(LogTemp, Warning, TEXT("OnGameStatsUpdated"));
+
+	TArray<FString> LeaderIds;
+	if (AMatchGameState* MatchGameState = GetGameState<AMatchGameState>(); IsValid(MatchGameState))
+	{
+		TArray<AMatchPlayerState*> Leaders = MatchGameState->GetLeaders();
+		for (AMatchPlayerState* Leader : Leaders)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Leader: %s"), *Leader->GetUsername());
+			if (ADS_PlayerController* LeaderPlayerController = 
+					Cast<ADS_PlayerController>(Leader->GetPlayerController()); 
+					IsValid(LeaderPlayerController))
+			{
+				LeaderIds.Add(Leader->GetUsername());
+			}
+		}
+	}
+
+	UpdateLeaderboard(LeaderIds);
+}
+```
+
+마찬가지로 DB에 기록하는 작업은 ```GameStatsManager``` 클래스를 통해 처리합니다.
+
+```cpp
+void ADS_MatchGameMode::UpdateLeaderboard(const TArray<FString>& LeaderboardNames)
+{
+	if (IsValid(GameStatsManager))
+	{
+		GameStatsManager->UpdateLeaderboard(LeaderboardNames);
+	}
+}
+```
+
+**UpdateLeaderboard Lambda** 함수는 경기가 끝난 직후 승리한 플레이어들의 정보를 Leaderboard 테이블에 **갱신(Update/Put)**합니다. 그 후, 테이블의 모든 데이터를 **스캔(Scan)**하여 승수(matchWins) 기준으로 내림차순 정렬하고, 상위 10명을 제외한 나머지 플레이어들을 테이블에서 **삭제(Delete)**하여 리더보드를 항상 상위 10명으로 유지합니다.
+
+<p><details>
+<summary>구현 코드: 랭킹 기록 Lambda (Node.js)  (클릭)</summary><p>
+
+```js
+import { CognitoIdentityProviderClient, AdminGetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { DynamoDBClient, GetItemCommand, PutItemCommand, ScanCommand, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+
+const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.REGION });
+const dynamoDBClient = new DynamoDBClient({ region: process.env.REGION });
+
+export const handler = async (event) => {
+  const userPoolId = process.env.USER_POOL_ID;
+  const playerIdArr = event.playerIds;
+  console.log(playerIdArr);
+
+  // playerData {palyerId, databaseId}
+  const playerData = await retrievePlayerData(playerIdArr, userPoolId);
+
+    // updatedPlayerData {palyerId, databaseId, wins}
+  const updatedPlayerData = await retrieveCurrentWins(playerData);
+
+  await updateLeaderboard(updatedPlayerData); // 리더보드에 추가
+  await ensureTopPlayers(); // 상위 n개의 데이터만 남기고 삭제
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: "Leaderboard updated successfully" })
+  };
+};
+
+async function retrievePlayerData(playerIdArr, userPoolId) {
+  return await Promise.all(playerIdArr.map(async (playerId) => { // Promise.all 병렬 실행
+    const adminGetUserCommand = new AdminGetUserCommand({
+      UserPoolId: userPoolId,
+      Username: playerId
+    });
+    const adminGetUserResponse = await cognitoClient.send(adminGetUserCommand);
+    const databaseId = adminGetUserResponse.UserAttributes.find(attr => attr.Name === "sub").Value;
+    return { playerId, databaseId };
+  }));
+}
+
+async function retrieveCurrentWins(playerData) {
+  return await Promise.all(playerData.map(async (player) => {
+    const getItemCommand = new GetItemCommand({
+      TableName: "Players",
+      Key: marshall({databaseid: player.databaseId})
+    });
+    const getItemResponse = await dynamoDBClient.send(getItemCommand);
+    const playerItem = getItemResponse.Item ? unmarshall(getItemResponse.Item) : null;
+    
+    let numWins = playerItem.matchWins || 0;
+
+    return { ...player, wins: numWins || 0 };
+  }));
+}
+
+async function updateLeaderboard(playerData) {
+  return await Promise.all(playerData.map(async (player) => {
+    const putItemCommand = new PutItemCommand({
+      TableName: "Leaderboard",
+      Item: marshall({
+        databaseid: player.databaseId,
+        username: player.playerId,
+        matchWins: player.wins
+      }),
+    });
+    const putItemResponse = await dynamoDBClient.send(putItemCommand);
+    return putItemResponse.Item ? unmarshall(putItemResponse.Item) : null;
+  }));
+}
+
+async function ensureTopPlayers() {
+  const scanCommand = new ScanCommand({
+    TableName: "Leaderboard"
+  });
+  const scanResponse = await dynamoDBClient.send(scanCommand);
+  const LeaderboardItems = scanResponse.Items.map(item => unmarshall(item));
+
+  // Sort
+  LeaderboardItems.sort((a, b) => b.matchWins - a.matchWins);
+  const topPlayers = LeaderboardItems.slice(0, 10); // 상위 10명
+  const playersToRemove = LeaderboardItems.slice(10);
+
+  // Delete
+  const deletePromises = playersToRemove.map(player => {
+    const DeleteItemCommand = new DeleteItemCommand({
+      TableName: "Leaderboard",
+      Key: marshall({databaseid: player.databaseId})
+    });
+    return dynamoDBClient.send(DeleteItemCommand);
+  });
+
+  await Promise.all(deletePromises);
+}
+```
+</details><p>
+
+
+<p align="center">
+ <img alt="이미지" src=".\ReadmeImages\leaderboard_table.png">
+</p>
+
+<p align="center">
+ <img alt="이미지" src=".\ReadmeImages\leaderboard_widget.png">
+</p>
+
+
+</details><p>
+
 

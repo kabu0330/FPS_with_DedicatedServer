@@ -10,11 +10,11 @@ struct FLobbyPlayerInfo : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
 
-	FLobbyPlayerInfo() {}
-	FLobbyPlayerInfo(const FString& Name) : Username(Name) {}
-	
 	UPROPERTY(BlueprintReadWrite)
 	FString Username{};
+
+	FLobbyPlayerInfo() {}
+	FLobbyPlayerInfo(const FString& Name) : Username(Name) {}
 
 	void PostReplicatedAdd(const FLobbyPlayerInfoArray& InArraySerializer);
 	void PreReplicatedRemove(const FLobbyPlayerInfoArray& InArraySerializer);

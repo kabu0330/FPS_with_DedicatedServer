@@ -3,6 +3,8 @@
 
 #include "Player/DS_PlayerController.h"
 
+#include "DedicatedServers/DedicatedServers.h"
+
 ADS_PlayerController::ADS_PlayerController()
 {
 }
@@ -25,6 +27,7 @@ void ADS_PlayerController::PostSeamlessTravel()
 	{
 		Server_Ping(GetWorld()->GetTimeSeconds());
 		DisableInput(this);
+		UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_PlayerController PostSeamlessTravel Server_Ping"));
 	}
 }
 
@@ -35,6 +38,13 @@ void ADS_PlayerController::BeginPlay()
 	if (GetNetMode() == NM_Standalone)
 	{
 		DisableInput(this);
+	}
+
+	if (GetNetMode() == NM_Standalone) return;
+	if (IsLocalPlayerController())
+	{
+		Server_Ping(GetWorld()->GetTimeSeconds());
+		UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_PlayerController BeginPlay Server_Ping"));
 	}
 }
 
@@ -53,10 +63,12 @@ void ADS_PlayerController::Client_SetInputEnabled_Implementation(bool bEnabled)
 void ADS_PlayerController::ReceivedPlayer()
 {
 	Super::ReceivedPlayer();
+
 	if (GetNetMode() == NM_Standalone) return;
 	if (IsLocalPlayerController())
 	{
 		Server_Ping(GetWorld()->GetTimeSeconds());
+		UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_PlayerController ReceivedPlayer Server_Ping"));
 	}
 }
 
