@@ -22,7 +22,6 @@ void ADS_PlayerController::BeginPlay()
 		EnableInput(this);
 		//DisableInput(this);
 	}
-	
 }
 
 void ADS_PlayerController::OnRep_PlayerState()
@@ -38,9 +37,8 @@ void ADS_PlayerController::OnRep_PlayerState()
 void ADS_PlayerController::PostSeamlessTravel()
 {
 	Super::PostSeamlessTravel();
-
-	UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_PlayerController PostSeamlessTravel"));
-	Server_PlayerIsReadyForMatch();
+	
+	PlayerIsReadyForMatch();
 	
 	if (IsLocalPlayerController())
 	{
@@ -74,7 +72,6 @@ void ADS_PlayerController::ReceivedPlayer()
 	if (IsLocalPlayerController())
 	{
 		Server_Ping(GetWorld()->GetTimeSeconds());
-		UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_PlayerController ReceivedPlayer Server_Ping"));
 	}
 }
 
@@ -124,12 +121,10 @@ void ADS_PlayerController::Server_PlayerIsReadyForLobby_Implementation(bool IsRe
 	}
 }
 
-void ADS_PlayerController::Server_PlayerIsReadyForMatch_Implementation()
+void ADS_PlayerController::PlayerIsReadyForMatch()
 {
-	UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_PlayerController Server_PlayerIsReadyForMatch"));
 	if (ADS_MatchGameMode* GameMode = GetWorld()->GetAuthGameMode<ADS_MatchGameMode>())
 	{
 		GameMode->PlayerIsReadyForMatch(this);
 	}
-
 }

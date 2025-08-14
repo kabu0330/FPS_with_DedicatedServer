@@ -45,8 +45,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_PlayerIsReadyForLobby(bool IsReady);
 
-	UFUNCTION(Server, Reliable)
-	void Server_PlayerIsReadyForMatch();
+	void PlayerIsReadyForMatch();
 
 protected:
 	UFUNCTION(Server, Reliable)
