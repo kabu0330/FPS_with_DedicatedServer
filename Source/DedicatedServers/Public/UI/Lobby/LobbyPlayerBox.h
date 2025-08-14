@@ -28,18 +28,10 @@ public:
 
 protected:
 	virtual void NativeOnInitialized() override;
-	void UpdatePlayerInfo(ALobbyState* LobbyState);
-	void UpdatePlayerInfo(ADS_GameState* GameState);
-	
-	UFUNCTION()
-	void OnLobbyStateInitialized(ALobbyState* LobbyState);
-
-	UFUNCTION()
-	void CreateAndAddPlayerLabel(const FLobbyPlayerInfo& PlayerInfo);
-
-	UFUNCTION()
-	void OnPlayerRemoved(const FLobbyPlayerInfo& PlayerInfo);
 
 private:
 	UPlayerLabel* FindPlayerLabel(const FString& Username);
+
+	UFUNCTION()
+	void UpdatePlayerList();
 };

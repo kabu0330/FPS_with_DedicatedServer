@@ -15,7 +15,6 @@ void ADS_GameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ADS_GameState, PlayerList);
-	//DOREPLIFETIME(ADS_GameState, LobbyState);
 }
 
 void ADS_GameState::BeginPlay()
@@ -25,15 +24,13 @@ void ADS_GameState::BeginPlay()
 	if (HasAuthority())
 	{
 		PlayerList.SetOwner(this);
-		// LobbyState는 서버에서만 생성하고 그 사실을 전파한다.
-		//CreateLobbyState();
-		//OnLobbyStateInitialized.Broadcast(LobbyState);
 	}
 }
 
 void ADS_GameState::OnRep_PlayerList()
 {
 	PlayerList.SetOwner(this);
+	OnPlayerListUpdated.Broadcast();
 }
 
 FLobbyPlayerInfoArray& ADS_GameState::GetPlayerList()
@@ -46,25 +43,3 @@ TArray<FLobbyPlayerInfo> ADS_GameState::GetPlayerListArray()
 	return PlayerList.Items;
 }
 
-// void ADS_GameState::CreateLobbyState()
-// {
-// 	if (UWorld* World = GetWorld(); IsValid(World))
-// 	{
-// 		FActorSpawnParameters SpawnParams;
-// 		LobbyState = World->SpawnActor<ALobbyState>(
-// 			ALobbyState::StaticClass(),
-// 			FVector::ZeroVector,
-// 			FRotator::ZeroRotator,
-// 			SpawnParams
-// 		);
-// 		if (IsValid(LobbyState))
-// 		{
-// 			LobbyState->SetOwner(this);
-// 		}
-// 	}
-// }
-
-// void ADS_GameState::OnRep_LobbyState()
-// {
-// 	OnLobbyStateInitialized.Broadcast(LobbyState);
-// }

@@ -12,6 +12,7 @@
 
 AShooterGameModeBase::AShooterGameModeBase()
 {
+	bUseSeamlessTravel = true;
 	RespawnTime = 2.f;
 }
 

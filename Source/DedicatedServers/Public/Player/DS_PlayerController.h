@@ -22,6 +22,7 @@ public:
 	virtual void ReceivedPlayer() override;
 	virtual void OnRep_PlayerState() override;
 	virtual void PostSeamlessTravel() override;
+	virtual void OnPossess(APawn* InPawn) override;
 	virtual void BeginPlay() override;
 
 	UFUNCTION(Client, Reliable)
@@ -38,6 +39,14 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnTimerStateChangedDelegate OnTimerStopped;
+
+	void PlayerIsReadyForLobby(bool IsReady);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_PlayerIsReadyForLobby(bool IsReady);
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayerIsReadyForMatch();
 
 protected:
 	UFUNCTION(Server, Reliable)

@@ -2,20 +2,29 @@
 
 #include "Game/DS_GameState.h"
 
-void FLobbyPlayerInfo::PostReplicatedAdd(const FLobbyPlayerInfoArray& InArraySerializer)
+void FLobbyPlayerInfo::TriggerUpdate(const FLobbyPlayerInfoArray& InArraySerializer)
 {
+	if (!InArraySerializer.GameState) return;
+
 	if (ADS_GameState* GameState = Cast<ADS_GameState>(InArraySerializer.GetOwner()))
 	{
-		GameState->OnPlayerAddedDelegate.Broadcast(*this);
+		GameState->OnPlayerListUpdated.Broadcast();
 	}
+}
+
+void FLobbyPlayerInfo::PostReplicatedAdd(const FLobbyPlayerInfoArray& InArraySerializer)
+{
+	TriggerUpdate(InArraySerializer);
 }
 
 void FLobbyPlayerInfo::PreReplicatedRemove(const FLobbyPlayerInfoArray& InArraySerializer)
 {
-	if (ADS_GameState* GameState = Cast<ADS_GameState>(InArraySerializer.GetOwner()))
-	{
-		GameState->OnPlayerRemovedDelegate.Broadcast(*this);
-	}
+	TriggerUpdate(InArraySerializer);
+}
+
+void FLobbyPlayerInfo::PostReplicatedChange(const FLobbyPlayerInfoArray& InArraySerializer)
+{
+	TriggerUpdate(InArraySerializer);
 }
 
 void FLobbyPlayerInfoArray::AddPlayer(const FLobbyPlayerInfo& NewPlayerInfo)
@@ -35,6 +44,19 @@ void FLobbyPlayerInfoArray::RemovePlayer(const FString& Username)
 			PlayerInfo.PreReplicatedRemove(*this);
 			Items.RemoveAtSwap(PlayerIndex);
 			MarkArrayDirty();
+			break;
+		}
+	}
+}
+
+void FLobbyPlayerInfoArray::SetPlayerReady(const FString& Username, bool IsReady)
+{
+	for (FLobbyPlayerInfo& PlayerInfo : Items)
+	{
+		if (PlayerInfo.Username == Username)
+		{
+			PlayerInfo.bIsReady = IsReady;
+			MarkItemDirty(PlayerInfo);
 			break;
 		}
 	}

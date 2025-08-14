@@ -20,36 +20,10 @@ ADS_MatchGameMode::ADS_MatchGameMode()
 	
 }
 
-void ADS_MatchGameMode::PostLogin(APlayerController* NewPlayer)
+void ADS_MatchGameMode::BeginPlay()
 {
-	Super::PostLogin(NewPlayer);
-
-	/** 처음에는 PreMatchTimer를 전달하고 x초 후에 OnCountdownTimerFinished 함수로 넘어오면
-	 ** Match -> PostMatch 타이머가 순차적으로 돌아간다.
-	 */
-	
-	if (MatchStatus == EMatchStatus::WaitingForPlayers)
-	{
-		MatchStatus = EMatchStatus::PreMatch;
-		StartCountdownTimer(PreMatchTimerHandle);
-	}
-}
-
-void ADS_MatchGameMode::Logout(AController* Exiting)
-{
-	Super::Logout(Exiting);
-	RemovePlayerSession(Exiting);
-}
-
-void ADS_MatchGameMode::InitSeamlessTravelPlayer(AController* NewController)
-{
-	Super::InitSeamlessTravelPlayer(NewController);
-
-	if (MatchStatus == EMatchStatus::WaitingForPlayers)
-	{
-		MatchStatus = EMatchStatus::PreMatch;
-		StartCountdownTimer(PreMatchTimerHandle);
-	}
+	Super::BeginPlay();
+	CreateGameStatsManager();
 }
 
 void ADS_MatchGameMode::CreateGameStatsManager()
@@ -72,10 +46,114 @@ UGameStatsManager* ADS_MatchGameMode::GetGameStatsManager()
 	return GameStatsManager;
 }
 
-void ADS_MatchGameMode::BeginPlay()
+void ADS_MatchGameMode::UpdateLeaderboard(const TArray<FString>& LeaderboardNames)
 {
-	Super::BeginPlay();
-	CreateGameStatsManager();
+	if (IsValid(GameStatsManager))
+	{
+		GameStatsManager->UpdateLeaderboard(LeaderboardNames);
+	}
+}
+
+void ADS_MatchGameMode::EndMatchForPlayerStats()
+{
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (ADS_PlayerController* DSPlayerController = Cast<ADS_PlayerController>(It->Get()); IsValid(DSPlayerController))
+		{
+			if (ADS_MatchPlayerState* MatchPlayerState = Cast<ADS_MatchPlayerState>(DSPlayerController->PlayerState); IsValid(MatchPlayerState))
+			{
+				MatchPlayerState->OnMatchEnded();
+			}
+		}
+	}
+}
+
+void ADS_MatchGameMode::OnMatchEnded()
+{
+	EndMatchForPlayerStats();
+}
+
+void ADS_MatchGameMode::OnGameStatsUpdated()
+{
+	// Content Moudule: ShooterGameMode override
+	// UpdateLeaderboard()
+}
+
+void ADS_MatchGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+	CheckAllPlayersIsReady();
+	/** 처음에는 PreMatchTimer를 전달하고 x초 후에 OnCountdownTimerFinished 함수로 넘어오면
+	 ** Match -> PostMatch 타이머가 순차적으로 돌아간다.
+	 */
+	
+	// if (MatchStatus == EMatchStatus::WaitingForPlayers)
+	// {
+	// 	MatchStatus = EMatchStatus::PreMatch;
+	// 	StartCountdownTimer(PreMatchTimerHandle);
+	// }
+}
+
+void ADS_MatchGameMode::OnPostLogin(AController* NewPlayer)
+{
+	Super::OnPostLogin(NewPlayer);
+	
+}
+
+void ADS_MatchGameMode::InitSeamlessTravelPlayer(AController* NewController)
+{
+	Super::InitSeamlessTravelPlayer(NewController);
+
+	// if (MatchStatus == EMatchStatus::WaitingForPlayers)
+	// {
+	// 	MatchStatus = EMatchStatus::PreMatch;
+	// 	StartCountdownTimer(PreMatchTimerHandle);
+	// }
+}
+
+void ADS_MatchGameMode::HandleSeamlessTravelPlayer(AController*& Controller)
+{
+	Super::HandleSeamlessTravelPlayer(Controller);
+	
+}
+
+void ADS_MatchGameMode::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+	RemovePlayerSession(Exiting);
+	
+	ReadyPlayerCount--;
+	if (ReadyPlayerCount < 0) ReadyPlayerCount = 0;
+	CheckAllPlayersIsReady();
+}
+
+void ADS_MatchGameMode::PlayerIsReadyForMatch(AController* Controller)
+{
+	if (!Controller) return;
+
+	ReadyPlayerCount++;
+	UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_MatchGameMode PlayerIsReadyForMatch ReadyPlayerCount: %d, Total: %d"), ReadyPlayerCount, GetNumPlayers());
+
+	CheckAllPlayersIsReady();
+}
+
+void ADS_MatchGameMode::CheckAllPlayersIsReady()
+{
+	if (ReadyPlayerCount >= GetNumPlayers())
+	{
+		if (MatchStatus == EMatchStatus::WaitingForPlayers)
+		{
+			MatchStatus = EMatchStatus::PreMatch;
+			StartCountdownTimer(PreMatchTimerHandle);
+		}
+	}
+	else
+	{
+		MatchStatus = EMatchStatus::WaitingForPlayers;
+		StopCountdownTimer(PreMatchTimerHandle);
+	}
+	
+	UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_MatchGameMode CheckAllPlayersIsReady ReadyPlayerCount: %d, Total: %d"), ReadyPlayerCount, GetNumPlayers());
 }
 
 void ADS_MatchGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
@@ -117,38 +195,5 @@ void ADS_MatchGameMode::SetClientInputEnabled(bool bEnabled)
 			DSPlayerController->Client_SetInputEnabled(bEnabled);
 		}
 	}
-}
-
-void ADS_MatchGameMode::UpdateLeaderboard(const TArray<FString>& LeaderboardNames)
-{
-	if (IsValid(GameStatsManager))
-	{
-		GameStatsManager->UpdateLeaderboard(LeaderboardNames);
-	}
-}
-
-void ADS_MatchGameMode::EndMatchForPlayerStats()
-{
-	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-	{
-		if (ADS_PlayerController* DSPlayerController = Cast<ADS_PlayerController>(It->Get()); IsValid(DSPlayerController))
-		{
-			if (ADS_MatchPlayerState* MatchPlayerState = Cast<ADS_MatchPlayerState>(DSPlayerController->PlayerState); IsValid(MatchPlayerState))
-			{
-				MatchPlayerState->OnMatchEnded();
-			}
-		}
-	}
-}
-
-void ADS_MatchGameMode::OnMatchEnded()
-{
-	EndMatchForPlayerStats();
-}
-
-void ADS_MatchGameMode::OnGameStatsUpdated()
-{
-	// Content Moudule: ShooterGameMode override
-	// UpdateLeaderboard()
 }
 

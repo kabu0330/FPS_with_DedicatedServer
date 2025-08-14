@@ -10,14 +10,20 @@ struct FLobbyPlayerInfo : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY()
 	FString Username{};
+
+	UPROPERTY()
+	bool bIsReady = false;
 
 	FLobbyPlayerInfo() {}
 	FLobbyPlayerInfo(const FString& Name) : Username(Name) {}
 
+	void TriggerUpdate(const FLobbyPlayerInfoArray& InArraySerializer);
+	
 	void PostReplicatedAdd(const FLobbyPlayerInfoArray& InArraySerializer);
 	void PreReplicatedRemove(const FLobbyPlayerInfoArray& InArraySerializer);
+	void PostReplicatedChange(const FLobbyPlayerInfoArray& InArraySerializer);
 };
 
 /** Fast TArray Serializer
@@ -43,6 +49,7 @@ struct FLobbyPlayerInfoArray : public FFastArraySerializer
 	}
 	void AddPlayer(const FLobbyPlayerInfo& NewPlayerInfo);
 	void RemovePlayer(const FString& Username);
+	void SetPlayerReady(const FString& Username, bool IsReady);
 
 	AGameState* GetOwner() const;
 	void SetOwner(AGameState* InGameState);

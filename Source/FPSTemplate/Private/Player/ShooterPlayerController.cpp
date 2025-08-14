@@ -69,6 +69,11 @@ void AShooterPlayerController::SetupInputComponent()
 	ShooterInputComponent->BindAction(QuitAction, ETriggerEvent::Started, this, &AShooterPlayerController::Input_Quit);
 }
 
+void AShooterPlayerController::PostSeamlessTravel()
+{
+	Super::PostSeamlessTravel();
+}
+
 void AShooterPlayerController::Input_Move(const FInputActionValue& InputActionValue)
 {
 	if (!bPawnAlive) return;

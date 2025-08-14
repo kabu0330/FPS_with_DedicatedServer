@@ -9,9 +9,7 @@
 
 class ALobbyState;
 
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLobbyStateInitialized, ALobbyState*, LobbyState);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLobbyPlayerAdded, const FLobbyPlayerInfo&, PlayerInfo);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLobbyPlayerRemoved, const FLobbyPlayerInfo&, PlayerInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerListUpdated);
 
 /** 1. LobbyLevel에서 현재 서버에 접속한 플레이어 리스트를 관리한다. 
  * 
@@ -25,33 +23,20 @@ public:
 	ADS_GameState();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	
-	//UPROPERTY(ReplicatedUsing = OnRep_LobbyState)
-	//TObjectPtr<ALobbyState> LobbyState;
-
-	//UPROPERTY(BlueprintAssignable)
-	//FOnLobbyStateInitialized OnLobbyStateInitialized;
-protected:
-	virtual void BeginPlay() override;
-	//void CreateLobbyState();
-
-private:
-	//UFUNCTION()
-	//void OnRep_LobbyState();
-
-public:
 	FLobbyPlayerInfoArray& GetPlayerList();
 	TArray<FLobbyPlayerInfo> GetPlayerListArray();
-
-	UFUNCTION()
-	void OnRep_PlayerList();
 	
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerListUpdated OnPlayerListUpdated;
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
 	UPROPERTY(ReplicatedUsing = OnRep_PlayerList) 
 	FLobbyPlayerInfoArray PlayerList;
+	
+	UFUNCTION()
+	void OnRep_PlayerList();
 
-	UPROPERTY(BlueprintAssignable)
-	FOnLobbyPlayerAdded OnPlayerAddedDelegate;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnLobbyPlayerRemoved OnPlayerRemovedDelegate;
 };

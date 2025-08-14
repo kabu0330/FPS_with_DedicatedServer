@@ -18,15 +18,13 @@ class DEDICATEDSERVERS_API ADS_MatchGameMode : public ADS_GameModeBase
 public:
 	ADS_MatchGameMode();
 
-	virtual void PostLogin(APlayerController* NewPlayer) override;
-	virtual void Logout(AController* Exiting) override;
-	virtual void InitSeamlessTravelPlayer(AController* NewController) override;
+	void PlayerIsReadyForMatch(AController* Controller);
 
 	UGameStatsManager* GetGameStatsManager();
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UGameStatsManager> GameStatsManagerClass;
-
+	
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	FCountdownTimerHandle PreMatchTimerHandle;
@@ -41,7 +39,15 @@ protected:
 	TSoftObjectPtr<UWorld> LobbyMap;
 
 	virtual void BeginPlay() override;
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void OnPostLogin(AController* NewPlayer) override;
+	virtual void Logout(AController* Exiting) override;
+	virtual void InitSeamlessTravelPlayer(AController* NewController) override;
+	virtual void HandleSeamlessTravelPlayer(AController*& Controller) override;
+
+	
 	virtual void OnCountdownTimerFinished(ECountdownTimerType Type) override;
+	
 	virtual void OnMatchEnded();
 
 	UFUNCTION()
@@ -55,9 +61,13 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UGameStatsManager> GameStatsManager;
+
+	int32 ReadyPlayerCount = 0;
 	
 	void SetClientInputEnabled(bool bEnabled);
 	void EndMatchForPlayerStats();
 	void CreateGameStatsManager();
+
+	void CheckAllPlayersIsReady();
 	
 };

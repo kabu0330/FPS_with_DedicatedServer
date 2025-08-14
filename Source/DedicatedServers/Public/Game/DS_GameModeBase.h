@@ -15,7 +15,9 @@ UCLASS()
 class DEDICATEDSERVERS_API ADS_GameModeBase : public AGameMode
 {
 	GENERATED_BODY()
-
+public:
+	virtual void CheckAllPlayersIsReady();
+	
 protected:
 	void StartCountdownTimer(FCountdownTimerHandle& CountdownTimerHandle);
 	void StopCountdownTimer(FCountdownTimerHandle& CountdownTimerHandle);

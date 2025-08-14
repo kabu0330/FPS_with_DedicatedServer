@@ -18,14 +18,13 @@ ADS_LobbyGameMode::ADS_LobbyGameMode()
     bUseSeamlessTravel = true;
     
     LobbyStatus = ELobbyStatus::WaitingForPlayers;
-    MinPlayers = 1;
     LobbyCountdownTimer.Type = ECountdownTimerType::LobbyCountdown;
     
     PlayerStateClass = ADS_DefaultPlayerState::StaticClass();
 }
 
 void ADS_LobbyGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
-    FString& ErrorMessage)
+                                 FString& ErrorMessage)
 {
     Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 
@@ -79,7 +78,7 @@ void ADS_LobbyGameMode::RecordUserInformation(APlayerController* NewPlayerContro
 void ADS_LobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
-    CheckAndStartLobbyCountdown();
+    CheckAllPlayersIsReady();
 
     FString Username{};
     ADS_DefaultPlayerState* PlayerState = NewPlayer->GetPlayerState<ADS_DefaultPlayerState>();
@@ -96,7 +95,6 @@ void ADS_LobbyGameMode::PostLogin(APlayerController* NewPlayer)
 void ADS_LobbyGameMode::InitSeamlessTravelPlayer(AController* NewController)
 {
     Super::InitSeamlessTravelPlayer(NewController);
-    CheckAndStartLobbyCountdown();
 
     AddPlayerInfoToLobbyState(NewController);
     
@@ -110,24 +108,24 @@ void ADS_LobbyGameMode::AddPlayerInfoToLobbyState(AController* Player) const
     ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(Player);
     ADS_GameState* DSGameState = GetGameState<ADS_GameState>();
     ADS_DefaultPlayerState* PlayerState = PlayerController->GetPlayerState<ADS_DefaultPlayerState>();
-    if (IsValid(DSGameState) && /*IsValid(DSGameState->LobbyState) &&*/ IsValid(PlayerController) && IsValid(PlayerState))
+    if (IsValid(DSGameState) && IsValid(PlayerController) && IsValid(PlayerState))
     {
         FLobbyPlayerInfo PlayerInfo(PlayerState->GetUsername());
         DSGameState->GetPlayerList().AddPlayer(PlayerInfo);
-        //DSGameState->LobbyState->AddPlayerInfo(PlayerInfo);
     }
 }
 
 void ADS_LobbyGameMode::Logout(AController* Exiting)
 {
     Super::Logout(Exiting);
-    CheckAndStopLobbyCountdown();
     if (LobbyStatus != ELobbyStatus::SeamlessTravelling)
     {
         RemovePlayerInfoFromLobbyState(Exiting);
     }
     
     RemovePlayerSession(Exiting);
+
+    CheckAllPlayersIsReady();
     
     UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_LobbyGameMode Logout for %s"), *Exiting->GetName());
 }
@@ -137,10 +135,37 @@ void ADS_LobbyGameMode::RemovePlayerInfoFromLobbyState(AController* Player) cons
     ADS_PlayerController* PlayerController = Cast<ADS_PlayerController>(Player);
     ADS_GameState* DSGameState = GetGameState<ADS_GameState>();
     ADS_DefaultPlayerState* PlayerState = PlayerController->GetPlayerState<ADS_DefaultPlayerState>();
-    if (IsValid(DSGameState) && /*IsValid(DSGameState->LobbyState) &&*/ IsValid(PlayerController) && IsValid(PlayerState))
+    if (IsValid(DSGameState) && IsValid(PlayerController) && IsValid(PlayerState))
     {
         DSGameState->GetPlayerList().RemovePlayer(PlayerState->GetUsername());
-        //DSGameState->LobbyState->RemovePlayerInfo(PlayerState->GetUsername());
+    }
+}
+
+void ADS_LobbyGameMode::CheckAllPlayersIsReady()
+{
+    Super::CheckAllPlayersIsReady();
+
+    // 신규 플레이어가 접속했을 때, 플레이어가 Ready 버튼을 클릭했을 때(PC RPC), 플레이어가 나갔을 때 호출
+    int32 TotalPlayers = GetNumPlayers();
+    int32 ReadyPlayers = 0;
+    ADS_GameState* GS = GetGameState<ADS_GameState>();
+    for (const FLobbyPlayerInfo& PlayerInfo : GS->GetPlayerListArray())
+    {
+        if (PlayerInfo.bIsReady == true)
+        {
+            ReadyPlayers++;
+        }
+    }
+
+    UE_LOG(LogDedicatedServers, Warning, TEXT("TotalPlayers : %d, ReadyPlayers : %d"), TotalPlayers, ReadyPlayers);
+
+    if (1 <= TotalPlayers && TotalPlayers == ReadyPlayers) // 서버 트래블 조건
+    {
+        CheckAndStartLobbyCountdown();
+    }
+    else
+    {
+        CheckAndStopLobbyCountdown();
     }
 }
 
@@ -158,7 +183,7 @@ void ADS_LobbyGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
 
 void ADS_LobbyGameMode::CheckAndStartLobbyCountdown()
 {
-    if (GetNumPlayers() >= MinPlayers && LobbyStatus == ELobbyStatus::WaitingForPlayers)
+    if (LobbyStatus == ELobbyStatus::WaitingForPlayers)
     {
         LobbyStatus = ELobbyStatus::CountdownToSeamlessTravel;
         StartCountdownTimer(LobbyCountdownTimer);
@@ -167,7 +192,7 @@ void ADS_LobbyGameMode::CheckAndStartLobbyCountdown()
 
 void ADS_LobbyGameMode::CheckAndStopLobbyCountdown()
 {
-    if (GetNumPlayers() - 1 < MinPlayers && LobbyStatus == ELobbyStatus::CountdownToSeamlessTravel)
+    if (LobbyStatus == ELobbyStatus::CountdownToSeamlessTravel)
     {
         LobbyStatus = ELobbyStatus::WaitingForPlayers;
         StopCountdownTimer(LobbyCountdownTimer);

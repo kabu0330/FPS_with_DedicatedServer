@@ -4,9 +4,25 @@
 #include "Player/DS_PlayerController.h"
 
 #include "DedicatedServers/DedicatedServers.h"
+#include "Game/DS_GameState.h"
+#include "Game/DS_LobbyGameMode.h"
+#include "Game/DS_MatchGameMode.h"
+#include "Player/DS_DefaultPlayerState.h"
 
 ADS_PlayerController::ADS_PlayerController()
 {
+}
+
+void ADS_PlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (GetNetMode() == NM_Standalone)
+	{
+		EnableInput(this);
+		//DisableInput(this);
+	}
+	
 }
 
 void ADS_PlayerController::OnRep_PlayerState()
@@ -23,29 +39,19 @@ void ADS_PlayerController::PostSeamlessTravel()
 {
 	Super::PostSeamlessTravel();
 
-	if (IsLocalController())
-	{
-		Server_Ping(GetWorld()->GetTimeSeconds());
-		DisableInput(this);
-		UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_PlayerController PostSeamlessTravel Server_Ping"));
-	}
-}
-
-void ADS_PlayerController::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (GetNetMode() == NM_Standalone)
-	{
-		DisableInput(this);
-	}
-
-	if (GetNetMode() == NM_Standalone) return;
+	UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_PlayerController PostSeamlessTravel"));
+	Server_PlayerIsReadyForMatch();
+	
 	if (IsLocalPlayerController())
 	{
 		Server_Ping(GetWorld()->GetTimeSeconds());
-		UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_PlayerController BeginPlay Server_Ping"));
+		DisableInput(this);
 	}
+}
+
+void ADS_PlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
 }
 
 void ADS_PlayerController::Client_SetInputEnabled_Implementation(bool bEnabled)
@@ -98,4 +104,32 @@ void ADS_PlayerController::Client_TimerStopped_Implementation(float CountdownTim
 {
 	// Type == Stopped, 즉시 카운트다운 종료 전파
 	OnTimerStopped.Broadcast(CountdownTimeLeft - SingleTripTime, Type);
+}
+
+void ADS_PlayerController::PlayerIsReadyForLobby(bool IsReady)
+{
+	Server_PlayerIsReadyForLobby(IsReady);
+}
+
+void ADS_PlayerController::Server_PlayerIsReadyForLobby_Implementation(bool IsReady)
+{
+	if (ADS_GameState* GameState = GetWorld()->GetGameState<ADS_GameState>(); IsValid(GameState))
+	{
+		ADS_DefaultPlayerState* PS = GetPlayerState<ADS_DefaultPlayerState>();
+		GameState->GetPlayerList().SetPlayerReady(PS->GetUsername(), IsReady);
+	}
+	if (ADS_LobbyGameMode* GameMode = GetWorld()->GetAuthGameMode<ADS_LobbyGameMode>(); IsValid(GameMode))
+	{
+		GameMode->CheckAllPlayersIsReady();
+	}
+}
+
+void ADS_PlayerController::Server_PlayerIsReadyForMatch_Implementation()
+{
+	UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_PlayerController Server_PlayerIsReadyForMatch"));
+	if (ADS_MatchGameMode* GameMode = GetWorld()->GetAuthGameMode<ADS_MatchGameMode>())
+	{
+		GameMode->PlayerIsReadyForMatch(this);
+	}
+
 }

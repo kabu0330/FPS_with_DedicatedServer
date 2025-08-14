@@ -8,6 +8,10 @@
 #include "Player/DS_DefaultPlayerState.h"
 #include "Player/DS_PlayerController.h"
 
+void ADS_GameModeBase::CheckAllPlayersIsReady()
+{
+}
+
 void ADS_GameModeBase::StartCountdownTimer(FCountdownTimerHandle& CountdownTimerHandle)
 {
 	/* Bind를 Weak로 설정한 이유
