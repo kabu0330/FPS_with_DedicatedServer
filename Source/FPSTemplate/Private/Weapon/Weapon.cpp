@@ -231,8 +231,5 @@ void AWeapon::Rep_Fire(int32 AuthAmmo)
 		--Sequence;
 		Ammo -= Sequence;
 	}
-	
-   
-
 }
 

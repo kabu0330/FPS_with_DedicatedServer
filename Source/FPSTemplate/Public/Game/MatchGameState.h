@@ -20,6 +20,8 @@ struct FKillInfo
 	UPROPERTY()
 	FString VictimName;
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKillAnnounced, const FKillInfo&, KillInfo);
 /**
  * 
  */
@@ -36,6 +38,11 @@ public:
 	bool HasFirstBloodBeenHad() const { return bHasFirstBloodBeenHad; }
 	bool IsTiedForTheLead(AMatchPlayerState* PlayerState);
 	TArray<AMatchPlayerState*> GetLeaders() const;
+
+	void AnnounceKill(const FKillInfo& KillInfo);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnKillAnnounced OnKillAnnounced;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -49,4 +56,7 @@ private:
 	TArray<TObjectPtr<AMatchPlayerState>> SortedPlayerStates;
 
 	bool bHasFirstBloodBeenHad;
+
+	UFUNCTION(NetMulticast, reliable)
+	void Multicast_AnnounceKill(const FKillInfo& KillInfo);
 };

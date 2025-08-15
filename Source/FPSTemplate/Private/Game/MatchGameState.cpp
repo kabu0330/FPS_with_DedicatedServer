@@ -75,6 +75,19 @@ TArray<AMatchPlayerState*> AMatchGameState::GetLeaders() const
 	return Leaders;
 }
 
+void AMatchGameState::AnnounceKill(const FKillInfo& KillInfo)
+{
+	if (HasAuthority())
+	{
+		Multicast_AnnounceKill(KillInfo);
+	}
+}
+
+void AMatchGameState::Multicast_AnnounceKill_Implementation(const FKillInfo& KillInfo)
+{
+	OnKillAnnounced.Broadcast(KillInfo);
+}
+
 void AMatchGameState::BeginPlay()
 {
 	Super::BeginPlay();

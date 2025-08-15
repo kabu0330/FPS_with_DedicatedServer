@@ -170,6 +170,13 @@ void UEliminationComponent::ProcessElimination(bool bHeadShot, AMatchPlayerState
     {
         HandleFirstBlood(GameState, SpecialElimType, AttackerPS);
         UpdateLeaderStatus(GameState, SpecialElimType, AttackerPS, VictimPS);
+        
+        // GameState->Multicast Deleaget Broadcast -> Widget Kill Feed Update
+        FKillInfo KillInfo;
+        KillInfo.KillerName = AttackerPS->GetUsername();
+        KillInfo.VictimName = VictimPS->GetUsername();
+        
+        GameState->AnnounceKill(KillInfo);
     }
 
     if (HasSpecialElimTypes(SpecialElimType))

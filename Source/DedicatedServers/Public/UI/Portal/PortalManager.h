@@ -14,7 +14,7 @@
 /** 로그인, 회원가입, 인증, 로그아웃 HTTP 통신 기능 구현
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class DEDICATEDSERVERS_API UPortalManager : public UHTTPRequestManager, public IPortalManagement
 {
 	GENERATED_BODY()
@@ -45,7 +45,7 @@ public:
 	// IPortalManagement
 	virtual void RefreshTokens(const FString& RefreshToken) override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void QuitGame();
 
 	FDSSignUpResponse LastSignUpResponse;
