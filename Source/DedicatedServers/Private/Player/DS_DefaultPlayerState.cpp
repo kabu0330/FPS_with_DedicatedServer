@@ -26,7 +26,7 @@ void ADS_DefaultPlayerState::CopyProperties(APlayerState* PlayerState)
 	{
 		NewPlayerState->DefaultUsername = DefaultUsername;
 		NewPlayerState->DefaultPlayerSessionId = DefaultPlayerSessionId;
-		UE_LOG(LogTemp, Warning, TEXT("CopyProperties Username: %s"), *NewPlayerState->DefaultUsername);
+		//UE_LOG(LogTemp, Warning, TEXT("CopyProperties Username: %s"), *NewPlayerState->DefaultUsername);
 	}
 	else
 	{
@@ -41,7 +41,6 @@ void ADS_DefaultPlayerState::OverrideWith(APlayerState* PlayerState)
 	{
 		DefaultUsername = NewPlayerState->DefaultUsername;
 		DefaultPlayerSessionId = NewPlayerState->DefaultPlayerSessionId;
-		UE_LOG(LogTemp, Warning, TEXT("OverrideWith Username: %s"), *DefaultUsername);
 	}
 }
 
@@ -60,7 +59,6 @@ void ADS_DefaultPlayerState::SetUsername(const FString& Username)
 	if (HasAuthority())
 	{
 		DefaultUsername = Username;
-		OnRep_DisplayUsername();
 	}
 }
 
@@ -69,18 +67,18 @@ void ADS_DefaultPlayerState::SetPlayerSessionId(const FString& SessionId)
 	if (HasAuthority())
 	{
 		DefaultPlayerSessionId = SessionId;
-		OnRep_DisplayPlayerSessionId();
 	}
 }
 
-void ADS_DefaultPlayerState::OnRep_DisplayUsername()
+void ADS_DefaultPlayerState::OnRep_Username()
 {
-	UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_DefaultPlayerState SetUsername: %s"), *DefaultUsername);
+	UE_LOG(LogDedicatedServers, Warning, TEXT("OnRep_Username: %s"), *DefaultUsername);
+	OnPlayerUsernameChanged.Broadcast(DefaultUsername);
 }
 
-void ADS_DefaultPlayerState::OnRep_DisplayPlayerSessionId()
+void ADS_DefaultPlayerState::OnRep_PlayerSessionId()
 {
-	UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_DefaultPlayerState SetPlayerSessionId: %s"), *DefaultPlayerSessionId);
+	
 }
 
 void ADS_DefaultPlayerState::BeginPlay()

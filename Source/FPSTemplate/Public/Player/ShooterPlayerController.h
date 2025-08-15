@@ -64,7 +64,4 @@ private:
 	void Input_Quit();
 	bool bQuitMenuOpen;
 	
-	
-
-	
 };

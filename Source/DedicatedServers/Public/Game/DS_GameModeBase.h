@@ -16,7 +16,7 @@ class DEDICATEDSERVERS_API ADS_GameModeBase : public AGameMode
 {
 	GENERATED_BODY()
 public:
-	virtual void CheckAllPlayersIsReady();
+	virtual void CheckAllPlayersIsReady(AController* Player);
 	
 protected:
 	void StartCountdownTimer(FCountdownTimerHandle& CountdownTimerHandle);

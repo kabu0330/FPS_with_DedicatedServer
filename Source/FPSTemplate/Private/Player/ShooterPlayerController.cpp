@@ -3,9 +3,12 @@
 
 #include "Player/ShooterPlayerController.h"
 
+#include "EngineUtils.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "Character/ShooterCharacter.h"
+#include "GameFramework/PlayerState.h"
 #include "Interfaces/PlayerInterface.h"
 
 AShooterPlayerController::AShooterPlayerController()

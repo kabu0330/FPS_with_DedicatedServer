@@ -5,6 +5,7 @@
 
 #include "DedicatedServers/DedicatedServers.h"
 #include "Game/DS_GameInstanceSubsystem.h"
+#include "Game/DS_MatchGameState.h"
 #include "GameFramework/GameStateBase.h"
 #include "Player/DS_MatchPlayerState.h"
 #include "Player/DS_PlayerController.h"
@@ -82,16 +83,8 @@ void ADS_MatchGameMode::OnGameStatsUpdated()
 void ADS_MatchGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-	CheckAllPlayersIsReady();
-	/** 처음에는 PreMatchTimer를 전달하고 x초 후에 OnCountdownTimerFinished 함수로 넘어오면
-	 ** Match -> PostMatch 타이머가 순차적으로 돌아간다.
-	 */
 	
-	// if (MatchStatus == EMatchStatus::WaitingForPlayers)
-	// {
-	// 	MatchStatus = EMatchStatus::PreMatch;
-	// 	StartCountdownTimer(PreMatchTimerHandle);
-	// }
+	CheckAllPlayersIsReady(NewPlayer);
 }
 
 void ADS_MatchGameMode::OnPostLogin(AController* NewPlayer)
@@ -103,12 +96,6 @@ void ADS_MatchGameMode::OnPostLogin(AController* NewPlayer)
 void ADS_MatchGameMode::InitSeamlessTravelPlayer(AController* NewController)
 {
 	Super::InitSeamlessTravelPlayer(NewController);
-
-	// if (MatchStatus == EMatchStatus::WaitingForPlayers)
-	// {
-	// 	MatchStatus = EMatchStatus::PreMatch;
-	// 	StartCountdownTimer(PreMatchTimerHandle);
-	// }
 }
 
 void ADS_MatchGameMode::HandleSeamlessTravelPlayer(AController*& Controller)
@@ -124,33 +111,36 @@ void ADS_MatchGameMode::Logout(AController* Exiting)
 	
 	ReadyPlayerCount--;
 	if (ReadyPlayerCount < 0) ReadyPlayerCount = 0;
-	CheckAllPlayersIsReady();
+	CheckAllPlayersIsReady(Exiting);
 }
 
 void ADS_MatchGameMode::PlayerIsReadyForMatch(AController* Controller)
 {
 	if (!Controller) return;
-
 	ReadyPlayerCount++;
-	UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_MatchGameMode PlayerIsReadyForMatch ReadyPlayerCount: %d, Total: %d"), ReadyPlayerCount, GetNumPlayers());
-
-	CheckAllPlayersIsReady();
+	CheckAllPlayersIsReady(Controller);
 }
 
-void ADS_MatchGameMode::CheckAllPlayersIsReady()
+void ADS_MatchGameMode::CheckAllPlayersIsReady(AController* Player)
 {
+	Super::CheckAllPlayersIsReady(Player);
+	ADS_MatchGameState* GS = GetGameState<ADS_MatchGameState>();
+	check(IsValid(GS));
+	
 	if (ReadyPlayerCount >= GetNumPlayers())
 	{
 		if (MatchStatus == EMatchStatus::WaitingForPlayers)
 		{
 			MatchStatus = EMatchStatus::PreMatch;
 			StartCountdownTimer(PreMatchTimerHandle);
+			GS->bIsMatchCountdownStarted = true;
 		}
 	}
 	else
 	{
 		MatchStatus = EMatchStatus::WaitingForPlayers;
 		StopCountdownTimer(PreMatchTimerHandle);
+		GS->bIsMatchCountdownStarted = false;
 	}
 	
 	UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_MatchGameMode CheckAllPlayersIsReady ReadyPlayerCount: %d, Total: %d"), ReadyPlayerCount, GetNumPlayers());

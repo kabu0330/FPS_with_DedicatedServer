@@ -9,6 +9,8 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimerStateChangedDelegate, float, Time, ECountdownTimerType, Type);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchCountdownTimerStart, bool, IsStart);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateCreated, APlayerState*, PS);
 /** 1. 입력 통제
  *  2. 서버와 지연 시간을 계산하여 게임 카운트다운 시간 동기화
  */
@@ -40,12 +42,10 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnTimerStateChangedDelegate OnTimerStopped;
 
-	void PlayerIsReadyForLobby(bool IsReady);
-	
-	UFUNCTION(Server, Reliable)
-	void Server_PlayerIsReadyForLobby(bool IsReady);
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerStateCreated OnPlayerStateCreated;
 
-	void PlayerIsReadyForMatch();
+	virtual void UpdateAllNameplatesOnClient();
 
 protected:
 	UFUNCTION(Server, Reliable)
@@ -56,6 +56,7 @@ protected:
 
 private:
 	float SingleTripTime{};
+	
 };
 
 

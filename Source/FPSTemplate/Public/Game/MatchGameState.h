@@ -3,16 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Game/DS_MatchGameState.h"
 #include "GameFramework/GameState.h"
 #include "MatchGameState.generated.h"
 
 class AMatchPlayerState;
 
+USTRUCT(BlueprintType)
+struct FKillInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString KillerName;
+
+	UPROPERTY()
+	FString VictimName;
+};
 /**
  * 
  */
 UCLASS()
-class FPSTEMPLATE_API AMatchGameState : public AGameState
+class FPSTEMPLATE_API AMatchGameState : public ADS_MatchGameState
 {
 	GENERATED_BODY()
 public:

@@ -8,7 +8,7 @@
 #include "Player/DS_DefaultPlayerState.h"
 #include "Player/DS_PlayerController.h"
 
-void ADS_GameModeBase::CheckAllPlayersIsReady()
+void ADS_GameModeBase::CheckAllPlayersIsReady(AController* Player)
 {
 }
 

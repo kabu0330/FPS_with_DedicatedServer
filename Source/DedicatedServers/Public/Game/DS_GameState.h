@@ -29,6 +29,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerListUpdated OnPlayerListUpdated;
 
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -20,7 +20,7 @@ class DEDICATEDSERVERS_API ADS_LobbyGameMode : public ADS_GameModeBase
 	GENERATED_BODY()
 public:
 	ADS_LobbyGameMode();
-	void CheckAllPlayersIsReady();
+	virtual void CheckAllPlayersIsReady(AController* Player) override;
 
 protected:
 	// InitGameLift() 호출

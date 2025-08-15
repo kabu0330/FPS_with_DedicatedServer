@@ -78,7 +78,7 @@ void ADS_LobbyGameMode::RecordUserInformation(APlayerController* NewPlayerContro
 void ADS_LobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
-    CheckAllPlayersIsReady();
+    CheckAllPlayersIsReady(NewPlayer);
 
     FString Username{};
     ADS_DefaultPlayerState* PlayerState = NewPlayer->GetPlayerState<ADS_DefaultPlayerState>();
@@ -125,7 +125,7 @@ void ADS_LobbyGameMode::Logout(AController* Exiting)
     
     RemovePlayerSession(Exiting);
 
-    CheckAllPlayersIsReady();
+    CheckAllPlayersIsReady(Exiting);
     
     UE_LOG(LogDedicatedServers, Warning, TEXT("ADS_LobbyGameMode Logout for %s"), *Exiting->GetName());
 }
@@ -141,9 +141,9 @@ void ADS_LobbyGameMode::RemovePlayerInfoFromLobbyState(AController* Player) cons
     }
 }
 
-void ADS_LobbyGameMode::CheckAllPlayersIsReady()
+void ADS_LobbyGameMode::CheckAllPlayersIsReady(AController* Player)
 {
-    Super::CheckAllPlayersIsReady();
+    Super::CheckAllPlayersIsReady(Player);
 
     // 신규 플레이어가 접속했을 때, 플레이어가 Ready 버튼을 클릭했을 때(PC RPC), 플레이어가 나갔을 때 호출
     int32 TotalPlayers = GetNumPlayers();

@@ -8,6 +8,7 @@
 #include "Game/DS_LobbyGameMode.h"
 #include "Game/DS_MatchGameMode.h"
 #include "Player/DS_DefaultPlayerState.h"
+#include "Player/DS_MatchPlayerState.h"
 
 ADS_PlayerController::ADS_PlayerController()
 {
@@ -19,9 +20,20 @@ void ADS_PlayerController::BeginPlay()
 
 	if (GetNetMode() == NM_Standalone)
 	{
-		EnableInput(this);
-		//DisableInput(this);
+		if (GIsEditor) // Debug
+		{
+			EnableInput(this);
+		}
+		else
+		{
+			DisableInput(this);
+		}
 	}
+}
+
+void ADS_PlayerController::UpdateAllNameplatesOnClient()
+{
+	
 }
 
 void ADS_PlayerController::OnRep_PlayerState()
@@ -31,14 +43,18 @@ void ADS_PlayerController::OnRep_PlayerState()
 	if (IsLocalController())
 	{
 		DisableInput(this);
+		
+		OnPlayerStateCreated.Broadcast(PlayerState);
 	}
 }
 
 void ADS_PlayerController::PostSeamlessTravel()
 {
 	Super::PostSeamlessTravel();
-	
-	PlayerIsReadyForMatch();
+
+	ADS_MatchPlayerState* PS = Cast<ADS_MatchPlayerState>(PlayerState);
+	check(IsValid(PS));
+	PS->PlayerIsReadyForMatch();
 	
 	if (IsLocalPlayerController())
 	{
@@ -103,28 +119,4 @@ void ADS_PlayerController::Client_TimerStopped_Implementation(float CountdownTim
 	OnTimerStopped.Broadcast(CountdownTimeLeft - SingleTripTime, Type);
 }
 
-void ADS_PlayerController::PlayerIsReadyForLobby(bool IsReady)
-{
-	Server_PlayerIsReadyForLobby(IsReady);
-}
 
-void ADS_PlayerController::Server_PlayerIsReadyForLobby_Implementation(bool IsReady)
-{
-	if (ADS_GameState* GameState = GetWorld()->GetGameState<ADS_GameState>(); IsValid(GameState))
-	{
-		ADS_DefaultPlayerState* PS = GetPlayerState<ADS_DefaultPlayerState>();
-		GameState->GetPlayerList().SetPlayerReady(PS->GetUsername(), IsReady);
-	}
-	if (ADS_LobbyGameMode* GameMode = GetWorld()->GetAuthGameMode<ADS_LobbyGameMode>(); IsValid(GameMode))
-	{
-		GameMode->CheckAllPlayersIsReady();
-	}
-}
-
-void ADS_PlayerController::PlayerIsReadyForMatch()
-{
-	if (ADS_MatchGameMode* GameMode = GetWorld()->GetAuthGameMode<ADS_MatchGameMode>())
-	{
-		GameMode->PlayerIsReadyForMatch(this);
-	}
-}

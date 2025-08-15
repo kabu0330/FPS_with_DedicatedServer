@@ -18,15 +18,23 @@ class DEDICATEDSERVERS_API ADS_MatchPlayerState : public ADS_DefaultPlayerState
 	GENERATED_BODY()
 public:
 	virtual void OnMatchEnded();
+	void PlayerIsReadyForLobby(bool IsReady);
+
+	void PlayerIsReadyForMatch();
 
 protected:
 	virtual void BeginPlay() override;
 
 	void RecordMatchStats(const FDSRecordMatchStatsInput& RecordMatchStatsInput) const;
-	
+
 private:
 	UPROPERTY()
 	TObjectPtr<UGameStatsManager> GameStatsManager;
-
+	
 	void TakeGameStatsManager();
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayerIsReadyForLobby(bool IsReady);
+
+
 };

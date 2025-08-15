@@ -9,6 +9,8 @@
 #include "ShooterTypes/ShooterTypes.h"
 #include "ShooterCharacter.generated.h"
 
+class UWidgetComponent;
+class UNameplateWidget;
 class UEliminationComponent;
 class UShooterHealthComponent;
 class UShooterOverlay;
@@ -83,6 +85,7 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Aiming")
 	float DefaultFieldOfView;

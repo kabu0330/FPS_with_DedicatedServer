@@ -3,6 +3,7 @@
 
 #include "Game/DS_GameState.h"
 
+#include "DedicatedServers/DedicatedServers.h"
 #include "Lobby/LobbyState.h"
 #include "Net/UnrealNetwork.h"
 

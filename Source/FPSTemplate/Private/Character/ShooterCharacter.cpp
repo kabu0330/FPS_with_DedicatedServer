@@ -132,6 +132,12 @@ void AShooterCharacter::BeginPlay()
 		}
 	});
 	GetWorldTimerManager().SetTimer(InitiializeWidgets_Timer, InitializeWidgetsDelegate, 0.5f, false);
+	
+}
+
+void AShooterCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 }
 
 void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -204,6 +210,7 @@ void AShooterCharacter::Tick(float DeltaTime)
 	}
 
 	AO_Yaw *= -1.f;
+	
 }
 
 void AShooterCharacter::OnRep_PlayerState()
@@ -426,7 +433,4 @@ void AShooterCharacter::EnableGameActions_Implementation(bool bEnable)
 		Combat->Initiate_AimReleased();
 	}
 }
-
-
-
 
