@@ -3,7 +3,10 @@
 
 #include "Player/DS_PlayerController.h"
 
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "DedicatedServers/DedicatedServers.h"
+#include "Game/ChatComponent.h"
 #include "Game/DS_GameState.h"
 #include "Game/DS_LobbyGameMode.h"
 #include "Game/DS_MatchGameMode.h"
@@ -31,9 +34,42 @@ void ADS_PlayerController::BeginPlay()
 	}
 }
 
-void ADS_PlayerController::UpdateAllNameplatesOnClient()
+void ADS_PlayerController::SetupInputComponent()
 {
-	
+	Super::SetupInputComponent();
+
+	UEnhancedInputLocalPlayerSubsystem* Subsystem =
+		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	if (Subsystem)
+	{
+		Subsystem->AddMappingContext(DSMappingContext, 0);
+	}
+	UEnhancedInputComponent* DSInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	DSInputComponent->BindAction(ChatAction, ETriggerEvent::Started, this, &ADS_PlayerController::Input_StartChat);
+}
+
+void ADS_PlayerController::Input_StartChat(const FInputActionValue& InputActionValue)
+{
+	bIsChatting = !bIsChatting;
+	if (bIsChatting)
+	{
+		OnChatStatus.Broadcast(true);
+	}
+	else
+	{
+		OnChatStatus.Broadcast(false);
+	}
+}
+
+void ADS_PlayerController::Server_SendChatMessage_Implementation(const FText& Message)
+{
+	if (ADS_GameState* GS = GetWorld()->GetGameState<ADS_GameState>(); IsValid(GS))
+	{
+		if (UChatComponent* ChatComponent = GS->GetChatComponent())
+		{
+			ChatComponent->SendChatMessage(this, Message);
+		}
+	}
 }
 
 void ADS_PlayerController::OnRep_PlayerState()

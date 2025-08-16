@@ -8,9 +8,14 @@
 #include "DS_PlayerController.generated.h"
 
 
+struct FInputActionValue;
+class UInputAction;
+class UInputMappingContext;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimerStateChangedDelegate, float, Time, ECountdownTimerType, Type);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchCountdownTimerStart, bool, IsStart);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateCreated, APlayerState*, PS);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChatStatus, bool, IsChatting);
 /** 1. 입력 통제
  *  2. 서버와 지연 시간을 계산하여 게임 카운트다운 시간 동기화
  */
@@ -20,12 +25,6 @@ class DEDICATEDSERVERS_API ADS_PlayerController : public APlayerController
 	GENERATED_BODY()
 public:
 	ADS_PlayerController();
-
-	virtual void ReceivedPlayer() override;
-	virtual void OnRep_PlayerState() override;
-	virtual void PostSeamlessTravel() override;
-	virtual void OnPossess(APawn* InPawn) override;
-	virtual void BeginPlay() override;
 
 	UFUNCTION(Client, Reliable)
 	void Client_TimerUpdated(float CountdownTimeLeft, ECountdownTimerType Type) const;
@@ -45,9 +44,20 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerStateCreated OnPlayerStateCreated;
 
-	virtual void UpdateAllNameplatesOnClient();
+	UPROPERTY(BlueprintAssignable)
+	FOnChatStatus OnChatStatus;
+
+	UFUNCTION(Server, Reliable)
+	void Server_SendChatMessage(const FText& Message);
 
 protected:
+	virtual void ReceivedPlayer() override;
+	virtual void OnRep_PlayerState() override;
+	virtual void PostSeamlessTravel() override;
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
+	
 	UFUNCTION(Server, Reliable)
 	void Server_Ping(float TimeOfRequest);
 
@@ -56,6 +66,16 @@ protected:
 
 private:
 	float SingleTripTime{};
+
+	bool bIsChatting = false;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputMappingContext> DSMappingContext;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> ChatAction;
+
+	void Input_StartChat(const FInputActionValue& InputActionValue);
 	
 };
 

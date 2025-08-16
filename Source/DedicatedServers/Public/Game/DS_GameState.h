@@ -7,9 +7,11 @@
 #include "Lobby/LobbyPlayerInfo.h"
 #include "DS_GameState.generated.h"
 
+class UChatComponent;
 class ALobbyState;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerListUpdated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChatComponentCreated, UChatComponent*, ChatComponent);
 
 /** 1. LobbyLevel에서 현재 서버에 접속한 플레이어 리스트를 관리한다. 
  * 
@@ -29,6 +31,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerListUpdated OnPlayerListUpdated;
 
+	UChatComponent* GetChatComponent() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -36,6 +39,9 @@ protected:
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_PlayerList) 
 	FLobbyPlayerInfoArray PlayerList;
+
+	UPROPERTY()
+	TObjectPtr<UChatComponent> ChatComponent;
 	
 	UFUNCTION()
 	void OnRep_PlayerList();

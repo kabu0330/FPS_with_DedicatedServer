@@ -15,7 +15,8 @@ public class DedicatedServers : ModuleRules
 			"GameplayTags",
 			"HTTP",
 			"InputCore",
-			"NetCore"
+			"NetCore",
+			"EnhancedInput"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
@@ -25,5 +26,10 @@ public class DedicatedServers : ModuleRules
 			"UMG",
 			"Json", "JsonUtilities"
 		});
+		
+		if (Target.bBuildEditor)
+		{
+			PublicDependencyModuleNames.AddRange(new string[] { "MessageLog" });
+		}
 	}
 }
