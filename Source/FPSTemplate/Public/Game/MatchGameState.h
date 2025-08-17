@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Game/DS_MatchGameState.h"
-#include "GameFramework/GameState.h"
+#include "SoundGameState.h"
 #include "MatchGameState.generated.h"
 
 class AMatchPlayerState;
@@ -26,7 +25,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKillAnnounced, const FKillInfo&, 
  * 
  */
 UCLASS()
-class FPSTEMPLATE_API AMatchGameState : public ADS_MatchGameState
+class FPSTEMPLATE_API AMatchGameState : public ASoundGameState
 {
 	GENERATED_BODY()
 public:

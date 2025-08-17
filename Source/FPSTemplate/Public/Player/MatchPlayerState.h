@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 #include "Player/DS_MatchPlayerState.h"
+#include "Data/SpecialElimData.h"
 #include "MatchPlayerState.generated.h"
 
 enum class ESpecialElimType : uint16;
@@ -62,9 +63,10 @@ public:
 	TArray<ESpecialElimType> DecodeElimBitmask(ESpecialElimType ElimTypeBitmask);
 
 protected:
-	
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> SpecialElimWidgetClass;
+
+	virtual void Tick(float DeltaTime) override;
 	
 private:
 	int32 ScoredElims;
@@ -88,8 +90,15 @@ private:
 	TQueue<FSpecialElimInfo> SpecialElimQueue;
 	bool bIsProcessingQueue;
 
+	float KillStreakTime = 30.0f;
+	float InitialKillStreakTime = 30.0f;
+	int MultiKillCount = 0;
+
 	void ProcessNextSpecialElim();
 	void ShowSpecialElim(const FSpecialElimInfo& ElimMessageInfo);
+
+	void CountdownMultiKill(float DeltaTime);
+	void PlayKillSound();
 };
 
 

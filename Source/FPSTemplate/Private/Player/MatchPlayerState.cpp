@@ -12,7 +12,7 @@
 
 AMatchPlayerState::AMatchPlayerState()
 {
-	NetUpdateFrequency = 100.f; // let's not be sluggish, alright?
+	SetNetUpdateFrequency(100.f);
 	
 	ScoredElims = 0;
 	Defeats = 0;
@@ -67,11 +67,16 @@ void AMatchPlayerState::OnMatchEnded()
 void AMatchPlayerState::AddScoredElim()
 {
 	++ScoredElims;
+	++MultiKillCount;
+
+	PlayKillSound();
 }
 
 void AMatchPlayerState::AddDefeat()
 {
 	++Defeats;
+	MultiKillCount = 0;
+	KillStreakTime = InitialKillStreakTime;
 }
 
 void AMatchPlayerState::AddHit()
@@ -87,6 +92,7 @@ void AMatchPlayerState::AddMiss()
 void AMatchPlayerState::AddHeadShotElim()
 {
 	++HeadShotElims;
+	PlayKillSound();
 }
 
 void AMatchPlayerState::AddSequentialElim(int32 SequenceCount)
@@ -124,16 +130,19 @@ void AMatchPlayerState::UpdateHighestStreak(int32 StreakCount)
 void AMatchPlayerState::AddRevengeElim()
 {
 	++RevengeElims;
+	PlayKillSound();
 }
 
 void AMatchPlayerState::AddDethroneElim()
 {
 	++DethroneElims;
+	PlayKillSound();
 }
 
 void AMatchPlayerState::AddShowStopperElim()
 {
 	++ShowStopperElims;
+	PlayKillSound();
 }
 
 void AMatchPlayerState::GotFirstBlood()
@@ -259,5 +268,40 @@ void AMatchPlayerState::Client_LostTheLead_Implementation()
 			ElimWidget->InitializeWidget(ElimMessageInfo.ElimMessage, ElimMessageInfo.ElimIcon);
 			ElimWidget->AddToViewport();
 		}
+	}
+}
+
+void AMatchPlayerState::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	CountdownMultiKill(DeltaTime);
+}
+
+void AMatchPlayerState::CountdownMultiKill(float DeltaTime)
+{
+	if (0 != MultiKillCount)
+	{
+		KillStreakTime -= DeltaTime;
+	}
+	else if (0 >= KillStreakTime)
+	{
+		KillStreakTime = InitialKillStreakTime;
+		MultiKillCount = 0;
+	}
+}
+
+void AMatchPlayerState::PlayKillSound()
+{
+	AMatchGameState* GS = GetWorld()->GetGameState<AMatchGameState>();
+	if (!IsValid(GS)) return;
+	
+	if (2 > MultiKillCount)
+	{
+		GS->PlaySoundOnKill();
+	}
+	else
+	{
+		GS->Server_PlaySoundOnMultiKill(MultiKillCount);
 	}
 }

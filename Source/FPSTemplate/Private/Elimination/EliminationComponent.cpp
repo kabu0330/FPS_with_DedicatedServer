@@ -119,6 +119,7 @@ void UEliminationComponent::HandleFirstBlood(AMatchGameState* GameState, ESpecia
     {
         SpecialElimType |= ESpecialElimType::FirstBlood;
         AttackerPS->GotFirstBlood();
+        GameState->Server_PlaySoundOnFirstBlood();
     }
 }
 
