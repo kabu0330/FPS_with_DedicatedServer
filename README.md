@@ -1,6 +1,12 @@
 # Unreal Engine Dedicated Server 프로젝트
 ## 플레이 영상
 
+<p align="center">
+ <img alt="이미지" src="https://github.com/user-attachments/assets/3de639c0-ec17-4d90-a25d-5aa980b208e2">
+</p>
+
+https://youtu.be/8tyiK_7egvI?si=qGpzTXXsj3Ot6rOT
+
 
 ## 프로젝트 소개
 해당 프로젝트는 FPS 게임에 데디케이티드 서버 모듈을 추가, AWS 서비스를 이용해 실시간 네트워크 동기화 외에도 회원가입 및 로그인, DB를 활용한 플레이 기록 및 랭킹 시스템을 구현했습니다.
