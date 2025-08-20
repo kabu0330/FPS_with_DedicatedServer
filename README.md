@@ -7,6 +7,16 @@
 
 https://youtu.be/8tyiK_7egvI?si=qGpzTXXsj3Ot6rOT
 
+## 기술스택
+* 언어 : C++ 20, Node.js
+* 엔진 : Unreal Engine 5.6
+* 프로토콜 데이터 : JSON
+* 데이터베이스 : AWS Dynamo DB
+* OS : Windows Server 2016
+* 배포 : AWS EC2
+* 개발 환경 : Rider
+* 형상 관리 : Git
+
 
 ## 프로젝트 소개
 해당 프로젝트는 FPS 게임에 데디케이티드 서버 모듈을 추가, AWS 서비스를 이용해 실시간 네트워크 동기화 외에도 회원가입 및 로그인, DB를 활용한 플레이 기록 및 랭킹 시스템을 구현했습니다.
