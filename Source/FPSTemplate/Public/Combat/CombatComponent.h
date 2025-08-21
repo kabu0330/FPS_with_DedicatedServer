@@ -125,10 +125,11 @@ private:
 	void Local_FireWeapon();
 
 	UFUNCTION(Server, Reliable)
-	void Server_FireWeapon(const FVector_NetQuantize& TraceStart, const FHitResult& Impact, bool bScoredHit, bool bHeadShot);
+	void Server_FireWeapon(const FVector_NetQuantize& TraceStart, const FHitResult& Impact, bool bScoredHit, bool bHeadShot,
+		USoundBase* FireSound, const FVector_NetQuantize& SoundLocation);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_FireWeapon(const FHitResult& Impact, int32 AuthAmmo);
+	void Multicast_FireWeapon(const FHitResult& Impact, int32 AuthAmmo, USoundBase* FireSound, const FVector_NetQuantize& SoundLocation);
 
 	UFUNCTION(Server, Reliable)
 	void Server_ReloadWeapon(bool bLocalOwnerReload = false);

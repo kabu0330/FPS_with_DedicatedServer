@@ -27,6 +27,18 @@ void ADS_MatchGameMode::BeginPlay()
 	CreateGameStatsManager();
 }
 
+void ADS_MatchGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
+	FString& ErrorMessage)
+{
+	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+	
+	if (MatchStatus != EMatchStatus::WaitingForPlayers)
+	{
+		ErrorMessage = TEXT("이미 게임이 진행 중입니다. 게임이 끝난 이후에 입장 가능합니다.");
+		return;
+	}
+}
+
 void ADS_MatchGameMode::CreateGameStatsManager()
 {
 	check(GameStatsManagerClass);
@@ -84,13 +96,12 @@ void ADS_MatchGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 	
-	CheckAllPlayersIsReady(NewPlayer);
+	PlayerIsReadyForMatch(NewPlayer);
 }
 
 void ADS_MatchGameMode::OnPostLogin(AController* NewPlayer)
 {
 	Super::OnPostLogin(NewPlayer);
-	
 }
 
 void ADS_MatchGameMode::InitSeamlessTravelPlayer(AController* NewController)
@@ -101,7 +112,6 @@ void ADS_MatchGameMode::InitSeamlessTravelPlayer(AController* NewController)
 void ADS_MatchGameMode::HandleSeamlessTravelPlayer(AController*& Controller)
 {
 	Super::HandleSeamlessTravelPlayer(Controller);
-	
 }
 
 void ADS_MatchGameMode::Logout(AController* Exiting)
@@ -117,6 +127,8 @@ void ADS_MatchGameMode::Logout(AController* Exiting)
 void ADS_MatchGameMode::PlayerIsReadyForMatch(AController* Controller)
 {
 	if (!Controller) return;
+	if (MatchStatus == EMatchStatus::Match || MatchStatus == EMatchStatus::SeamlessTravelling) return;
+	
 	ReadyPlayerCount++;
 	CheckAllPlayersIsReady(Controller);
 }
@@ -133,7 +145,7 @@ void ADS_MatchGameMode::CheckAllPlayersIsReady(AController* Player)
 		{
 			MatchStatus = EMatchStatus::PreMatch;
 			StartCountdownTimer(PreMatchTimerHandle);
-			GS->bIsMatchCountdownStarted = true;
+			GS->bIsMatchCountdownStarted = true; // 위젯에 다른 플레이어를 기다리는지 아닌지를 메시지를 띄우는 변수
 		}
 	}
 	else
@@ -156,6 +168,10 @@ void ADS_MatchGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
 		MatchStatus = EMatchStatus::Match;
 		StartCountdownTimer(MatchTimerHandle);
 		SetClientInputEnabled(true);
+
+		ADS_MatchGameState* GS = GetGameState<ADS_MatchGameState>();
+		check(IsValid(GS));
+		GS->bIsMatchCountdownStarted = true;
 	}
 	if (Type == ECountdownTimerType::Match)
 	{

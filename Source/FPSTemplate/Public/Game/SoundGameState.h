@@ -26,25 +26,10 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlaySoundOnMultiKill(int32 MultiKillCount);
-
-	UFUNCTION()
-	void PlaySoundOnKill();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "GameSound")
 	TObjectPtr<USoundBase> FirstBloodSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "GameSound")
-	TObjectPtr<USoundBase> KillSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "GameSound")
-	TObjectPtr<USoundBase> KillSound2;
-
-	UPROPERTY(EditDefaultsOnly, Category = "GameSound")
-	TObjectPtr<USoundBase> KillSound3;
-
-	UPROPERTY(EditDefaultsOnly, Category = "GameSound")
-	TObjectPtr<USoundBase> KillSound4;
 	
 
 	UPROPERTY(EditDefaultsOnly, Category = "GameSound")

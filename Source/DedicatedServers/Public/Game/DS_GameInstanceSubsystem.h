@@ -7,6 +7,8 @@
 #include "GameLiftServerSDK.h"
 #include "DS_GameInstanceSubsystem.generated.h"
 
+
+
 class UGameStatsManager;
 struct FProcessParameters;
 struct FServerParameters;
@@ -22,8 +24,13 @@ public:
 	
 	void InitGameLift(const FServerParameters& ServerParameters);
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Network")
+	FString LastConnectionError;
+
 protected:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	void OnNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
 	
 private:
 	TSharedPtr<FProcessParameters> ProcessParameters;

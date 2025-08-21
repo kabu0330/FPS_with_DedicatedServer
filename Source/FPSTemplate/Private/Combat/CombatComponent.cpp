@@ -342,11 +342,13 @@ void UCombatComponent::Local_FireWeapon()
 		OnRoundFired.Broadcast(CurrentWeapon->Ammo, CurrentWeapon->MagCapacity, CarriedAmmo);
 
 		if (GetNetMode() == NM_Standalone) return;
-		Server_FireWeapon(TraceStart, Hit, bHitPlayer, bHeadShot);
+		USoundBase* SoundToPlay = CurrentWeapon->WeaponFireSound;
+		FVector SoundLocation = CurrentWeapon->GetActorLocation();
+		Server_FireWeapon(TraceStart, Hit, bHitPlayer, bHeadShot, SoundToPlay, SoundLocation);
 	}
 }
 
-void UCombatComponent::Server_FireWeapon_Implementation(const FVector_NetQuantize& TraceStart, const FHitResult& Impact, bool bScoredHit, bool bHeadShot)
+void UCombatComponent::Server_FireWeapon_Implementation(const FVector_NetQuantize& TraceStart, const FHitResult& Impact, bool bScoredHit, bool bHeadShot, USoundBase* FireSound, const FVector_NetQuantize& SoundLocation)
 {
 	// Do your server-side rewind validation here...
 	if (!IsValid(CurrentWeapon) || !IsValid(GetOwner())) return;
@@ -370,10 +372,10 @@ void UCombatComponent::Server_FireWeapon_Implementation(const FVector_NetQuantiz
 		// We still need to update ammo server-side for non-hosting player-controlled proxies on a listen server
 		CurrentWeapon->Auth_Fire();
 	}
-	Multicast_FireWeapon(Impact, CurrentWeapon->Ammo);
+	Multicast_FireWeapon(Impact, CurrentWeapon->Ammo, FireSound, SoundLocation);
 }
 
-void UCombatComponent::Multicast_FireWeapon_Implementation(const FHitResult& Impact, int32 AuthAmmo)
+void UCombatComponent::Multicast_FireWeapon_Implementation(const FHitResult& Impact, int32 AuthAmmo, USoundBase* FireSound, const FVector_NetQuantize& SoundLocation)
 {
 	if (!IsValid(CurrentWeapon) || !IsValid(GetOwner())) return;
 	if (Cast<APawn>(GetOwner())->IsLocallyControlled())
@@ -401,7 +403,10 @@ void UCombatComponent::Multicast_FireWeapon_Implementation(const FHitResult& Imp
 				{
 					Mesh3P->GetAnimInstance()->Montage_Play(Montage3P);
 				}
-
+				if (IsValid(FireSound))
+				{
+					UGameplayStatics::PlaySoundAtLocation(this, FireSound, SoundLocation);
+				}
 			}
 		}
 	}

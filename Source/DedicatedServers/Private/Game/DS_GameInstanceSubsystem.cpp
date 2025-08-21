@@ -150,6 +150,17 @@ void UDS_GameInstanceSubsystem::ParesCommandLinePort()
 void UDS_GameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
+
+    if (GEngine)
+    {
+        GEngine->OnNetworkFailure().AddUObject(this, &UDS_GameInstanceSubsystem::OnNetworkFailure);
+    }
+}
+
+void UDS_GameInstanceSubsystem::OnNetworkFailure(UWorld* World, UNetDriver* NetDriver,
+    ENetworkFailure::Type FailureType, const FString& ErrorString)
+{
+    LastConnectionError = ErrorString;
 }
 
 

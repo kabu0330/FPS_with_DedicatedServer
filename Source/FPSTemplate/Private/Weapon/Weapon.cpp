@@ -3,6 +3,8 @@
 
 #include "Weapon/Weapon.h"
 
+#include "Character/ShooterCharacter.h"
+#include "Game/ShooterGameModeBase.h"
 #include "Interfaces/PlayerInterface.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -205,16 +207,13 @@ void AWeapon::PostInitializeComponents()
 
 void AWeapon::Local_Fire(const FVector& ImpactPoint, const FVector& ImpactNormal, TEnumAsByte<EPhysicalSurface> SurfaceType, bool bIsFirstPerson)
 {
-
 	FireEffects(ImpactPoint, ImpactNormal, SurfaceType, bIsFirstPerson);
-	
 	
 	if (GetInstigator()->IsLocallyControlled())
 	{
 		Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
 		++Sequence;
 	}
-	
 }
 
 int32 AWeapon::Auth_Fire()
@@ -230,6 +229,16 @@ void AWeapon::Rep_Fire(int32 AuthAmmo)
 		Ammo = AuthAmmo;
 		--Sequence;
 		Ammo -= Sequence;
+	}
+}
+
+
+void AWeapon::Multicast_PlayFireSound_Implementation(APlayerController* PlayerController, USoundBase* Sound, const FVector& Location)
+{
+	if (PlayerController == GetWorld()->GetFirstPlayerController()) return;
+	if (IsValid(WeaponFireSound))
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, Sound, Location);	
 	}
 }
 

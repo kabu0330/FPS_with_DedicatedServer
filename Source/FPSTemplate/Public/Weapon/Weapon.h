@@ -58,7 +58,18 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void FireEffects(const FVector& ImpactPoint, const FVector& ImpactNormal, EPhysicalSurface SurfaceType, bool bIsFirstPerson);
+	
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayFireSound(APlayerController* PlayerController, USoundBase* Sound, const FVector& Location);
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<USoundBase> WeaponFireSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	TObjectPtr<UAnimMontage> WeaponFireMontage;
+	
+	
 	//////////////////////////////////////////////////////////////////////////
 	// Inventory
 	

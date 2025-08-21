@@ -68,8 +68,7 @@ void AMatchPlayerState::AddScoredElim()
 {
 	++ScoredElims;
 	++MultiKillCount;
-
-	PlayKillSound();
+	PlayOnMultiKillSound();
 }
 
 void AMatchPlayerState::AddDefeat()
@@ -92,7 +91,7 @@ void AMatchPlayerState::AddMiss()
 void AMatchPlayerState::AddHeadShotElim()
 {
 	++HeadShotElims;
-	PlayKillSound();
+	PlayOnMultiKillSound();
 }
 
 void AMatchPlayerState::AddSequentialElim(int32 SequenceCount)
@@ -130,19 +129,19 @@ void AMatchPlayerState::UpdateHighestStreak(int32 StreakCount)
 void AMatchPlayerState::AddRevengeElim()
 {
 	++RevengeElims;
-	PlayKillSound();
+	PlayOnMultiKillSound();
 }
 
 void AMatchPlayerState::AddDethroneElim()
 {
 	++DethroneElims;
-	PlayKillSound();
+	PlayOnMultiKillSound();
 }
 
 void AMatchPlayerState::AddShowStopperElim()
 {
 	++ShowStopperElims;
-	PlayKillSound();
+	PlayOnMultiKillSound();
 }
 
 void AMatchPlayerState::GotFirstBlood()
@@ -291,16 +290,12 @@ void AMatchPlayerState::CountdownMultiKill(float DeltaTime)
 	}
 }
 
-void AMatchPlayerState::PlayKillSound()
+void AMatchPlayerState::PlayOnMultiKillSound() const
 {
 	AMatchGameState* GS = GetWorld()->GetGameState<AMatchGameState>();
 	if (!IsValid(GS)) return;
 	
-	if (2 > MultiKillCount)
-	{
-		GS->PlaySoundOnKill();
-	}
-	else
+	if (2 <= MultiKillCount)
 	{
 		GS->Server_PlaySoundOnMultiKill(MultiKillCount);
 	}

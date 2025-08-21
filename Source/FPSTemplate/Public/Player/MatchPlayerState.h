@@ -94,11 +94,23 @@ private:
 	float InitialKillStreakTime = 30.0f;
 	int MultiKillCount = 0;
 
+	UPROPERTY(EditDefaultsOnly, Category = "GameSound")
+	TObjectPtr<USoundBase> KillSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GameSound")
+	TObjectPtr<USoundBase> KillSound2;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GameSound")
+	TObjectPtr<USoundBase> KillSound3;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GameSound")
+	TObjectPtr<USoundBase> KillSound4;
+
 	void ProcessNextSpecialElim();
 	void ShowSpecialElim(const FSpecialElimInfo& ElimMessageInfo);
 
 	void CountdownMultiKill(float DeltaTime);
-	void PlayKillSound();
+	void PlayOnMultiKillSound() const;
 };
 
 

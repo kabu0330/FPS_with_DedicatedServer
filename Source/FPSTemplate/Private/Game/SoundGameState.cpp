@@ -53,35 +53,5 @@ void ASoundGameState::Multicast_PlaySoundOnMultiKill_Implementation(int32 MultiK
 	}
 }
 
-void ASoundGameState::PlaySoundOnKill()
-{
-	check(IsValid(GetWorld()));
 
-	std::random_device Random;
-	std::mt19937 RandomEngine(Random());
-	std::uniform_int_distribution<int> RandomDistribution(1, 4);
-	int RandomNumber = RandomDistribution(RandomEngine);
-	UE_LOG(LogTemp, Warning, TEXT("PlaySoundOnKill RandomNumber: %d"), RandomNumber);
-	
-	switch (RandomNumber)
-	{
-	case 1:
-	default:
-		if (!IsValid(KillSound)) return;
-		UGameplayStatics::PlaySound2D(GetWorld(), KillSound);
-		break;
-	case 2:
-		if (!IsValid(KillSound2)) return;
-		UGameplayStatics::PlaySound2D(GetWorld(), KillSound2);
-		break;
-	case 3:
-		if (!IsValid(KillSound3)) return;
-		UGameplayStatics::PlaySound2D(GetWorld(), KillSound3);
-		break;
-	case 4:
-		if (!IsValid(KillSound4)) return;
-		UGameplayStatics::PlaySound2D(GetWorld(), KillSound4);
-		break;
-	}
-}
 
