@@ -38,7 +38,15 @@ https://youtu.be/8tyiK_7egvI?si=qGpzTXXsj3Ot6rOT
 14. ```GameState``` 및 ```Fast TArray``` 직렬화를 이용한 **실시간 접속자 목록 표시**
 15. **핑퐁(Ping-Pong) 방식의 RTT(왕복 시간) 계산을 통한 클라이언트-서버 간 타이머 동기화** 
 16. ```PlayerState```를 이용한 플레이어 정보(점수, 상태 등) 실시간 복제 및 게임 결과 기록
-17. **델리게이트 전파(Broadcast)를 이용한 위젯과 게임 로직 간 결합도 최소화(Decoupling) 설계** 
+17. **델리게이트 전파(Broadcast)를 이용한 위젯과 게임 로직 간 결합도 최소화(Decoupling) 설계**
+
+</br>
+
+#### 보다 상세한 내용은 [메인 페이지](https://github.com/kabu0330)를 참고해주세요.
+<p align="center">
+ <img alt="이미지" src=https://github.com/user-attachments/assets/8e390c26-67da-4310-8d4b-720ab377dcda>
+</p>
+
 
 
 ## 구현 상세
