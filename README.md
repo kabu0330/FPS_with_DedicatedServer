@@ -42,13 +42,6 @@ https://youtu.be/8tyiK_7egvI?si=qGpzTXXsj3Ot6rOT
 
 </br>
 
-#### 보다 상세한 내용은 [메인 페이지](https://github.com/kabu0330)를 참고해주세요.
-<p align="center">
- <img alt="이미지" src=https://github.com/user-attachments/assets/8e390c26-67da-4310-8d4b-720ab377dcda>
-</p>
-
-
-
 ## 구현 상세
 ### AWS 기반 서버리스 게임 백엔드 아키텍처
 
